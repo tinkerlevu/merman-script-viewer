@@ -93,15 +93,23 @@ function App(): React.JSX.Element {
               <Tab>Remember</Tab>
               <Tab>Preprocessor</Tab>
               <button onClick={render_merman}>Render</button>
-              <button>Save</button>
-              <button>Save As</button>
-              <input type="checkbox" />Darkmode            </TabList>
+              <input type="checkbox" />Darkmode
+            </TabList>
           </div>
 
           <TabPanel > {/* Write */}
+            <input type="checkbox" />Auto-Refresh
+            <input type="checkbox" />Auto-Render
+            <button>Save</button>
+            <button >Save As</button>
+            ! unsaved changes !
+            error tab that also displays docs for merman syntax
             <CodeEditor type="merman" />
           </TabPanel>
           <TabPanel > {/* Script */}
+            <div>
+              <h2 className='FixedContainer'>Test displacement</h2>
+            </div>
             <GraphViewer src={script_palceholder} />
           </TabPanel>
           <TabPanel> {/* Summary */}
@@ -117,7 +125,16 @@ function App(): React.JSX.Element {
             <MarkdownViewer text={remember_placeholder} />
           </TabPanel>
           <TabPanel> {/* Preprocessor */}
-            <h2>script writer javascript mode, runs function which passes an object as variable STATIC to be called over multiple lines!</h2>
+
+            runs function which passes an object as variable STATIC to be called over multiple lines!
+            <button>New</button>
+            <button>Open</button>
+            a single preprocessor file can be linked to multiple open scripts
+            <button>Save</button>
+            <button >Save As</button>
+            <input type="checkbox" /> Skip (disable for this file)
+            list of open preprocessor files that can be assigned to this file with -None- / default option
+            error, and console log outputs
             <CodeEditor type="javascript" />
           </TabPanel>
         </Tabs>
