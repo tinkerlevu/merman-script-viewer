@@ -1,0 +1,23 @@
+.mainContent {
+  max-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.fixedContainer{
+  flex: 0;
+  height: 50vh
+}
+
+.expandContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1
+}
+
+.contentPage {
+  height: 100%;
+  flex: 1
+}

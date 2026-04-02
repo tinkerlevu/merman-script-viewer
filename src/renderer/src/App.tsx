@@ -10,7 +10,7 @@ import sorted_placeholder from "./assets/test-remove/sorted_placeholder.svg"
 
 
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -24,11 +24,13 @@ import GraphViewer from './components/GraphViewer';
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import '@sinm/react-chrome-tabs/css/chrome-tabs-dark-theme.css';
 // for regular tabs
-// import 'react-tabs/style/react-tabs.css';
+import 'react-tabs/style/react-tabs.css';
 
 
 // my stuff
 import layout from './assets/spacing.module.css';
+import windowDimensions from './components/dynamicSize'
+import ContentHeight from './components/dynamicSize'
 
 
 
@@ -52,6 +54,8 @@ function App(): React.JSX.Element {
     console.log("Start rendering this file")
   }
 
+
+
   // TODO implement missing actions from Tabs like selecting active, etc.
   // TODO fix add file button css styling
   // TODO fix tab icon css styling
@@ -60,29 +64,33 @@ function App(): React.JSX.Element {
   return (
     <>
       <div className={layout.mainContent}>
-        <FileTabBar
-          // darkMode={false}
-          draggable
-          onTabClose={() => console.log("tab close request")}
-          //        onTabReorder={reorder}
-          onTabActive={() => console.log("active tab changed")}
-          // onDragBegin={() => console.log('Drag started')}
-          // onDragEnd={() => console.log('Drag ended')}
-          tabs={fileTabs}
-          pinnedRight={<button style={{ height: "100%" }} onClick={file_open_action}>+</button>}
-        />
+        <div className="FixedContainer">
+          <FileTabBar className="FixedContainer"
+            // darkMode={false}
+            draggable
+            onTabClose={() => console.log("tab close request")}
+            //        onTabReorder={reorder}
+            onTabActive={() => console.log("active tab changed")}
+            // onDragBegin={() => console.log('Drag started')}
+            // onDragEnd={() => console.log('Drag ended')}
+            tabs={fileTabs}
+            pinnedRight={<button style={{ height: "100%" }} onClick={file_open_action}>+</button>}
+          />
+        </div>
 
-        <Tabs className={layout.expandContainer}>
-          <TabList>
-            <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
-            <Tab>Script</Tab>
-            <Tab>Summary</Tab>
-            <Tab>Sorted</Tab>
-            <Tab>Todo</Tab>
-            <Tab>Remember</Tab>
-            <Tab>Preprocessor</Tab>
-            <button onClick={render_merman}>Render</button>
-          </TabList>
+        <Tabs>
+          <div className='FixedContainer'>
+            <TabList>
+              <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
+              <Tab>Script</Tab>
+              <Tab>Summary</Tab>
+              <Tab>Sorted</Tab>
+              <Tab>Todo</Tab>
+              <Tab>Remember</Tab>
+              <Tab>Preprocessor</Tab>
+              <button onClick={render_merman}>Render</button>
+            </TabList>
+          </div>
 
           <TabPanel > {/* Write */}
             <h2>script writer merman mode</h2>
@@ -106,10 +114,11 @@ function App(): React.JSX.Element {
             <h2>script writer javascript mode, runs function which passes an object as variable STATIC to be called over multiple lines!</h2>
           </TabPanel>
         </Tabs>
+        hello
+
+        Height : <span>{ContentHeight()}</span>
 
       </div>
-      <Versions></Versions>
-
     </>
   )
 }
