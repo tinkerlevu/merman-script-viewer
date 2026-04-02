@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@sinm/react-chrome-tabs": "^2.6.3",
+    "prism-react-editor": "^3.1.0",
     "react-tabs": "^6.1.1"
   },
   "devDependencies": {

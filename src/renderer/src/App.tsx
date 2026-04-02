@@ -28,9 +28,10 @@ import 'react-tabs/style/react-tabs.css';
 
 
 // my stuff
-import layout from './assets/spacing.module.css';
+// import layout from './assets/spacing.module.css';
 import windowDimensions from './components/dynamicSize'
 import ContentHeight from './components/dynamicSize'
+import CodeEditor from './components/CodeEditor'
 
 
 
@@ -63,7 +64,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
-      <div className={layout.mainContent}>
+      <div style={{ height: '95vh' }}>
         <div className="FixedContainer">
           <FileTabBar className="FixedContainer"
             // darkMode={false}
@@ -93,9 +94,9 @@ function App(): React.JSX.Element {
           </div>
 
           <TabPanel > {/* Write */}
-            <h2>script writer merman mode</h2>
+            <CodeEditor type="merman" />
           </TabPanel>
-          <TabPanel className={layout.contentPage}> {/* Script */}
+          <TabPanel > {/* Script */}
             <GraphViewer src={script_palceholder} />
           </TabPanel>
           <TabPanel> {/* Summary */}
@@ -112,9 +113,9 @@ function App(): React.JSX.Element {
           </TabPanel>
           <TabPanel> {/* Preprocessor */}
             <h2>script writer javascript mode, runs function which passes an object as variable STATIC to be called over multiple lines!</h2>
+            <CodeEditor type="javascript" />
           </TabPanel>
         </Tabs>
-        hello
 
         Height : <span>{ContentHeight()}</span>
 
