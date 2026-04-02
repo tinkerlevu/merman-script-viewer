@@ -1,12 +1,115 @@
-import Versions from './components/Versions'
+// ------------------------------ TODO REPLACE THESE -------------------------------
+import Versions from './components/Versions' // replace with WORD COUNT
+import test_fav from "./assets/favicons/test.ico"
+import script_palceholder from "./assets/test-remove/script_placeholder.svg"
+import summary_placeholder from "./assets/test-remove/summary_placeholder.svg"
+import sorted_placeholder from "./assets/test-remove/sorted_placeholder.svg"
+
+
+
+
+
+
+import { useState } from 'react';
+import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
+import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
+// my components
+import GraphViewer from './components/GraphViewer';
+
+
+
+// for file tabs
+import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
+import '@sinm/react-chrome-tabs/css/chrome-tabs-dark-theme.css';
+// for regular tabs
+// import 'react-tabs/style/react-tabs.css';
+
+
+// my stuff
+import layout from './assets/spacing.module.css';
+
+
+
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+
+
+
+  const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([
+    { id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
+    { id: "def", favicon: test_fav, title: "test_Doc_name2", active: false },
+  ]);
+
+
+  const file_open_action = () => {
+    window.electron.ipcRenderer.send('file_open')
+  }
+
+  const render_merman = () => {
+    console.log("Start rendering this file")
+  }
+
+  // TODO implement missing actions from Tabs like selecting active, etc.
+  // TODO fix add file button css styling
+  // TODO fix tab icon css styling
+  // TODO add dark mode
 
   return (
     <>
-      <button type="button" onClick={ipcHandle}>Ping</button>
+      <div className={layout.mainContent}>
+        <FileTabBar
+          // darkMode={false}
+          draggable
+          onTabClose={() => console.log("tab close request")}
+          //        onTabReorder={reorder}
+          onTabActive={() => console.log("active tab changed")}
+          // onDragBegin={() => console.log('Drag started')}
+          // onDragEnd={() => console.log('Drag ended')}
+          tabs={fileTabs}
+          pinnedRight={<button style={{ height: "100%" }} onClick={file_open_action}>+</button>}
+        />
+
+        <Tabs className={layout.expandContainer}>
+          <TabList>
+            <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
+            <Tab>Script</Tab>
+            <Tab>Summary</Tab>
+            <Tab>Sorted</Tab>
+            <Tab>Todo</Tab>
+            <Tab>Remember</Tab>
+            <Tab>Preprocessor</Tab>
+            <button onClick={render_merman}>Render</button>
+          </TabList>
+
+          <TabPanel > {/* Write */}
+            <h2>script writer merman mode</h2>
+          </TabPanel>
+          <TabPanel className={layout.contentPage}> {/* Script */}
+            <GraphViewer src={script_palceholder} />
+          </TabPanel>
+          <TabPanel> {/* Summary */}
+            <GraphViewer src={summary_placeholder} />
+          </TabPanel>
+          <TabPanel> {/* Assorted */}
+            <GraphViewer src={sorted_placeholder} />
+          </TabPanel>
+          <TabPanel> {/* Todo.md */}
+            <h2>TODO report markdown viewer</h2>
+          </TabPanel>
+          <TabPanel> {/* Remember.md */}
+            <h2>Remember report markdownviewer</h2>
+          </TabPanel>
+          <TabPanel> {/* Preprocessor */}
+            <h2>script writer javascript mode, runs function which passes an object as variable STATIC to be called over multiple lines!</h2>
+          </TabPanel>
+        </Tabs>
+
+      </div>
       <Versions></Versions>
+
     </>
   )
 }

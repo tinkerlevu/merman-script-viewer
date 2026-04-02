@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -9,6 +9,7 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
+    frame: true,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -16,6 +17,7 @@ function createWindow(): void {
       sandbox: false
     }
   })
+
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -33,7 +35,44 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Open',
+          click: () => { console.log('open file') }
+        },
+        { role: 'quit' },
+      ]
+    },
+    { role: 'editMenu' },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+        { type: 'separator' },
+
+      ]
+    },
+    { role: 'about' },
+  ])
+  Menu.setApplicationMenu(menu)
+  mainWindow.setMenu(menu)
+
 }
+
+
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -49,12 +88,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // IPC ----------------------------------------------------- add more IPC Stuff here
+  ipcMain.on('file_open', () => console.log('file open request'))
 
   createWindow()
 
-  app.on('activate', function () {
+  app.on('activate', function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
