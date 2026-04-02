@@ -4,6 +4,8 @@ import test_fav from "./assets/favicons/test.ico"
 import script_palceholder from "./assets/test-remove/script_placeholder.svg"
 import summary_placeholder from "./assets/test-remove/summary_placeholder.svg"
 import sorted_placeholder from "./assets/test-remove/sorted_placeholder.svg"
+import remember_placeholder from "./assets/test-remove/remember_placeholder.md?raw"
+import todo_placeholder from "./assets/test-remove/todo_placeholder.md?raw"
 
 
 
@@ -32,6 +34,7 @@ import 'react-tabs/style/react-tabs.css';
 import windowDimensions from './components/dynamicSize'
 import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
+import MarkdownViewer from './components/MarkdownViewer'
 
 
 
@@ -90,7 +93,9 @@ function App(): React.JSX.Element {
               <Tab>Remember</Tab>
               <Tab>Preprocessor</Tab>
               <button onClick={render_merman}>Render</button>
-            </TabList>
+              <button>Save</button>
+              <button>Save As</button>
+              <input type="checkbox" />Darkmode            </TabList>
           </div>
 
           <TabPanel > {/* Write */}
@@ -106,10 +111,10 @@ function App(): React.JSX.Element {
             <GraphViewer src={sorted_placeholder} />
           </TabPanel>
           <TabPanel> {/* Todo.md */}
-            <h2>TODO report markdown viewer</h2>
+            <MarkdownViewer text={todo_placeholder} />
           </TabPanel>
           <TabPanel> {/* Remember.md */}
-            <h2>Remember report markdownviewer</h2>
+            <MarkdownViewer text={remember_placeholder} />
           </TabPanel>
           <TabPanel> {/* Preprocessor */}
             <h2>script writer javascript mode, runs function which passes an object as variable STATIC to be called over multiple lines!</h2>
