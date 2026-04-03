@@ -1249,8 +1249,11 @@ class ReportItem:
 
 # START ADAPTING FROM HERE:
 
+  # def run(merman_filetext):
 
-def run(merman_filetext, params):
+merman_filetext = filedata
+
+if True:
 
     print("> Reading Lines.......\t", end='')
 
@@ -1300,7 +1303,6 @@ def run(merman_filetext, params):
 # ------ CLASSIFY SCRIPT LINES -------
 
         # for a normal line in the script, determine what type of command it is
-
 
     def classify(line):
         if line.is_style():
@@ -1455,7 +1457,6 @@ def run(merman_filetext, params):
 # -------- Map Splits and Joins ---------
 
             # recursive function throws error (from split line) if end of array is encountered before join:
-
 
     def map_split(splitpoint, index, script):
         previous_line = None  # the previous line in the loop
@@ -1828,7 +1829,7 @@ def run(merman_filetext, params):
 
     print("< DONE >")
 
-    return OUTPUTS
+    print(OUTPUTS)
 
 
 # UPDATE MERMAN SYNTAX, WITH UPDATED independent pointers, that start with '-' like a bullet point list (indicate these special pointers with italics)
@@ -1850,3 +1851,6 @@ def run(merman_filetext, params):
     # or swap references and pointers: ??? NO
     #    &Reference NO
     #    *Pointer NO
+#
+
+# run(filedata)

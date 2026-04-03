@@ -25,6 +25,7 @@ export default async function full_render() {
 
   console.log(mermaid)
 
+  console.log("finished")
 }
 
 
@@ -34,6 +35,7 @@ export default async function full_render() {
 async function translate_merman(file_lines) {
   const fs = require('fs')
   const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
+
   console.log(MERMAN_CODE)
 
   const pyodide = await loadPyodide();
