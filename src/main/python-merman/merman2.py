@@ -8,6 +8,8 @@ import copy
 
 
 class MermanLine:
+    global re
+    global copy
     # meta functions ----
 
     def __init__(self, text, line_number):
@@ -752,6 +754,8 @@ class Join(Linkable):
 
 
 class GraphNode(Linkable):
+    global Pointer
+    global Reference
 
     # NOTE IMPLEMENT titles? |hello| or special char: \|
 
@@ -1249,11 +1253,16 @@ class ReportItem:
 
 # START ADAPTING FROM HERE:
 
-  # def run(merman_filetext):
 
-merman_filetext = filedata
+def run(merman_filetext):
+    global MermanLine
+    global Subgraph
+    global Linkable
+    global Split
+    global DescendantLink
+    global Style
 
-if True:
+  # JUST KEEP ADDING TO THIS!!! <<<<<<<<<<<<<<<<<<
 
     print("> Reading Lines.......\t", end='')
 
@@ -1305,6 +1314,8 @@ if True:
         # for a normal line in the script, determine what type of command it is
 
     def classify(line):
+        global GraphNode
+
         if line.is_style():
             return Style(line)
         if line.is_section():
@@ -1829,7 +1840,7 @@ if True:
 
     print("< DONE >")
 
-    print(OUTPUTS)
+    return OUTPUTS
 
 
 # UPDATE MERMAN SYNTAX, WITH UPDATED independent pointers, that start with '-' like a bullet point list (indicate these special pointers with italics)
@@ -1852,5 +1863,11 @@ if True:
     #    &Reference NO
     #    *Pointer NO
 #
+# WARNING: code adaptation incomplete, test this code out with the full proper test files to check if all globals are added properly
 
-# run(filedata)
+# WARNING: remove this line, to improve performance
+print(run(filedata))
+
+
+# NOTE: filedata is the data passed from node to the python code when running in local scope
+run(filedata)

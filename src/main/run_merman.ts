@@ -20,7 +20,6 @@ const test_merman = [
 
 
 export default async function full_render() {
-  const json_string = JSON.stringify(test_merman)
   const mermaid = await translate_merman(test_merman)
 
   console.log(mermaid)
@@ -35,8 +34,6 @@ export default async function full_render() {
 async function translate_merman(file_lines) {
   const fs = require('fs')
   const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
-
-  console.log(MERMAN_CODE)
 
   const pyodide = await loadPyodide();
   const locals = pyodide.toPy({ filedata: file_lines })

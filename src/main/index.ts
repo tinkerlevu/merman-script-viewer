@@ -94,6 +94,9 @@ app.whenReady().then(() => {
   // ipcMain.on('file_open', () => console.log('file open request'))
   ipcMain.on('render', render_merman);
 
+  // WARNING: remove this line:
+  render_merman()
+
   createWindow()
 
 
