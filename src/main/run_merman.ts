@@ -1,8 +1,7 @@
 import { loadPyodide, toPy } from "pyodide";
-import { json } from "stream/consumers";
-
-
-
+//
+// TODO TEST THIS FILE PATH FOR PRODUCTION AND BUILD
+import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 
 const test_code = `
 s = "hello world potato"
@@ -33,9 +32,13 @@ export default async function full_render() {
 
 // json string has to be an array, where each entry is each line in the file, but it's a single string
 async function translate_merman(file_lines) {
+  const fs = require('fs')
+  const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
+  console.log(MERMAN_CODE)
+
   const pyodide = await loadPyodide();
   const locals = pyodide.toPy({ filedata: file_lines })
-  return pyodide.runPython(test_code, { locals })
+  return pyodide.runPython(MERMAN_CODE, { locals })
 }
 
 
