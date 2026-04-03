@@ -37,7 +37,8 @@ async function translate_merman(file_lines) {
 
   const pyodide = await loadPyodide();
   const locals = pyodide.toPy({ filedata: file_lines })
-  return pyodide.runPython(MERMAN_CODE, { locals })
+  const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
+  return evaluated.toJs()
 }
 
 
