@@ -13,6 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview -- --ozone-platform=x11",
     "dev": "electron-vite dev -- --ozone-platform=x11",
+    "dev:watch": "electron-vite dev --watch -- --ozone-platform=x11",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
@@ -26,6 +27,7 @@
     "@sinm/react-chrome-tabs": "^2.6.3",
     "@uiw/react-markdown-preview": "^5.2.0",
     "prism-react-editor": "^3.1.0",
+    "pyodide": "^0.29.3",
     "react-tabs": "^6.1.1"
   },
   "devDependencies": {

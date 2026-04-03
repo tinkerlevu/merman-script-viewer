@@ -6,5 +6,3 @@ declare global {
     api: unknown
   }
 }
-
-type EditorType = "js" | "merman"

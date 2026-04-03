@@ -55,7 +55,7 @@ function App(): React.JSX.Element {
   }
 
   const render_merman = () => {
-    console.log("Start rendering this file")
+    window.electron.ipcRenderer.send('render')
   }
 
 

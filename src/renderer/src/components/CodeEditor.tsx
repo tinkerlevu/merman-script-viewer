@@ -50,7 +50,7 @@ export default function CodeEditor(
 
 
 
-  return <Editor language={highlighting} value="const foo = 'bar' dookie">
+  return <Editor language={highlighting} value="const foo = 'bar'">
     <BasicSetup />
   </Editor>
 }
