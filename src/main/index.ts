@@ -2,8 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import hello_python from './run_merman'
-import full_render from './run_merman'
+import full_render, { sendRenderInfo } from './run_merman'
 
 function createWindow(): void {
   // Create the browser window.
@@ -97,7 +96,8 @@ app.whenReady().then(() => {
 
   // IPC ----------------------------------------------------- add more IPC Stuff here
   // ipcMain.on('file_open', () => console.log('file open request'))
-  ipcMain.on('render', render_merman);
+  ipcMain.on('render', full_render);
+  ipcMain.on('renderer_initalized', sendRenderInfo);
 
   createWindow()
 
@@ -122,7 +122,4 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 //
 //
-function render_merman() {
-  full_render()
-}
 

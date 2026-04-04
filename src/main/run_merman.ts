@@ -1,5 +1,5 @@
 import { loadPyodide, toPy } from "pyodide";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, IpcMainEvent } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
 
@@ -30,7 +30,7 @@ var renderWindows: Array<BrowserWindow> = []
 export default async function full_render() {
   const mermaid = await translate_merman(test_merman)
 
-  console.log(mermaid)
+  // console.log(mermaid)
 
   console.log("finished")
 
@@ -50,8 +50,6 @@ async function translate_merman(file_lines) {
   const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
   return evaluated.toJs()
 }
-
-
 
 
 function createRenderWindow(): void {
@@ -74,18 +72,20 @@ function createRenderWindow(): void {
 
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    console.log(process.env['ELECTRON_RENDERER_URL'])
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/mermaid_render_index.html')
+    renderWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/mermaid_render_index.html')
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/mermaid_render_index.html'))
+    renderWindow.loadFile(join(__dirname, '../renderer/mermaid_render_index.html'))
   }
 
-
+  console.log("id:", renderWindow.webContents.id)
 }
 
 
+export function sendRenderInfo(event, data): void {
+  console.log("EVENT", event)
+  console.log("DATA", data)
 
-
+}
 
 
 
