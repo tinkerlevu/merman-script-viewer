@@ -61,18 +61,21 @@ const MermaidChart = (
 // get and render data
 
 
+// TODO: REMOVE
 const test_def = 'graph TB\na-->b'
 
 
 
 function Renderer(): React.JSX.Element {
   var [scriptDef, setScriptDef] = useState(null);
-  var summary_def = null
-  var sort_def = null
+  var [summaryDef, setSummaryDef] = useState(null);
+  var [sortDef, setSortDef] = useState(null);
 
 
   window.electron.ipcRenderer.on('start_render', (event, data) => {
     setScriptDef(data.script.join(''))
+    setSummaryDef(data.summary.join(''))
+    setSortDef(data.sorted.join(''))
   })
 
 
@@ -93,6 +96,18 @@ function Renderer(): React.JSX.Element {
       chart={scriptDef}
       type="script"
       isDone={setScriptDone}
+      afterDone={checkDone}
+    />
+    <MermaidChart
+      chart={summaryDef}
+      type="summary"
+      isDone={setSummaryDone}
+      afterDone={checkDone}
+    />
+    <MermaidChart
+      chart={sortDef}
+      type="sorted"
+      isDone={setSortDone}
       afterDone={checkDone}
     />
   </>)

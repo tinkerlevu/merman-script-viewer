@@ -3,9 +3,10 @@ import { BrowserWindow, IpcMainEvent } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
 
+import { AssignedRenderWindow } from "./env";
+
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
-import { AssignedBrowserWindow } from "./env";
 
 // TODO: remove
 const test_code = `
@@ -22,9 +23,6 @@ const test_merman = [
   'special: "node with references" *reference1 *reference2',
 ]
 
-// NOTE: this is where all the currently open mermaid render windows are
-var runningRenderWindows: Array<AssignedBrowserWindow> = []
-
 const test_render_data = {
   script: [
     'graph TD\n',
@@ -36,6 +34,10 @@ const test_render_data = {
     'reference1 ==> _6 ;;reference2 ==> _6;;\n'
   ],
 }
+// NOTE: this is where all the currently open mermaid render windows are
+var runningRenderWindows: Array<AssignedRenderWindow> = []
+
+
 
 
 export default async function full_render() {
@@ -47,7 +49,9 @@ export default async function full_render() {
 
   renderWindow.webContents.on('did-finish-load', () => {
     // IPC comms here
+    // TODO: add mmd_filepath to mermaid stuff? or to browserwindow preload?
     renderWindow.webContents.send('start_render', mermaid)
+    console.log(mermaid)
   })
 
 
@@ -69,6 +73,7 @@ async function translate_merman(file_lines) {
   const pyodide = await loadPyodide();
   const locals = pyodide.toPy({ filedata: file_lines })
   const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
+
   return evaluated.toJs()
 }
 
@@ -83,6 +88,7 @@ function createRenderWindow(): BrowserWindow {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      // TODO: adjust this number to largest file length
       additionalArguments: ['--maxMermaidChars=69420'],
     }
   })

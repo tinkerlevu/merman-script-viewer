@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron"
 
-type AssignedBrowserWindow = {
+type AssignedRenderWindow = {
   bWindow: BrowserWindow,
   mmn_filepath: string
 }
