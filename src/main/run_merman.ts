@@ -5,6 +5,7 @@ import { is } from "@electron-toolkit/utils";
 
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
+import { AssignedBrowserWindow } from "./env";
 
 // TODO: remove
 const test_code = `
@@ -22,19 +23,39 @@ const test_merman = [
 ]
 
 // NOTE: this is where all the currently open mermaid render windows are
-var renderWindows: Array<BrowserWindow> = []
+var runningRenderWindows: Array<AssignedBrowserWindow> = []
 
-
+const test_render_data = {
+  script: [
+    'graph TD\n',
+    'my_ID("hi here<br>"):::why\n',
+    '_4("node with <br> pointers<br>"):::special\n',
+    '_6("node with references<br>"):::special\n',
+    'my_ID==> _4;\n',
+    '_4 ==> terminating; _4 ==> non_terminating;\n',
+    'reference1 ==> _6 ;;reference2 ==> _6;;\n'
+  ],
+}
 
 
 export default async function full_render() {
   const mermaid = await translate_merman(test_merman)
 
-  // console.log(mermaid)
+  // TODO: check if mermaid translation is successful before starting this create render window
 
-  console.log("finished")
+  const renderWindow = createRenderWindow()
 
-  createRenderWindow()
+  renderWindow.webContents.on('did-finish-load', () => {
+    // IPC comms here
+    renderWindow.webContents.send('start_render', mermaid)
+  })
+
+
+  runningRenderWindows.push({
+    bWindow: renderWindow,
+    mmn_filepath: "test" // TODO: replace with proper filepath
+  })
+
 }
 
 
@@ -52,7 +73,7 @@ async function translate_merman(file_lines) {
 }
 
 
-function createRenderWindow(): void {
+function createRenderWindow(): BrowserWindow {
   const renderWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -61,12 +82,13 @@ function createRenderWindow(): void {
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      additionalArguments: ['--maxMermaidChars=69420'],
     }
   })
 
+  // TODO: remove this
   renderWindow.on('ready-to-show', () => {
-    // TODO: add communications stuff here
     renderWindow.show()
   })
 
@@ -77,14 +99,17 @@ function createRenderWindow(): void {
     renderWindow.loadFile(join(__dirname, '../renderer/mermaid_render_index.html'))
   }
 
-  console.log("id:", renderWindow.webContents.id)
+
+  // TODO: remove this
+  console.log("new Render window id:", renderWindow.webContents.id)
+
+  return renderWindow;
 }
 
 
-export function sendRenderInfo(event, data): void {
+export function handleFinishedRender(event, data): void {
   console.log("EVENT", event)
   console.log("DATA", data)
-
 }
 
 

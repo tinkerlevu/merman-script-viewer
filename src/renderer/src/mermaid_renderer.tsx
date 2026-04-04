@@ -2,28 +2,28 @@
 // import './assets/base.css'
 
 import mermaid from 'mermaid'
-import { StrictMode, useEffect, useRef } from 'react'
+import { ReactSVGElement, StrictMode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 
 
 
-function Renderer(): React.JSX.Element {
-  const init = useEffect(() => {
-    console.log('hello init')
-    window.electron.ipcRenderer.send('renderer_initalized', 'payload')
-  })
+// Initialize mermaid
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'default',
+  securityLevel: 'loose',
+});
 
-  return (
-    <>
-      <div></div>
-    </>
-  )
-}
 
-const test_def = 'graph TB\na-->b'
-
-const MermaidChart = ({ chart }) => { // TODO: add type variable for ipccallback
+const MermaidChart = (
+  { chart, type, isDone, afterDone }: {
+    chart: string | null,
+    type: string,
+    isDone: (newValue: boolean) => void,
+    afterDone: () => void
+  }
+) => { // TODO: add type variable for ipccallback
   const divRef = useRef(null);
 
   useEffect(() => {
@@ -31,13 +31,22 @@ const MermaidChart = ({ chart }) => { // TODO: add type variable for ipccallback
       // Generate unique ID for rendering
       const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
 
+      if (!chart) return; // if chart is null
+
       // Render the diagram
       mermaid.render(id, chart).then(({ svg }) => {
         if (divRef.current) {
           divRef.current.innerHTML = svg;
         }
-        // WARNING: change the channel on this send:
-        window.electron.ipcRenderer.send('renderer_initalized', svg)
+        window.electron.ipcRenderer.send(
+          'render_done',
+          {
+            type: type,
+            svg: svg
+          })
+
+        isDone(true); // set corresponding done flag to true
+        afterDone()
       });
     }
   }, [chart]);
@@ -47,13 +56,54 @@ const MermaidChart = ({ chart }) => { // TODO: add type variable for ipccallback
 
 
 
+// ---------- END OF MERMAID STUFF
+//
+// get and render data
+
+
+const test_def = 'graph TB\na-->b'
+
+
+
+function Renderer(): React.JSX.Element {
+  var [scriptDef, setScriptDef] = useState(null);
+  var summary_def = null
+  var sort_def = null
+
+
+  window.electron.ipcRenderer.on('start_render', (event, data) => {
+    setScriptDef(data.script.join(''))
+  })
+
+
+  var [scriptDone, setScriptDone] = useState(false);
+  var [summaryDone, setSummaryDone] = useState(false);
+  var [sortDone, setSortDone] = useState(false);
+
+  // sets script Done, summary done, etc. to true and checks if everything is done or not
+  const checkDone = () => {
+    console.log("CHECKING if DONE")
+    if (scriptDone && summaryDone && sortDone) {
+      // TODO: send ipc message to close window here
+      console.log("ALL DONE")
+    }
+  }
+  return (<>
+    <MermaidChart
+      chart={scriptDef}
+      type="script"
+      isDone={setScriptDone}
+      afterDone={checkDone}
+    />
+  </>)
+}
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     hello worold lsdkfjsdlfkjsdj
     <Renderer />
-    <MermaidChart chart={test_def} />
+
   </StrictMode>
 )
 
