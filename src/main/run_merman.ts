@@ -8,6 +8,11 @@ import { AssignedRenderWindow } from "./env";
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 
+
+
+
+
+
 // TODO: remove
 const test_code = `
 s = "hello world potato"
@@ -34,6 +39,14 @@ const test_render_data = {
     'reference1 ==> _6 ;;reference2 ==> _6;;\n'
   ],
 }
+
+
+
+
+
+
+
+
 // NOTE: this is where all the currently open mermaid render windows are
 var runningRenderWindows: Array<AssignedRenderWindow> = []
 
@@ -51,7 +64,6 @@ export default async function full_render() {
     // IPC comms here
     // TODO: add mmd_filepath to mermaid stuff? or to browserwindow preload?
     renderWindow.webContents.send('start_render', mermaid)
-    console.log(mermaid)
   })
 
 

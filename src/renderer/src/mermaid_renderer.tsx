@@ -2,7 +2,7 @@
 // import './assets/base.css'
 
 import mermaid from 'mermaid'
-import { ReactSVGElement, StrictMode, useEffect, useRef, useState } from 'react'
+import { StrictMode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 
@@ -13,6 +13,9 @@ mermaid.initialize({
   startOnLoad: true,
   theme: 'default',
   securityLevel: 'loose',
+  // TODO: add more configurations here!
+  maxTextSize: Number.MAX_SAFE_INTEGER,
+  maxEdges: Number.MAX_SAFE_INTEGER,
 });
 
 
@@ -20,7 +23,7 @@ const MermaidChart = (
   { chart, type, isDone, afterDone }: {
     chart: string | null,
     type: string,
-    isDone: (newValue: boolean) => void,
+    isDone: () => void,
     afterDone: () => void
   }
 ) => { // TODO: add type variable for ipccallback
@@ -45,7 +48,7 @@ const MermaidChart = (
             svg: svg
           })
 
-        isDone(true); // set corresponding done flag to true
+        isDone(); // set corresponding done flag to true
         afterDone()
       });
     }
@@ -79,35 +82,42 @@ function Renderer(): React.JSX.Element {
   })
 
 
-  var [scriptDone, setScriptDone] = useState(false);
-  var [summaryDone, setSummaryDone] = useState(false);
-  var [sortDone, setSortDone] = useState(false);
+  var scriptDone = false;
+  var summaryDone = false;
+  var sortDone = false;
 
   // sets script Done, summary done, etc. to true and checks if everything is done or not
   const checkDone = () => {
-    console.log("CHECKING if DONE")
+    console.log("CHECKING if DONE", scriptDone, summaryDone, sortDone)
     if (scriptDone && summaryDone && sortDone) {
       // TODO: send ipc message to close window here
       console.log("ALL DONE")
     }
+
+    // NOTE: this can be used to pass params to mermaid:
+    // console.log(JSON.parse(
+    //   process.argv.find(
+    //     arg => arg.startsWith('--maxMermaidChars')
+    //   ).split('=')[1])
+    // )
   }
   return (<>
     <MermaidChart
       chart={scriptDef}
       type="script"
-      isDone={setScriptDone}
+      isDone={() => scriptDone = true}
       afterDone={checkDone}
     />
     <MermaidChart
       chart={summaryDef}
       type="summary"
-      isDone={setSummaryDone}
+      isDone={() => summaryDone = true}
       afterDone={checkDone}
     />
     <MermaidChart
       chart={sortDef}
       type="sorted"
-      isDone={setSortDone}
+      isDone={() => sortDone = true}
       afterDone={checkDone}
     />
   </>)
