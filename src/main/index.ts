@@ -46,6 +46,11 @@ function createWindow(): void {
           label: 'Open',
           click: () => { console.log('open file') }
         },
+        {
+          label: 'DEBUG',
+          click: () => { mainWindow.webContents.openDevTools() }
+
+        },
         { role: 'quit' },
       ]
     },
@@ -93,9 +98,6 @@ app.whenReady().then(() => {
   // IPC ----------------------------------------------------- add more IPC Stuff here
   // ipcMain.on('file_open', () => console.log('file open request'))
   ipcMain.on('render', render_merman);
-
-  // WARNING: remove this line:
-  render_merman()
 
   createWindow()
 

@@ -1864,11 +1864,8 @@ def run(merman_filetext):
     #    *Pointer NO
 #
 # WARNING: code adaptation incomplete, test this code out with the full proper test files to check if all globals are added properly
-# WARNING code sometimes produces double semicolons or sth idk fix it
 
-# WARNING: remove this line, to improve performance
-print(run(filedata))
+# WARNING: code sometimes produces double semicolons or sth idk fix it
 
-
-# NOTE: filedata is the data passed from node to the python code when running in local scope
+# NOTE: filedata is the data passed from node to the python code when running in local scope, the value of the last statement is returned
 run(filedata)
