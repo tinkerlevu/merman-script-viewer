@@ -44,16 +44,72 @@ function App(): React.JSX.Element {
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
 
+  const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
+
+
+  // NOTE: ---------- file handling
 
   const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([
-    { id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
-    { id: "def", favicon: test_fav, title: "test_Doc_name2", active: false },
+    // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
+    // {id: "def", favicon: test_fav, title: "test_Doc_name2", active: false },
   ]);
 
+  const [activeFile, setActiveFile] = useState<OpenFile>({
+    filepath: "",
+    text: ""
+  })
+
+  window.electron.ipcRenderer.on('file_change', (e, data) => {
+    console.log('recieved', e, data)
+
+    console.log(openFiles.find( // existing file not found
+      (item) => item.filepath == data.filepath))
+
+    console.log("openfiles", openFiles)
+
+    if (-1 >= openFiles.findIndex( // existing file not found
+      (item) => item.filepath == data.filepath)) {
+
+      const newFile = {
+        filepath: data.filepath,
+        text: data.text
+      }
+
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFile(newFile)
+
+      setFileTabs([...fileTabs, {
+        id: data.filepath,
+        favicon: test_fav, // TODO: replace this with proper favicon
+        title: data.title,
+        active: true
+      }])
+
+
+    } else { // NOTE:: File Already opened
+      const changed_file = openFiles.find(
+        (i) => i.filepath == data.filepath)
+
+
+      //@ts-ignore then modify entry in array?
+      if (changed_file.text != data.text) {
+        //@ts-ignore
+        changed_file.text = data.text
+        console.log("reloading")
+      }
+    }
+
+  })
+  //
+  // TODO: add a file close method
+  // WARNING: file close method is needed to stop file modify monitoring
+
+  // NOTE: ---------- end of file handling
 
   const file_open_action = () => {
     window.electron.ipcRenderer.send('file_open')
   }
+
 
   const render_merman = () => {
     window.electron.ipcRenderer.send('render')
@@ -75,11 +131,17 @@ function App(): React.JSX.Element {
             draggable
             onTabClose={() => console.log("tab close request")}
             //        onTabReorder={reorder}
-            onTabActive={() => console.log("active tab changed")}
+            onTabActive={() => console.log(fileTabs)}
             // onDragBegin={() => console.log('Drag started')}
             // onDragEnd={() => console.log('Drag ended')}
             tabs={fileTabs}
-            pinnedRight={<button style={{ height: "100%" }} onClick={file_open_action}>+</button>}
+            pinnedRight={
+              <button
+                style={{ height: "100%" }}
+                onClick={file_open_action}>
+                +
+              </button>
+            }
           />
         </div>
 
@@ -99,7 +161,7 @@ function App(): React.JSX.Element {
           </div>
 
           <TabPanel > {/* Write */}
-            <MermanEditor />
+            <MermanEditor ActiveFile={activeFile} />
           </TabPanel>
           <TabPanel > {/* Script */}
             <div>

@@ -4,15 +4,24 @@ import { useRef, useState } from "react";
 
 
 
-export default function MermanEditor(): React.JSX.Element {
+export default function MermanEditor(
+  { ActiveFile }: { ActiveFile: OpenFile }
+): React.JSX.Element {
   const editorRef = useRef<PrismEditor>(null);
-  const [writeValue, setWriteValue] = useState("var foo = bar")
   const [unsavedChanges, setUnsavedChanges] = useState(false)
 
   const saveFile = () => {
-    setUnsavedChanges(false)
-    console.log(editorRef.current?.value) // recommended way to get editor state
-    setWriteValue("test") // overwrite current value of editor
+    window.electron.ipcRenderer.send('save_file', {
+      filepath: ActiveFile.filepath,
+      text: editorRef.current?.value // recommended way to get editor state
+    })
+  }
+
+  const textUpdated = () => {
+    if (editorRef.current?.value == ActiveFile.text)
+      setUnsavedChanges(false)
+    else
+      setUnsavedChanges(true)
   }
 
 
@@ -33,9 +42,9 @@ export default function MermanEditor(): React.JSX.Element {
     error tab that also displays docs for merman syntax
     <CodeEditor
       type="merman"
-      value={writeValue}
+      value={ActiveFile.text}
       ref={editorRef}
-      onUpdate={() => { setUnsavedChanges(true) }}
+      onUpdate={textUpdated}
     />
   </>)
 }

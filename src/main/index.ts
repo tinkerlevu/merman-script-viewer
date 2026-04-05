@@ -2,7 +2,9 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import full_render, { handleFinishedRender, sendRenderInfo } from './run_merman'
+import full_render, { handleFinishedRender } from './runMerman'
+import openMermaidFile, { initalizeFS, writeFileContents } from './fileManagement'
+
 
 function createWindow(): void {
   // Create the browser window.
@@ -75,6 +77,9 @@ function createWindow(): void {
   Menu.setApplicationMenu(menu)
   mainWindow.setMenu(menu)
 
+
+  initalizeFS(mainWindow)
+
 }
 
 
@@ -94,8 +99,14 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC ----------------------------------------------------- add more IPC Stuff here
-  // ipcMain.on('file_open', () => console.log('file open request'))
+  // NOTE: add IPC stuff here
+
+  // File management
+  ipcMain.on('file_open', openMermaidFile)
+  ipcMain.on('save_file', (_, data) =>
+    writeFileContents(data.filepath, data.text))
+
+  // Render Management
   ipcMain.on('render', full_render);
   ipcMain.on('render_done', handleFinishedRender);
 
