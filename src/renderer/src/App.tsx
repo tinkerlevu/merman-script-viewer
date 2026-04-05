@@ -35,6 +35,7 @@ import windowDimensions from './components/dynamicSize'
 import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
+import MermanEditor from './components/MermanEditor'
 
 
 
@@ -69,7 +70,7 @@ function App(): React.JSX.Element {
     <>
       <div style={{ height: '95vh' }}>
         <div className="FixedContainer">
-          <FileTabBar className="FixedContainer"
+          <FileTabBar
             // darkMode={false}
             draggable
             onTabClose={() => console.log("tab close request")}
@@ -98,13 +99,7 @@ function App(): React.JSX.Element {
           </div>
 
           <TabPanel > {/* Write */}
-            <input type="checkbox" />Auto-Refresh
-            <input type="checkbox" />Auto-Render
-            <button>Save</button>
-            <button >Save As</button>
-            ! unsaved changes !
-            error tab that also displays docs for merman syntax
-            <CodeEditor type="merman" />
+            <MermanEditor />
           </TabPanel>
           <TabPanel > {/* Script */}
             <div>

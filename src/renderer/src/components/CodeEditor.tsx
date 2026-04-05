@@ -1,6 +1,6 @@
 // DEFAULTS
 
-import { Editor } from "prism-react-editor"
+import { Editor, PrismEditor } from "prism-react-editor"
 import { BasicSetup } from "prism-react-editor/setups"
 
 // Adding the JSX grammar
@@ -16,6 +16,7 @@ import "prism-react-editor/themes/github-dark.css"
 import "prism-react-editor/search.css"
 import "prism-react-editor/invisibles.css"
 import { languages } from "prism-react-editor/prism"
+import { RefObject } from "react"
 
 
 
@@ -38,19 +39,27 @@ languages['merman'] = MermanLanguage
 
 
 
-
 export default function CodeEditor(
-  { type }: { type: EditorType }
-): React.JSX.Element {
+  { type, ref, value, onUpdate }: {
+    type: EditorType,
+    ref: RefObject<PrismEditor | null>,
+    value: string
+    onUpdate: () => void
+  }): React.JSX.Element {
 
-  console.log(languages)
   // setup editor stuff here
   //
   var highlighting = type === "javascript" ? 'javascript' : 'merman';
+  if (!value) value = "var foo = bar"
 
 
 
-  return <Editor language={highlighting} value="const foo = 'bar'">
+  return <Editor
+    language={highlighting}
+    value={value}
+    ref={ref}
+    onUpdate={onUpdate}
+  >
     <BasicSetup />
   </Editor>
 }

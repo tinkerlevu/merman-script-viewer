@@ -14,16 +14,11 @@ const calculate_new_height = () => {
   // update measurements and calculations here
   //
 
-  console.log(fixed_elements, fixed_elements.length)
-
   var used_space: number = 0;
 
   for (let item of fixed_elements) {
-    console.log(item.id)
-    console.log(item.getBoundingClientRect().height)
     used_space += item.getBoundingClientRect().height
   }
-  console.log(used_space)
 
   return viewport_height - used_space
 

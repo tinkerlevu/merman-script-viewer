@@ -100,8 +100,8 @@ function createRenderWindow(): BrowserWindow {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      // TODO: adjust this number to largest file length
-      additionalArguments: ['--maxMermaidChars=69420'],
+      // NOTE: that this is how to pass args before init, might not be necessary
+      // additionalArguments: ['--maxMermaidChars=69420'],
     }
   })
 
@@ -132,6 +132,7 @@ export function handleFinishedRender(event, data): void {
 
 
 
+// TODO: REMOVE THIS
 export async function hello_python() {
   const pyodide = await loadPyodide();
   console.log(pyodide.runPython("1 + 2"));
