@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import full_render, { handleFinishedRender, initalizeMermaidRenderer } from './runMerman'
+import full_render, { handleFinishedRender, setupMermaidRenderer } from './runMerman'
 import openMermaidFile, { initalizeFS, writeFileContents } from './fileManagement'
 
 
@@ -79,7 +79,7 @@ function createWindow(): void {
 
 
   initalizeFS(mainWindow)
-  initalizeMermaidRenderer(mainWindow)
+  setupMermaidRenderer(mainWindow)
 
 }
 

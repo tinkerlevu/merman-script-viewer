@@ -4,6 +4,8 @@ type EditorType = "javascript" | "merman";
 
 type FileIDH = string
 
+type RenderType = "script" | "summary" | "sorted"
+
 type RenderedImage = {
   svg: string,
   hash: string,

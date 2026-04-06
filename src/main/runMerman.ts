@@ -12,7 +12,7 @@ import { createHash } from "crypto";
 
 var mainWindow: BrowserWindow // very hacky ikik
 
-export const initMermaidRenderer = (mainInterface: BrowserWindow) =>
+export const setupMermaidRenderer = (mainInterface: BrowserWindow) =>
   mainWindow = mainInterface
 
 

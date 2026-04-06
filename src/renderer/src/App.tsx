@@ -152,8 +152,11 @@ function App(): React.JSX.Element {
   }
 
 
-  // NOTE: ---------- mermaid Rendering
+  // NOTE: ---------- Displaying Renders
   //
+
+  const [refresher, setRefresher] = useState<number>(0)
+
   const mermanEditorRef = useRef({ get_text: () => " " });
 
   const render_merman = () => {
@@ -175,8 +178,6 @@ function App(): React.JSX.Element {
         render_status: "done"
       }
 
-      console.log(new_image)
-
       if (update_file) {
         if (data.type == "script")
           update_file.script = new_image
@@ -184,6 +185,8 @@ function App(): React.JSX.Element {
           update_file.summary = new_image
         if (data.type == "sorted")
           update_file.sorted = new_image
+
+        setRefresher(refresher + 1) // refresh all image displays
       }
       else {
         console.log("file not found")
@@ -196,7 +199,7 @@ function App(): React.JSX.Element {
 
   // TODO: text_hash
   // set hash
-  // NOTE: ---------- end of mermaid Rendering
+  // NOTE: ---------- end of Displaying Renders
 
 
 
@@ -244,7 +247,7 @@ function App(): React.JSX.Element {
             </TabList>
           </div>
 
-          <TabPanel > {/* Write */}
+          <TabPanel forceRender={true}> {/* Write */}
             <MermanEditor
               ActiveFile={activeFile}
               ref={mermanEditorRef}
@@ -254,13 +257,25 @@ function App(): React.JSX.Element {
             <div>
               <h2 className='FixedContainer'>Test displacement</h2>
             </div>
-            <GraphViewer src={script_palceholder} />
+            <GraphViewer
+              activeFile={activeFile}
+              type="script"
+              refresh={refresher}
+            />
           </TabPanel>
           <TabPanel> {/* Summary */}
-            <GraphViewer src={summary_placeholder} />
+            <GraphViewer
+              activeFile={activeFile}
+              type="summary"
+              refresh={refresher}
+            />
           </TabPanel>
           <TabPanel> {/* Assorted */}
-            <GraphViewer src={sorted_placeholder} />
+            <GraphViewer
+              activeFile={activeFile}
+              type="sorted"
+              refresh={refresher}
+            />
           </TabPanel>
           <TabPanel> {/* Todo.md */}
             <MarkdownViewer text={todo_placeholder} />
