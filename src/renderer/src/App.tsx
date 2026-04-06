@@ -59,6 +59,11 @@ function App(): React.JSX.Element {
     render_status: "none",
   }
 
+  const blank_markdown: RenderedMD = {
+    text: "",
+    hash: "",
+    render_status: "none",
+  }
 
   const [activeFile, setActiveFile] = useState<OpenFile>({
     filepath: "",
@@ -67,6 +72,8 @@ function App(): React.JSX.Element {
     script: blank_img,
     summary: blank_img,
     sorted: blank_img,
+    todo: blank_markdown,
+    remember: blank_markdown
 
   })
 
@@ -113,6 +120,8 @@ function App(): React.JSX.Element {
           script: blank_img,
           summary: blank_img,
           sorted: blank_img,
+          todo: blank_markdown,
+          remember: blank_markdown
           // TODO: assigned preprocessor
         }
 
@@ -168,17 +177,27 @@ function App(): React.JSX.Element {
   }
 
   useEffect(
-    window.electron.ipcRenderer.on("new_rendered_image", (_, data) => {
+    window.electron.ipcRenderer.on("new_render", (_, data) => {
       console.log(data.filepath)
       console.log("image updating", activeFile)
-      const update_file = getOpenFile(data.filepath)
-      const new_image: RenderedImage = {
-        svg: data.svg,
-        hash: data.hash,
-        render_status: "done"
-      }
 
-      if (update_file) {
+      const update_file = getOpenFile(data.filepath)
+
+      const image_types: Array<RenderImageType>
+        = ["script", "summary", "sorted"]
+
+
+      if (!update_file)
+        return console.log("file not found")
+
+
+      if (image_types.includes(data.type)) {
+        const new_image: RenderedImage = {
+          svg: data.svg,
+          hash: data.hash,
+          render_status: "done"
+        }
+
         if (data.type == "script")
           update_file.script = new_image
         if (data.type == "summary")
@@ -186,11 +205,21 @@ function App(): React.JSX.Element {
         if (data.type == "sorted")
           update_file.sorted = new_image
 
-        setRefresher(refresher + 1) // refresh all image displays
+      } else { // markdown types
+
+        const new_markdown: RenderedMD = {
+          text: data.text,
+          hash: data.hash,
+          render_status: "done"
+        }
+
+        if (data.type == "todo")
+          update_file.todo = new_markdown
+        if (data.type == "remember")
+          update_file.remember = new_markdown
       }
-      else {
-        console.log("file not found")
-      }
+
+      setRefresher(refresher + 1) // refresh all image displays
 
     }),
     [openFiles]
@@ -283,7 +312,7 @@ function App(): React.JSX.Element {
           <TabPanel> {/* Remember.md */}
             <MarkdownViewer text={remember_placeholder} />
           </TabPanel>
-          <TabPanel> {/* Preprocessor */}
+          <TabPanel forceRender={true}> {/* Preprocessor */}
 
             runs function which passes an object as variable STATIC to be called over multiple lines!
             <button>New</button>

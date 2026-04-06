@@ -1,7 +1,7 @@
 
 // TODO PUT ALL CSS ELEMENTS INTO A CENTRAL SPACING FILE WHERE VH is defined for everything !!
 
-import { act, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import ContentHeight from "./dynamicSize"
 
 // ------------- working setup :
@@ -14,8 +14,8 @@ const image_style = { width: "500px" } // CHANGE THIS TO SOMETHING DYNAMIC
 export default function GraphViewer(
   { activeFile, type, refresh }: {
     activeFile: OpenFile,
-    type: RenderType
-    refresh: any
+    type: RenderImageType,
+    refresh: number
 
   }
 ): React.JSX.Element {
@@ -23,7 +23,7 @@ export default function GraphViewer(
 
   const container_style = { overflow: "scroll", height: ContentHeight() }
   console.log(container_style)
-  const divRef = useRef(type);
+  const divRef = useRef(null);
 
   useEffect(() => {
     if (!divRef.current) return
@@ -42,7 +42,7 @@ export default function GraphViewer(
     activeFile.sorted
   ])
 
-  useEffect(() => { }, refresh)
+  useEffect(() => { }, [refresh])
 
   return (<>
     <div style={container_style} ref={divRef}>

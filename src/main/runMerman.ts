@@ -46,6 +46,22 @@ export default async function full_render(
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
 
+  // handleFinishedRender(null, {
+  //   filepath: filepath,
+  //   hash: hash,
+  //   type: 'todo',
+  //   text: mermaid.todo.join(',')
+  // })
+  //
+  //
+  // handleFinishedRender(null, {
+  //   filepath: filepath,
+  //   hash: hash,
+  //   type: 'remember',
+  //   text: mermaid.remember.join('')
+  // })
+
+
   // TODO: check if cached image exists
   // todo: only save X most recent images as cache
 
@@ -120,7 +136,7 @@ function createRenderWindow(): BrowserWindow {
 
 export function handleFinishedRender(_, data): void {
   console.log("Image DATA", data)
-  mainWindow.webContents.send('new_rendered_image', data)
+  mainWindow.webContents.send('new_render', data)
 }
 
 

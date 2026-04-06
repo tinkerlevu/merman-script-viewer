@@ -11,6 +11,5 @@ export default function MarkdownViewer(
 ): React.JSX.Element {
   return (<>
     <MarkdownPreview source={text} style={{ padding: 16 }} />
-
   </>)
 }
