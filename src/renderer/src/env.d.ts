@@ -6,13 +6,13 @@ type FileIDH = string
 
 type RenderImageType = "script" | "summary" | "sorted"
 
-type RenderMDType = "todo" | "remember"
-
 type RenderedImage = {
   svg: string,
   hash: string,
   render_status: "rendering" | "done" | "none"
 }
+
+type RenderMDType = "todo" | "remember"
 
 type RenderedMD = {
   text: string,

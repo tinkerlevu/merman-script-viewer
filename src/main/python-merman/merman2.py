@@ -1261,6 +1261,8 @@ def run(merman_filetext):
     global Split
     global DescendantLink
     global Style
+    global Comment
+    global ReportItem
 
   # JUST KEEP ADDING TO THIS!!! <<<<<<<<<<<<<<<<<<
 

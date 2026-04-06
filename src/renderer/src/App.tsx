@@ -307,10 +307,18 @@ function App(): React.JSX.Element {
             />
           </TabPanel>
           <TabPanel> {/* Todo.md */}
-            <MarkdownViewer text={todo_placeholder} />
+            <MarkdownViewer
+              activeFile={activeFile}
+              type="todo"
+              refresh={refresher}
+            />
           </TabPanel>
           <TabPanel> {/* Remember.md */}
-            <MarkdownViewer text={remember_placeholder} />
+            <MarkdownViewer
+              activeFile={activeFile}
+              type="remember"
+              refresh={refresher}
+            />
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}
 

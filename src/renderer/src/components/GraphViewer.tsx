@@ -42,7 +42,7 @@ export default function GraphViewer(
     activeFile.sorted
   ])
 
-  useEffect(() => { }, [refresh])
+  useEffect(() => { }, [refresh]) // force refresh
 
   return (<>
     <div style={container_style} ref={divRef}>
