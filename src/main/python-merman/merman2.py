@@ -1245,16 +1245,18 @@ class ReportItem:
 
         # highlight all instances of target in self.text with color
     def highlight(self, target, color):
-        self.text = self.text.replace(target,
-                                      '<span style="background-color: ' + color + '">' +
-                                      target + '</span>'
-                                      )
+        self.text = self.text.replace(
+            target,
+            '<span style="background-color: ' + color + '">' +
+            target + '</span>'
+        )
 
 
 # START ADAPTING FROM HERE:
 
 
 def run(merman_filetext):
+    global re
     global MermanLine
     global Subgraph
     global Linkable
@@ -1314,6 +1316,7 @@ def run(merman_filetext):
 # ------ CLASSIFY SCRIPT LINES -------
 
         # for a normal line in the script, determine what type of command it is
+
 
     def classify(line):
         global GraphNode
@@ -1470,6 +1473,7 @@ def run(merman_filetext):
 # -------- Map Splits and Joins ---------
 
             # recursive function throws error (from split line) if end of array is encountered before join:
+
 
     def map_split(splitpoint, index, script):
         previous_line = None  # the previous line in the loop
@@ -1695,7 +1699,7 @@ def run(merman_filetext):
                     categories['backstory'].append(
                         item)  # instances are mutable
 
-                if item.find('worldbuilding'):
+                if item.find('WORLDBUILDING'):
                     item.highlight('WORLDBUILDING', '#cc66ff')  # purple
                     categories['worldbuilding'].append(
                         item)  # instances are mutable
@@ -1748,8 +1752,6 @@ def run(merman_filetext):
 
         # ---------- Generate Remember Report --------
 
-    if True:
-
         print('[ Generating Remember Report ]')
 
         items = []  # all comments with remember keywords
@@ -1757,7 +1759,8 @@ def run(merman_filetext):
         # COMMENTS --
         for comment in comments:
             if re.search(   # comment Remember keywords:
-                    r'\\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\\W|$)',
+                    # r'(XXX|NOTE|REMEMBER|WARNING|MAYBE)',
+                    r'\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\W|$)',
                     comment.get_text()):
                 items.append(comment)
 

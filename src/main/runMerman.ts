@@ -135,38 +135,37 @@ function createRenderWindow(): BrowserWindow {
 
 
 export function handleFinishedRender(_, data): void {
-  console.log("Image DATA", data)
   mainWindow.webContents.send('new_render', data)
 }
 
 
 
-
-// TODO: remove
-const test_code = `
-s = "hello world potato"
-s
-print(filedata)
-`
-const test_merman = [
-  'why: "hi here" !my_ID',
-  '',
-  '',
-  'special: "node with \n pointers" ^terminating non_terminating&',
-  '',
-  'special: "node with references" *reference1 *reference2',
-]
-
-const test_render_data = {
-  script: [
-    'graph TD\n',
-    'my_ID("hi here<br>"):::why\n',
-    '_4("node with <br> pointers<br>"):::special\n',
-    '_6("node with references<br>"):::special\n',
-    'my_ID==> _4;\n',
-    '_4 ==> terminating; _4 ==> non_terminating;\n',
-    'reference1 ==> _6 ;;reference2 ==> _6;;\n'
-  ],
-}
-
+//
+// // TODO: remove
+// const test_code = `
+// s = "hello world potato"
+// s
+// print(filedata)
+// `
+// const test_merman = [
+//   'why: "hi here" !my_ID',
+//   '',
+//   '',
+//   'special: "node with \n pointers" ^terminating non_terminating&',
+//   '',
+//   'special: "node with references" *reference1 *reference2',
+// ]
+//
+// const test_render_data = {
+//   script: [
+//     'graph TD\n',
+//     'my_ID("hi here<br>"):::why\n',
+//     '_4("node with <br> pointers<br>"):::special\n',
+//     '_6("node with references<br>"):::special\n',
+//     'my_ID==> _4;\n',
+//     '_4 ==> terminating; _4 ==> non_terminating;\n',
+//     'reference1 ==> _6 ;;reference2 ==> _6;;\n'
+//   ],
+// }
+//
 
