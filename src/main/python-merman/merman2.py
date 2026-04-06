@@ -146,6 +146,10 @@ class Comment:
 
 # -----------------------------  ABC CLASS MermaidLine
 class MermaidLine():
+    global Pointer
+    global Reference
+    global DescendantLink
+
     line = None
     child = None
     remainder = ''  # after extract_any_text
@@ -754,8 +758,6 @@ class Join(Linkable):
 
 
 class GraphNode(Linkable):
-    global Pointer
-    global Reference
 
     # NOTE IMPLEMENT titles? |hello| or special char: \|
 
@@ -1252,625 +1254,636 @@ class ReportItem:
         )
 
 
+#
+#
+#
+#
+#
+#
+#
+#
 # START ADAPTING FROM HERE:
+# NOTE: ------------------ GET DATA FROM NODE --------------
+# NOTE: this is the point where the merman script data is injected from Nodejs main process
+merman_filetext = filedata
 
 
-def run(merman_filetext):
-    global re
-    global MermanLine
-    global Subgraph
-    global Linkable
-    global Split
-    global DescendantLink
-    global Style
-    global Comment
-    global ReportItem
+# --------- THE REST OF THIS RUNS SEQUENTIALLY: --------
 
-  # JUST KEEP ADDING TO THIS!!! <<<<<<<<<<<<<<<<<<
+print("> Reading Lines.......\t", end='')
 
-    print("> Reading Lines.......\t", end='')
+unfiltered = []  # all the lines in the script, with comments
 
-    unfiltered = []  # all the lines in the script, with comments
+# read, clean and assign a linenumber to each line in the mermaid file.
+for index, text in enumerate(merman_filetext):
+    line = MermanLine(text.strip(), line_number=index+1)
 
-    # read, clean and assign a linenumber to each line in the mermaid file.
-    for index, text in enumerate(merman_filetext):
-        line = MermanLine(text.strip(), line_number=index+1)
-
-        # if not line.is_blank():
-        unfiltered.append(line)
+    # if not line.is_blank():
+    unfiltered.append(line)
 
 
 # ------ SEPERATE COMMENTS -------
 
-    unclassified = []  # all the lines in the script without comments
-    comments = []  # just the comments in the script
-    in_block_comment = False  # currently in a block comment
+unclassified = []  # all the lines in the script without comments
+comments = []  # just the comments in the script
+in_block_comment = False  # currently in a block comment
 
-    for line in unfiltered:  # for each line in script.
+for line in unfiltered:  # for each line in script.
 
-        # START / END of block comment
-        if line.is_block_comment_marker():
-            # do not record marker in script or comments
+    # START / END of block comment
+    if line.is_block_comment_marker():
+        # do not record marker in script or comments
 
-            if in_block_comment:  # exit block comment
-                in_block_comment = False
+        if in_block_comment:  # exit block comment
+            in_block_comment = False
 
-            else:  # initialize block comment
-                in_block_comment = True
-                comments.append(Comment())  # create blank comment at end
+        else:  # initialize block comment
+            in_block_comment = True
+            comments.append(Comment())  # create blank comment at end
 
-            # MIDDLE of block comment
-        elif in_block_comment:
-            comments[-1].combine(line)  # add line to current comment object
+        # MIDDLE of block comment
+    elif in_block_comment:
+        comments[-1].combine(line)  # add line to current comment object
 
-            # SINGLE line comment
-        elif line.is_comment():
-            comments.append(Comment(line))
+        # SINGLE line comment
+    elif line.is_comment():
+        comments.append(Comment(line))
 
-        # append all non-comment lines to script
-            # (Ignore Blank lines)
-        elif not line.is_blank():
-            unclassified.append(line)
+    # append all non-comment lines to script
+        # (Ignore Blank lines)
+    elif not line.is_blank():
+        unclassified.append(line)
 
 
 # ------ CLASSIFY SCRIPT LINES -------
 
-        # for a normal line in the script, determine what type of command it is
+    # for a normal line in the script, determine what type of command it is
+
+def classify(line):
+    global Style
+    global Section
+    global Patchbay
+    global Split
+    global Branch
+    global Join
+    global Subgraph
+    global Pointer
+    global Reference
+    global GraphNode
+
+    if line.is_style():
+        return Style(line)
+    if line.is_section():
+        return Section(line)
+    if line.is_patchbay():
+        return Patchbay(line)
+    if line.is_split():
+        return Split(line)
+    if line.is_branch():
+        return Branch(line)
+    if line.is_join():
+        return Join(line)
+    if line.is_subgraph():
+        return Subgraph(line)
+    if line.is_pointer():
+        return Pointer(line)
+    if line.is_reference():
+        return Reference(line)
+
+    # otherwise, treat as node
+    return GraphNode(line)
 
 
-    def classify(line):
-        global GraphNode
+unconsolidated = []  # with multiline nodes, and pointers + references
 
-        if line.is_style():
-            return Style(line)
-        if line.is_section():
-            return Section(line)
-        if line.is_patchbay():
-            return Patchbay(line)
-        if line.is_split():
-            return Split(line)
-        if line.is_branch():
-            return Branch(line)
-        if line.is_join():
-            return Join(line)
-        if line.is_subgraph():
-            return Subgraph(line)
-        if line.is_pointer():
-            return Pointer(line)
-        if line.is_reference():
-            return Reference(line)
-
-        # otherwise, treat as node
-        return GraphNode(line)
-
-    unconsolidated = []  # with multiline nodes, and pointers + references
-
-    for line in unclassified:
-        unconsolidated.append(classify(line))
+for line in unclassified:
+    unconsolidated.append(classify(line))
 
 
 # -------- linking Subgraphs ---------------
 # check that all Subgraph statements have a closing end tag
 
-    stack = []
-    for line in unconsolidated:
-        if isinstance(line, Subgraph):
-            if line.is_start():  # if opening tag
-                stack.append(line)  # increase level
-            else:  # if closing tag
-                try:  # TODO do better exception handling for this
-                    stack.pop()  # decrease level
-                except:  # but if no opening statement found
-                    line.throw_error(
-                        "No starting subgraph statement found for this line")
+stack = []
+for line in unconsolidated:
+    if isinstance(line, Subgraph):
+        if line.is_start():  # if opening tag
+            stack.append(line)  # increase level
+        else:  # if closing tag
+            try:  # TODO do better exception handling for this
+                stack.pop()  # decrease level
+            except:  # but if no opening statement found
+                line.throw_error(
+                    "No starting subgraph statement found for this line")
 
-    if len(stack) != 0:  # if at least one starting subgraph statement doesn't have and end statement
-        # throw an error for the most recent starting statement.
-        stack.pop().throw_error("Cant find closing subgraph statement for this line.")
+if len(stack) != 0:  # if at least one starting subgraph statement doesn't have and end statement
+    # throw an error for the most recent starting statement.
+    stack.pop().throw_error("Cant find closing subgraph statement for this line.")
 
 
 # -------- Combine Multiline Nodes and
 #                Consolidate Multiline References and Pointers-------
 
-    script = []  # final object instance and position of the lines
-    # the previous Node registered in the script (if it can have other nodes consolidated into it)
-    last_line = None
+script = []  # final object instance and position of the lines
+# the previous Node registered in the script (if it can have other nodes consolidated into it)
+last_line = None
 
-    for current_line in unconsolidated:
+for current_line in unconsolidated:
 
-        # if a multiline node is expected here
-        if isinstance(last_line, GraphNode) and last_line.is_multiline():
-            if isinstance(current_line, GraphNode):  # combine with next graph node
-                last_line.merge_with(current_line)
-            else:
-                current_line.throw_error("Expected a multiline node")
-
-        # A node that other nodes can merge into (GraphNode, Join)
-        elif isinstance(current_line, Linkable):
-            last_line = current_line
-            script.append(current_line)  # add to script
-
-        # multiline References/Pointers
-        elif isinstance(current_line, Link):
-            if last_line:  # and last_line is Graphnode or Join
-                last_line.register_reference_or_pointer(current_line)
-            else:
-                current_line.throw_error(
-                    "Parent Node not found for Pointer/Reference")
-
+    # if a multiline node is expected here
+    if isinstance(last_line, GraphNode) and last_line.is_multiline():
+        if isinstance(current_line, GraphNode):  # combine with next graph node
+            last_line.merge_with(current_line)
         else:
-            last_line = None
-            script.append(current_line)  # add to script
+            current_line.throw_error("Expected a multiline node")
 
-    print("[OK]")
+    # A node that other nodes can merge into (GraphNode, Join)
+    elif isinstance(current_line, Linkable):
+        last_line = current_line
+        script.append(current_line)  # add to script
+
+    # multiline References/Pointers
+    elif isinstance(current_line, Link):
+        if last_line:  # and last_line is Graphnode or Join
+            last_line.register_reference_or_pointer(current_line)
+        else:
+            current_line.throw_error(
+                "Parent Node not found for Pointer/Reference")
+
+    else:
+        last_line = None
+        script.append(current_line)  # add to script
+
+print("[OK]")
 
 
 # -------- Resolve Quick Connects ------
 
-    print("> Building Graph.......\t", end='')
+print("> Building Graph.......\t", end='')
 
-    # the last GraphNode quickconnect point that was encountered
-    active_quickconnect_point = None
-    to_link = []  # all quickconnect-next nodes that need to be connected
+# the last GraphNode quickconnect point that was encountered
+active_quickconnect_point = None
+to_link = []  # all quickconnect-next nodes that need to be connected
 
-    # order of operations important! lines can be simultaneously:
-    # quickconnect-next, quickconnect-previous and a quickconnect point
-    # so if current node is quickconnect point:
-    # resolve previous quickconnect-prev/next links
-    # register self as active_quickconnect_point
-    # then note down quickconnect-next links (for next point)
-    for line in script:
+# order of operations important! lines can be simultaneously:
+# quickconnect-next, quickconnect-previous and a quickconnect point
+# so if current node is quickconnect point:
+# resolve previous quickconnect-prev/next links
+# register self as active_quickconnect_point
+# then note down quickconnect-next links (for next point)
+for line in script:
 
-        # resolve quickconnect-previous
-        if isinstance(line, Linkable) and line.is_quickconnect_previous():
-            # quickconnect point exists
-            if active_quickconnect_point:
-                line.set_quickconnect_previous_id(
-                    active_quickconnect_point.get_ID())
-            # quickconnect point not set yet
-                # TODO move this functionality into class?
-            else:
-                line.set_quickconnect_previous_id(None)
+    # resolve quickconnect-previous
+    if isinstance(line, Linkable) and line.is_quickconnect_previous():
+        # quickconnect point exists
+        if active_quickconnect_point:
+            line.set_quickconnect_previous_id(
+                active_quickconnect_point.get_ID())
+        # quickconnect point not set yet
+            # TODO move this functionality into class?
+        else:
+            line.set_quickconnect_previous_id(None)
 
-            # set current line as new quickconnect point
-                # only GraphNodes can be quickconnect points
-        if isinstance(line, GraphNode) and line.is_quickconnect_point():
-            # resolve quickconnect-next links that connect to here
-            for node in to_link:
-                node.set_quickconnect_next_id(line.get_ID())
-            to_link = []  # reset pending quickconnect-next links
-            active_quickconnect_point = line  # this is new quickconnect point
+        # set current line as new quickconnect point
+            # only GraphNodes can be quickconnect points
+    if isinstance(line, GraphNode) and line.is_quickconnect_point():
+        # resolve quickconnect-next links that connect to here
+        for node in to_link:
+            node.set_quickconnect_next_id(line.get_ID())
+        to_link = []  # reset pending quickconnect-next links
+        active_quickconnect_point = line  # this is new quickconnect point
 
-        # note the links that should connect to the next quickconnect point
-        if isinstance(line, Linkable) and line.is_quickconnect_next():
-            to_link.append(line)
+    # note the links that should connect to the next quickconnect point
+    if isinstance(line, Linkable) and line.is_quickconnect_next():
+        to_link.append(line)
 
 # resolve any left over quickconnect-next points
-            # TODO move this functionality into class?
-    for node in to_link:
-        node.set_quickconnect_next_id(None)
+        # TODO move this functionality into class?
+for node in to_link:
+    node.set_quickconnect_next_id(None)
 
 
 # -------- Initialize Parent-Child Relationships ------
 
-    for index in range(len(script)-1):  # for last node, child is None
-        script[index].set_child(script[index+1])
+for index in range(len(script)-1):  # for last node, child is None
+    script[index].set_child(script[index+1])
 
 
 # -------- AutoAssign Class to GraphNodes ------
 
-    current_autoclass = 'none'  # default value for class
+current_autoclass = 'none'  # default value for class
 
-    for line in script:
-        if isinstance(line, GraphNode):
-            if line.get_class():
-                current_autoclass = line.get_class()
-            else:
-                line.set_class(current_autoclass)
-        # otherwise ignore
+for line in script:
+    if isinstance(line, GraphNode):
+        if line.get_class():
+            current_autoclass = line.get_class()
+        else:
+            line.set_class(current_autoclass)
+    # otherwise ignore
 
 
 # -------- Map Splits and Joins ---------
 
-            # recursive function throws error (from split line) if end of array is encountered before join:
+        # recursive function throws error (from split line) if end of array is encountered before join:
+
+def map_split(splitpoint, index, script):
+    previous_line = None  # the previous line in the loop
+    endpoints = []  # mermaid lines that connect to the closing join
+
+    try:
+        while True:
+            line = script[index]
+
+            if isinstance(line, Branch):  # branch
+                endpoints.append(previous_line)  # end last line
+                splitpoint.register_branch(line)  # start new line
+
+            elif isinstance(line, Join):  # join
+                for endpoint in endpoints:
+                    # override current child and link endpoints to join node
+                    if endpoint:
+                        endpoint.set_child(line)
+                return index  # return position to continue from
+
+            elif isinstance(line, Split):  # another split
+                index = map_split(line, index+1, script)
+
+            previous_line = line
+            index += 1
+
+    except:
+        splitpoint.throw_error(
+            "Expected a join/done point. No join point found")
 
 
-    def map_split(splitpoint, index, script):
-        previous_line = None  # the previous line in the loop
-        endpoints = []  # mermaid lines that connect to the closing join
+# search through script for Split points ---
+script_length = len(script)
+index = 0
 
-        try:
-            while True:
-                line = script[index]
+while index < script_length:
+    if isinstance(script[index], Split):
+        index = map_split(script[index], index+1, script)
 
-                if isinstance(line, Branch):  # branch
-                    endpoints.append(previous_line)  # end last line
-                    splitpoint.register_branch(line)  # start new line
+    index += 1
 
-                elif isinstance(line, Join):  # join
-                    for endpoint in endpoints:
-                        # override current child and link endpoints to join node
-                        if endpoint:
-                            endpoint.set_child(line)
-                    return index  # return position to continue from
-
-                elif isinstance(line, Split):  # another split
-                    index = map_split(line, index+1, script)
-
-                previous_line = line
-                index += 1
-
-        except:
-            splitpoint.throw_error(
-                "Expected a join/done point. No join point found")
-
-    # search through script for Split points ---
-    script_length = len(script)
-    index = 0
-
-    while index < script_length:
-        if isinstance(script[index], Split):
-            index = map_split(script[index], index+1, script)
-
-        index += 1
-
-    print('[OK]')
+print('[OK]')
 
 
 # ------- Create Script File --------
-    #
-    #
-    # OUTPUT PHASE STARTS HERE
-    #
-    #
+#
+#
+# OUTPUT PHASE STARTS HERE
+#
+#
 
-    OUTPUTS = {}
+OUTPUTS = {}
 
 
 # ---------- Main Script Graph --------
 
-    print('[ Extracting Script ]')
+print('[ Extracting Script ]')
 
-    OUTPUTS['script'] = []
+OUTPUTS['script'] = []
 
-    OUTPUTS['script'].append('graph TD\n')
-    for line in script:
-        OUTPUTS['script'].append(line.get_mermaid_text(summary=False) + '\n')
+OUTPUTS['script'].append('graph TD\n')
+for line in script:
+    OUTPUTS['script'].append(line.get_mermaid_text(summary=False) + '\n')
 
-    # ALWAYS Generate links after lines (or subsection bugs out!!!)
-    for line in script:
-        OUTPUTS['script'].append(line.get_mermaid_link(summary=False) + '\n')
+# ALWAYS Generate links after lines (or subsection bugs out!!!)
+for line in script:
+    OUTPUTS['script'].append(line.get_mermaid_link(summary=False) + '\n')
 
 
 # ---------- Generate Summary Lines and Links --------
 
-    print('[ Extracting Summary ]')
+print('[ Extracting Summary ]')
 
-    OUTPUTS['summary'] = []
+OUTPUTS['summary'] = []
 
-    OUTPUTS['summary'].append('graph TD\n')
-    for line in script:
-        OUTPUTS['summary'].append(line.get_mermaid_text(summary=True) + '\n')
+OUTPUTS['summary'].append('graph TD\n')
+for line in script:
+    OUTPUTS['summary'].append(line.get_mermaid_text(summary=True) + '\n')
 
-    # ALWAYS Generate links after lines (or subsection bugs out!!!)
-    for line in script:
-        OUTPUTS['summary'].append(line.get_mermaid_link(summary=True) + '\n')
+# ALWAYS Generate links after lines (or subsection bugs out!!!)
+for line in script:
+    OUTPUTS['summary'].append(line.get_mermaid_link(summary=True) + '\n')
 
-    # ------------ Generate Assorted Graph -----------
+# ------------ Generate Assorted Graph -----------
 
 # all graphNodes in script, sorted by class
 
 # NOTE NOTE NOTE After this step, the script (the connections between nodes) will be completely destroyed
 
-    print('[ Creating Sorted ]')
+print('[ Creating Sorted ]')
 
-    OUTPUTS['sorted'] = []
+OUTPUTS['sorted'] = []
 
-    # INIT --
-    assorted = {}  # all Graphnodes sorted by class
-    styles = []  # all classdef lines
+# INIT --
+assorted = {}  # all Graphnodes sorted by class
+styles = []  # all classdef lines
 
-    # SORT --
-    # all graphNodes in script
-    for line in script:
-        if isinstance(line, Style):
-            styles.append(line)
-            continue
+# SORT --
+# all graphNodes in script
+for line in script:
+    if isinstance(line, Style):
+        styles.append(line)
+        continue
 
-        if not isinstance(line, GraphNode):
-            continue
+    if not isinstance(line, GraphNode):
+        continue
 
-        nodeclass = line.get_class()
-        # append to end of appropriate class list
-        assorted[nodeclass] = assorted.get(nodeclass, []) + [line]
+    nodeclass = line.get_class()
+    # append to end of appropriate class list
+    assorted[nodeclass] = assorted.get(nodeclass, []) + [line]
 
-    # WRITE --
-    OUTPUTS['sorted'].append('graph TD\n')
+# WRITE --
+OUTPUTS['sorted'].append('graph TD\n')
 
-    # all the node styles
-    for line in styles:
-        OUTPUTS['sorted'].append(line.get_mermaid_text(summary=False) + '\n')
+# all the node styles
+for line in styles:
+    OUTPUTS['sorted'].append(line.get_mermaid_text(summary=False) + '\n')
 
-    # for each list of sorted nodes, join all nodes together directly
-        # without pointers or references. do this manually.
-    for nodeclass in assorted:
+# for each list of sorted nodes, join all nodes together directly
+    # without pointers or references. do this manually.
+for nodeclass in assorted:
 
-        # TODO   --------------- SORT BY NODE SHAPE HERE!
-        # TODO   --------------- SORT BY NODE TEXT HERE!
-        # OR is it more important to just leave everything in the order that it appears? make have it as a flag? with a button? full sort, sequential sort?
+    # TODO   --------------- SORT BY NODE SHAPE HERE!
+    # TODO   --------------- SORT BY NODE TEXT HERE!
+    # OR is it more important to just leave everything in the order that it appears? make have it as a flag? with a button? full sort, sequential sort?
 
-        # write each node
-        for node in assorted[nodeclass]:
-            OUTPUTS['sorted'].append(
-                node.get_mermaid_text(summary=False) + '\n')
-
-        # string all nodes in category together
+    # write each node
+    for node in assorted[nodeclass]:
         OUTPUTS['sorted'].append(
-            "-->".join([x.get_ID()
-                        for x in assorted[nodeclass]
-                        if x.is_displaying(summary=False)])
-        )
-        OUTPUTS['sorted'].append('\n')
+            node.get_mermaid_text(summary=False) + '\n')
 
-        # ---------- Generate Todo Report --------
+    # string all nodes in category together
+    OUTPUTS['sorted'].append(
+        "-->".join([x.get_ID()
+                    for x in assorted[nodeclass]
+                    if x.is_displaying(summary=False)])
+    )
+    OUTPUTS['sorted'].append('\n')
 
-    if True:
+    # ---------- Generate Todo Report --------
 
-        print('[ Generating Todo Report ]')
+if True:
 
-        todo_items = []  # all nodes with remember keywords
+    print('[ Generating Todo Report ]')
 
-        # COMMENTS --
-        # all the way from SEPERATE COMMENTS section above
-        for comment in comments:
-            if re.search(   # comment TODO keywords: {ignore REVIEWED}
-                    r'(TODO|REVIEW|XXX|FIX|REMOVE|INCOMPLETE)(?!ED)',
-                    comment.get_text()):
-                todo_items.append(comment)
+    todo_items = []  # all nodes with remember keywords
 
-        # NODES --
-        for node in [x for x in script if isinstance(x, GraphNode)]:
-            if re.search(   # Node Text TODO keywords:
-                    r'(XXX|NOUN|FORESHADOWING|BACKSTORY|WORLDBUILDING)',
-                    node.get_text()):
-                todo_items.append(node)
+    # COMMENTS --
+    # all the way from SEPERATE COMMENTS section above
+    for comment in comments:
+        if re.search(   # comment TODO keywords: {ignore REVIEWED}
+                r'(TODO|REVIEW|XXX|FIX|REMOVE|INCOMPLETE)(?!ED)',
+                comment.get_text()):
+            todo_items.append(comment)
 
-        # SORTING Comments and Nodes into appropriate positions --
-        todo_items.sort(key=lambda x: x.get_linenumber())
+    # NODES --
+    for node in [x for x in script if isinstance(x, GraphNode)]:
+        if re.search(   # Node Text TODO keywords:
+                r'(XXX|NOUN|FORESHADOWING|BACKSTORY|WORLDBUILDING)',
+                node.get_text()):
+            todo_items.append(node)
 
-        # the order of this determines the order that is printed in the report
+    # SORTING Comments and Nodes into appropriate positions --
+    todo_items.sort(key=lambda x: x.get_linenumber())
 
-        titles = {  # printed before all the content in each category
-            # both
-            'combined': '## <u>All Incomplete Items</u>',  # all items, in order
-            'misc': "## <u>Miscellaneous</u>",
-            # comments -
-            'todo': '## <u>TODO Items</u>',
-            'review': '## <u>Review Notes</u>',
-            'fix': '## <u>To Fix</u>',
-            'incomplete': '## <u>Still Incomplete</u>',
-            'remove': '## <u>To Remove</u>',
-            # nodes
-            'script': '## <u>Missing Script Elements</u>',  # not implemented in categories
-            'noun': '### <u>Nouns</u>',
-            'foreshadowing': '### <u>Foreshadowing</u>',
-            'backstory': '### <u>Backstory</u>',
-            'worldbuilding': '### <u>World Building</u>'
-        }
+    # the order of this determines the order that is printed in the report
 
-        categories = {
-            # comments -
-            'todo': [],
-            'review': [],
-            'fix': [],
-            'remove': [],
-            'incomplete': [],
-            # nodes
-            'noun': [],
-            'foreshadowing': [],
-            'backstory': [],
-            'worldbuilding': [],
-            # both
-            'combined': [],  # all items, in order
-            'misc': []
-        }
+    titles = {  # printed before all the content in each category
+        # both
+        'combined': '## <u>All Incomplete Items</u>',  # all items, in order
+        'misc': "## <u>Miscellaneous</u>",
+        # comments -
+        'todo': '## <u>TODO Items</u>',
+        'review': '## <u>Review Notes</u>',
+        'fix': '## <u>To Fix</u>',
+        'incomplete': '## <u>Still Incomplete</u>',
+        'remove': '## <u>To Remove</u>',
+        # nodes
+        'script': '## <u>Missing Script Elements</u>',  # not implemented in categories
+        'noun': '### <u>Nouns</u>',
+        'foreshadowing': '### <u>Foreshadowing</u>',
+        'backstory': '### <u>Backstory</u>',
+        'worldbuilding': '### <u>World Building</u>'
+    }
 
-        # -- Sort items --
+    categories = {
+        # comments -
+        'todo': [],
+        'review': [],
+        'fix': [],
+        'remove': [],
+        'incomplete': [],
+        # nodes
+        'noun': [],
+        'foreshadowing': [],
+        'backstory': [],
+        'worldbuilding': [],
+        # both
+        'combined': [],  # all items, in order
+        'misc': []
+    }
 
-        for node in todo_items:
-            item = ReportItem(node)  # easier to handle form
+    # -- Sort items --
 
-            if isinstance(node, GraphNode):  # GRAPHNODE ---
-                # items.set_text('```plain\n'+ items.get_text() +'\n```')
-                # differentiate Graphnodes from comments in report
-                # item.set_text('> '+ item.get_text())
+    for node in todo_items:
+        item = ReportItem(node)  # easier to handle form
 
-                if item.find('NOUN'):
-                    item.highlight('NOUN', '#cc66ff')  # purple
-                    categories['noun'].append(item)  # instances are mutable
+        if isinstance(node, GraphNode):  # GRAPHNODE ---
+            # items.set_text('```plain\n'+ items.get_text() +'\n```')
+            # differentiate Graphnodes from comments in report
+            # item.set_text('> '+ item.get_text())
 
-                if item.find('FORESHADOWING'):
-                    item.highlight('FORESHADOWING', '#cc66ff')  # purple
-                    categories['foreshadowing'].append(
-                        item)  # instances are mutable
+            if item.find('NOUN'):
+                item.highlight('NOUN', '#cc66ff')  # purple
+                categories['noun'].append(item)  # instances are mutable
 
-                if item.find('BACKSTORY'):
-                    item.highlight('BACKSTORY', '#cc66ff')  # purple
-                    categories['backstory'].append(
-                        item)  # instances are mutable
+            if item.find('FORESHADOWING'):
+                item.highlight('FORESHADOWING', '#cc66ff')  # purple
+                categories['foreshadowing'].append(
+                    item)  # instances are mutable
 
-                if item.find('WORLDBUILDING'):
-                    item.highlight('WORLDBUILDING', '#cc66ff')  # purple
-                    categories['worldbuilding'].append(
-                        item)  # instances are mutable
+            if item.find('BACKSTORY'):
+                item.highlight('BACKSTORY', '#cc66ff')  # purple
+                categories['backstory'].append(
+                    item)  # instances are mutable
 
-            else:  # COMMENT NODE ---
-                if item.find('TODO'):
-                    item.highlight('TODO', '#66ff66')  # green
-                    categories['todo'].append(item)  # instances are mutable
+            if item.find('WORLDBUILDING'):
+                item.highlight('WORLDBUILDING', '#cc66ff')  # purple
+                categories['worldbuilding'].append(
+                    item)  # instances are mutable
 
-                if item.find('REVIEW'):
-                    item.highlight('REVIEW', '#66ccff')  # blue
-                    categories['review'].append(item)  # instances are mutable
+        else:  # COMMENT NODE ---
+            if item.find('TODO'):
+                item.highlight('TODO', '#66ff66')  # green
+                categories['todo'].append(item)  # instances are mutable
 
-                if item.find('FIX'):
-                    item.highlight('FIX', '#ff5050')  # red
-                    categories['fix'].append(item)  # instances are mutable
+            if item.find('REVIEW'):
+                item.highlight('REVIEW', '#66ccff')  # blue
+                categories['review'].append(item)  # instances are mutable
 
-                if item.find('REMOVE'):
-                    item.highlight('REMOVE', '#ffcc00')  # yellow
-                    categories['remove'].append(item)  # instances are mutable
+            if item.find('FIX'):
+                item.highlight('FIX', '#ff5050')  # red
+                categories['fix'].append(item)  # instances are mutable
 
-                if item.find('INCOMPLETE'):
-                    item.highlight('INCOMPLETE', '#ff6600')  # orange
-                    categories['incomplete'].append(
-                        item)  # instances are mutable
+            if item.find('REMOVE'):
+                item.highlight('REMOVE', '#ffcc00')  # yellow
+                categories['remove'].append(item)  # instances are mutable
 
-            # BOTH comments and GraphNodes
-            if item.find('XXX'):
-                item.highlight('XXX', '#b3b3b3')  # grey
-                categories['misc'].append(item)
+            if item.find('INCOMPLETE'):
+                item.highlight('INCOMPLETE', '#ff6600')  # orange
+                categories['incomplete'].append(
+                    item)  # instances are mutable
 
-            categories['combined'].append(item)  # all items together
+        # BOTH comments and GraphNodes
+        if item.find('XXX'):
+            item.highlight('XXX', '#b3b3b3')  # grey
+            categories['misc'].append(item)
 
-            # END OF FOR LOOP
+        categories['combined'].append(item)  # all items together
 
-        # --- WRITE TO FILE ---
-        #
-        OUTPUTS['todo'] = []
+        # END OF FOR LOOP
 
-        OUTPUTS['todo'].append('# Todo Report\n')  # title
+    # --- WRITE TO FILE ---
+    #
+    OUTPUTS['todo'] = []
 
-        for category in titles:
-            # write section title
-            OUTPUTS['todo'].append(titles[category] + '\n\n')
+    OUTPUTS['todo'].append('# Todo Report\n')  # title
 
-            # for each category of items
-            for item in categories.get(category, []):
-                # write item entry to report
-                OUTPUTS['todo'].append(item.get_entry() + '\n\n')
+    for category in titles:
+        # write section title
+        OUTPUTS['todo'].append(titles[category] + '\n\n')
 
-        # ---------- Generate Remember Report --------
+        # for each category of items
+        for item in categories.get(category, []):
+            # write item entry to report
+            OUTPUTS['todo'].append(item.get_entry() + '\n\n')
 
-        print('[ Generating Remember Report ]')
+    # ---------- Generate Remember Report --------
 
-        items = []  # all comments with remember keywords
+    print('[ Generating Remember Report ]')
 
-        # COMMENTS --
-        for comment in comments:
-            if re.search(   # comment Remember keywords:
-                    # r'(XXX|NOTE|REMEMBER|WARNING|MAYBE)',
-                    r'\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\W|$)',
-                    comment.get_text()):
-                items.append(comment)
+    items = []  # all comments with remember keywords
 
-        # the order of this determines the order that is printed in the report
-        titles = {
-            'combined': '## <u>All Items</u>',  # all items, in order
-            'misc': "## <u>Miscellaneous</u>",
-            'note': '## <u>Notes</u>',
-            'remember': '## <u>To Remember</u>',
-            'warning': '## <u>Warnings</u>',
-            'maybe': '## <u>Maybe\'s and Possibilities</u>',
-        }
+    # COMMENTS --
+    for comment in comments:
+        if re.search(   # comment Remember keywords:
+                # r'(XXX|NOTE|REMEMBER|WARNING|MAYBE)',
+                r'\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\W|$)',
+                comment.get_text()):
+            items.append(comment)
 
-        categories = {
-            'combined': [],
-            'misc': [],
-            'note': [],
-            'remember': [],
-            'warning': [],
-            'maybe': []
-        }
+    # the order of this determines the order that is printed in the report
+    titles = {
+        'combined': '## <u>All Items</u>',  # all items, in order
+        'misc': "## <u>Miscellaneous</u>",
+        'note': '## <u>Notes</u>',
+        'remember': '## <u>To Remember</u>',
+        'warning': '## <u>Warnings</u>',
+        'maybe': '## <u>Maybe\'s and Possibilities</u>',
+    }
 
-        # -- Sort items --
+    categories = {
+        'combined': [],
+        'misc': [],
+        'note': [],
+        'remember': [],
+        'warning': [],
+        'maybe': []
+    }
 
-        for comment in items:
-            item = ReportItem(comment)
+    # -- Sort items --
 
-            if item.find('XXX'):
-                item.highlight('XXX', '#b3b3b3')  # grey
-                categories['misc'].append(item)
+    for comment in items:
+        item = ReportItem(comment)
 
-            if item.find('NOTE'):
-                item.highlight('NOTE', '#ffcc00')  # yellow
-                categories['note'].append(item)
+        if item.find('XXX'):
+            item.highlight('XXX', '#b3b3b3')  # grey
+            categories['misc'].append(item)
 
-            if item.find('REMEMBER'):
-                item.highlight('REMEMBER', '#ff6600')  # orange
-                categories['remember'].append(item)
+        if item.find('NOTE'):
+            item.highlight('NOTE', '#ffcc00')  # yellow
+            categories['note'].append(item)
 
-            if item.find('WARNING'):
-                item.highlight('WARNING', '#ff5050')  # red
-                categories['warning'].append(item)
+        if item.find('REMEMBER'):
+            item.highlight('REMEMBER', '#ff6600')  # orange
+            categories['remember'].append(item)
 
-            if item.find('MAYBE'):
-                item.highlight('MAYBE', '#66ff66')  # green
-                categories['maybe'].append(item)
+        if item.find('WARNING'):
+            item.highlight('WARNING', '#ff5050')  # red
+            categories['warning'].append(item)
 
-            categories['combined'].append(item)
+        if item.find('MAYBE'):
+            item.highlight('MAYBE', '#66ff66')  # green
+            categories['maybe'].append(item)
 
-            # END OF FOR LOOP
+        categories['combined'].append(item)
 
-        # --- WRITE TO FILE ---
-        #
-        OUTPUTS['remember'] = []
+        # END OF FOR LOOP
 
-        OUTPUTS['remember'].append('# Remember Report\n')  # title
+    # --- WRITE TO FILE ---
+    #
+    OUTPUTS['remember'] = []
 
-        for category in titles:
-            # write section title
-            OUTPUTS['remember'].append(titles[category] + '\n\n')
+    OUTPUTS['remember'].append('# Remember Report\n')  # title
 
-            # for each category of items
-            for item in categories.get(category, []):
-                # write item entry to report
-                OUTPUTS['remember'].append(item.get_entry() + '\n\n')
+    for category in titles:
+        # write section title
+        OUTPUTS['remember'].append(titles[category] + '\n\n')
 
-    # ------------ Count Words -----------
+        # for each category of items
+        for item in categories.get(category, []):
+            # write item entry to report
+            OUTPUTS['remember'].append(item.get_entry() + '\n\n')
 
-    total_words = 0
-    total_nodes = 0
+# ------------ Count Words -----------
 
-    for node in script:
+total_words = 0
+total_nodes = 0
 
-        if not isinstance(node, GraphNode):
-            continue
+for node in script:
 
-        total_nodes += 1
-        total_words += node.get_word_count()
+    if not isinstance(node, GraphNode):
+        continue
 
-    OUTPUTS['word_count'] = total_words
-    OUTPUTS['node_count'] = total_nodes
+    total_nodes += 1
+    total_words += node.get_word_count()
 
-    print("< DONE >")
+OUTPUTS['word_count'] = total_words
+OUTPUTS['node_count'] = total_nodes
 
-    return OUTPUTS
+print("< DONE >")
+
+# return OUTPUTS
 
 
 # UPDATE MERMAN SYNTAX, WITH UPDATED independent pointers, that start with '-' like a bullet point list (indicate these special pointers with italics)
 # - ^ID "optional"
 # - Quick connects:
-    # IDs
-    # Pointers and References
+# IDs
+# Pointers and References
 
-    # also titles? \hello\ "world"
-    # or |hello| "world?"    No, [A|B] is used a lot
+# also titles? \hello\ "world"
+# or |hello| "world?"    No, [A|B] is used a lot
 
-    # special characters: [^\\]\\
-    # or just [right now]: [binsu~!^_\]
+# special characters: [^\\]\\
+# or just [right now]: [binsu~!^_\]
 
-    # also XXX is just a general tag that makes a comment show up in both Todo.md and Remember.md, change the color for XXX to reflect this... like deep purple text, or yellow text? or is it even necessary?
+# also XXX is just a general tag that makes a comment show up in both Todo.md and Remember.md, change the color for XXX to reflect this... like deep purple text, or yellow text? or is it even necessary?
 
 
 # NOT THIS::::
-    # or swap references and pointers: ??? NO
-    #    &Reference NO
-    #    *Pointer NO
+# or swap references and pointers: ??? NO
+#    &Reference NO
+#    *Pointer NO
 #
 # WARNING: code adaptation incomplete, test this code out with the full proper test files to check if all globals are added properly
 
-# WARNING: code sometimes produces double semicolons or sth idk fix it
+# WARNING? code sometimes produces double semicolons or sth idk fix it EDIT: seems fine
 
 # NOTE: filedata is the data passed from node to the python code when running in local scope, the value of the last statement is returned
-run(filedata)
+#
+# run(filedata)
+OUTPUTS
