@@ -154,10 +154,18 @@ function App(): React.JSX.Element {
   // TODO: add a file close method
   // WARNING: file close method is needed to stop file modify monitoring
 
-  // NOTE: ---------- end of file handling
 
   const file_open_action = () => {
     window.electron.ipcRenderer.send('file_open')
+  }
+
+  // NOTE: ---------- Tab Management
+
+
+  const set_active_tab = (id: string) => {
+    setFileTabs(fileTabs.map((tab) => (
+      { ...tab, active: id === tab.id })));
+    setActiveFile(getOpenFile(id))
   }
 
 
@@ -228,6 +236,7 @@ function App(): React.JSX.Element {
 
   // TODO: text_hash
   // set hash
+  //
   // NOTE: ---------- end of Displaying Renders
 
 
@@ -239,15 +248,14 @@ function App(): React.JSX.Element {
 
   return (
     <>
-      <button onClick={() => console.log(openFiles)}>TEST </button>
-      <div style={{ height: '95vh' }}>
+      <div style={{ height: '92vh' }}>
         <div className='FixedContainer'>
           <FileTabBar
             // darkMode={false}
             draggable
             onTabClose={() => console.log("tab close request")}
             //        onTabReorder={reorder}
-            onTabActive={() => console.log(fileTabs)}
+            onTabActive={set_active_tab}
             // onDragBegin={() => console.log('Drag started')}
             // onDragEnd={() => console.log('Drag ended')}
             tabs={fileTabs}
@@ -264,6 +272,7 @@ function App(): React.JSX.Element {
         <Tabs>
           <div className='FixedContainer'>
             <TabList>
+              {/* replace with favicon component for the image and markdowntabs*/}
               <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
               <Tab>Script</Tab>
               <Tab>Summary</Tab>
@@ -334,9 +343,6 @@ function App(): React.JSX.Element {
             <CodeEditor type="javascript" />
           </TabPanel>
         </Tabs>
-
-        Height : <span>{ContentHeight()}</span>
-
       </div>
     </>
   )
