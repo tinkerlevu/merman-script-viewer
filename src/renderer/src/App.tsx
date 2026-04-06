@@ -46,62 +46,100 @@ function App(): React.JSX.Element {
 
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
 
-
   // NOTE: ---------- file handling
 
-  const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([
-    // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
-    // {id: "def", favicon: test_fav, title: "test_Doc_name2", active: false },
-  ]);
+  const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([]);
+  // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
+  //
+  const blank_img: RenderedImage = {
+    svg: "",
+    hash: "",
+    render_status: "none",
+  }
+
 
   const [activeFile, setActiveFile] = useState<OpenFile>({
     filepath: "",
-    text: ""
+    text: "",
+    text_hash: "",
+    script: blank_img,
+    summary: blank_img,
+    sorted: blank_img,
+
   })
 
-  window.electron.ipcRenderer.on('file_change', (e, data) => {
-    console.log('recieved', e, data.filepath)
+  useEffect(() => { // Cleanup Pattern, for IPC race conditions
+    // set active file to first item with matching filename
+    // clean up duplicates:
+    const clean: Array<OpenFile> = []
+    var prev: string = ""
+    var duplicates: boolean = false
 
-    console.log(openFiles.find( // existing file not found
-      (item) => item.filepath == data.filepath))
+    openFiles.forEach((file) => {
+      if (file.filepath != prev) {
+        clean.push(file)
+        prev = file.filepath
+      } else
+        duplicates = true
+    })
 
-    console.log("openfiles", openFiles)
+    console.log("clean", clean)
 
-    if (-1 >= openFiles.findIndex( // existing file not found
-      (item) => item.filepath == data.filepath)) {
+    if (duplicates) {
+      setActiveFile( // set Active file to the instance in the clean array that has the corresponding filename
+        clean.find((i) => i.filepath == activeFile.filepath))
 
-      const newFile = {
-        filepath: data.filepath,
-        text: data.text
-        // TODO: text_hash
-      }
-
-      setOpenFiles([...openFiles, newFile]);
-      setActiveFile(newFile)
-
-      setFileTabs([...fileTabs, {
-        id: data.filepath,
-        favicon: test_fav, // TODO: replace this with proper favicon
-        title: data.title,
-        active: true
-      }])
-
-
-    } else { // NOTE:: File Already opened
-      const changed_file = openFiles.find( // automatically updates active file anyways if it's open
-        (i) => i.filepath == data.filepath)
-
-
-      //@ts-ignore then modify entry in array?
-      if (changed_file.text != data.text)
-        // TODO: text_hash
-        // set hash
-
-        //@ts-ignore then modify entry in array?
-        changed_file.text = data.text
+      setOpenFiles(clean)
     }
 
-  })
+  }, [openFiles])
+
+  // TODO: REMOVE
+  useEffect(() => console.log("ACTIVE FILE:", activeFile), [activeFile])
+
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('file_change', (_, data) => {
+
+      if (-1 >= openFiles.findIndex( // existing file not found
+        (item) => item.filepath == data.filepath)) {
+
+        const newFile = {
+          filepath: data.filepath,
+          text: data.text,
+          text_hash: "",
+          script: blank_img,
+          summary: blank_img,
+          sorted: blank_img,
+          // TODO: assigned preprocessor
+        }
+
+        setOpenFiles(prev => [...prev, newFile]);
+        setActiveFile(newFile)
+
+        setFileTabs([...fileTabs, {
+          id: data.filepath,
+          favicon: test_fav, // TODO: replace this with proper favicon
+          title: data.title,
+          active: true
+        }])
+
+
+      } else { // NOTE:: File Already opened
+        const changed_file = openFiles.find((i) => // automatically updates active file anyways if it's open
+          i.filepath == data.filepath)
+
+
+        //@ts-ignore then modify entry in array?
+        if (changed_file.text != data.text)
+
+          //@ts-ignore then modify entry in array?
+          changed_file.text = data.text
+      }
+
+    })
+  }, [openFiles, activeFile])
+
 
   // TODO: add a file close method
   // WARNING: file close method is needed to stop file modify monitoring
@@ -125,6 +163,27 @@ function App(): React.JSX.Element {
     })
   }
 
+  window.electron.ipcRenderer.on("new_rendered_image", (_, data) => {
+    console.log(data.filepath)
+    console.log(openFiles)
+    const update_file = getOpenFile(data.filepath)
+    const new_image: RenderedImage = {
+      svg: data.svg,
+      hash: data.hash,
+      render_status: "done"
+    }
+
+    console.log(new_image)
+
+    if (data.type == "script")
+      update_file.script = new_image
+    if (data.type == "summary")
+      update_file.summary = new_image
+    if (data.type == "sorted")
+      update_file.sorted = new_image
+  })
+  // TODO: text_hash
+  // set hash
   // NOTE: ---------- end of mermaid Rendering
 
 
@@ -137,7 +196,7 @@ function App(): React.JSX.Element {
   return (
     <>
       <div style={{ height: '95vh' }}>
-        <div className="FixedContainer">
+        <div className='FixedContainer'>
           <FileTabBar
             // darkMode={false}
             draggable

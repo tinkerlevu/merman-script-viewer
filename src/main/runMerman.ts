@@ -10,41 +10,10 @@ import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 import { createHash } from "crypto";
 
 
+var mainWindow: BrowserWindow // very hacky ikik
 
-
-
-
-// TODO: remove
-const test_code = `
-s = "hello world potato"
-s
-print(filedata)
-`
-const test_merman = [
-  'why: "hi here" !my_ID',
-  '',
-  '',
-  'special: "node with \n pointers" ^terminating non_terminating&',
-  '',
-  'special: "node with references" *reference1 *reference2',
-]
-
-const test_render_data = {
-  script: [
-    'graph TD\n',
-    'my_ID("hi here<br>"):::why\n',
-    '_4("node with <br> pointers<br>"):::special\n',
-    '_6("node with references<br>"):::special\n',
-    'my_ID==> _4;\n',
-    '_4 ==> terminating; _4 ==> non_terminating;\n',
-    'reference1 ==> _6 ;;reference2 ==> _6;;\n'
-  ],
-}
-
-
-
-
-
+export const initMermaidRenderer = (mainInterface: BrowserWindow) =>
+  mainWindow = mainInterface
 
 
 
@@ -149,26 +118,39 @@ function createRenderWindow(): BrowserWindow {
 }
 
 
-export function handleFinishedRender(event, data): void {
-  console.log("EVENT", event)
-  console.log("DATA", data)
+export function handleFinishedRender(_, data): void {
+  console.log("Image DATA", data)
+  mainWindow.webContents.send('new_rendered_image', data)
 }
 
 
 
-// TODO: REMOVE THIS
-export async function hello_python() {
-  const pyodide = await loadPyodide();
-  console.log(pyodide.runPython("1 + 2"));
-  // 3
 
-  const globals = pyodide.toPy({ x: 3 });
-  console.log(pyodide.runPython("x + 1", { globals }));
-  // 4
+// TODO: remove
+const test_code = `
+s = "hello world potato"
+s
+print(filedata)
+`
+const test_merman = [
+  'why: "hi here" !my_ID',
+  '',
+  '',
+  'special: "node with \n pointers" ^terminating non_terminating&',
+  '',
+  'special: "node with references" *reference1 *reference2',
+]
 
-  const locals = pyodide.toPy({ arr: [1, 2, 3] });
-  console.log(pyodide.runPython("sum(arr)", { locals }));
-  // 6
+const test_render_data = {
+  script: [
+    'graph TD\n',
+    'my_ID("hi here<br>"):::why\n',
+    '_4("node with <br> pointers<br>"):::special\n',
+    '_6("node with references<br>"):::special\n',
+    'my_ID==> _4;\n',
+    '_4 ==> terminating; _4 ==> non_terminating;\n',
+    'reference1 ==> _6 ;;reference2 ==> _6;;\n'
+  ],
 }
 
 

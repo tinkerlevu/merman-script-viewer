@@ -79,13 +79,11 @@ function Renderer(): React.JSX.Element {
 
 
   window.electron.ipcRenderer.on('start_render', (event, data) => {
-    console.log(data)
     setFilepath(data.filepath)
     setHash(data.hash)
     setScriptDef(data.mermaid.script.join(''))
     setSummaryDef(data.mermaid.summary.join(''))
     setSortDef(data.mermaid.sorted.join(''))
-    // TODO: note hash and filename
   })
 
 

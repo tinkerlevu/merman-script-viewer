@@ -4,9 +4,18 @@ type EditorType = "javascript" | "merman";
 
 type FileIDH = string
 
+type RenderedImage = {
+  svg: string,
+  hash: string,
+  render_status: "rendering" | "done" | "none"
+}
+
 type OpenFile = {
   filepath: FileID,
-  text: string
-  //TODO: text_hash: md5 string, string of specific length
+  text: string,
+  text_hash: string,
+  script: RenderedImage,
+  summary: RenderedImage,
+  sorted: RenderedImage
 
 }
