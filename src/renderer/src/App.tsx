@@ -45,6 +45,8 @@ function App(): React.JSX.Element {
 
 
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
+  const getOpenFile = (filepath: string) =>
+    openFiles.find((file) => file.filepath == filepath)
 
   // NOTE: ---------- file handling
 
@@ -126,8 +128,7 @@ function App(): React.JSX.Element {
 
 
       } else { // NOTE:: File Already opened
-        const changed_file = openFiles.find((i) => // automatically updates active file anyways if it's open
-          i.filepath == data.filepath)
+        const changed_file = getOpenFile(data.filepath) // automatically updates active file anyways if it's open
 
 
         //@ts-ignore then modify entry in array?
@@ -163,25 +164,36 @@ function App(): React.JSX.Element {
     })
   }
 
-  window.electron.ipcRenderer.on("new_rendered_image", (_, data) => {
-    console.log(data.filepath)
-    console.log(openFiles)
-    const update_file = getOpenFile(data.filepath)
-    const new_image: RenderedImage = {
-      svg: data.svg,
-      hash: data.hash,
-      render_status: "done"
-    }
+  useEffect(
+    window.electron.ipcRenderer.on("new_rendered_image", (_, data) => {
+      console.log(data.filepath)
+      console.log("image updating", activeFile)
+      const update_file = getOpenFile(data.filepath)
+      const new_image: RenderedImage = {
+        svg: data.svg,
+        hash: data.hash,
+        render_status: "done"
+      }
 
-    console.log(new_image)
+      console.log(new_image)
 
-    if (data.type == "script")
-      update_file.script = new_image
-    if (data.type == "summary")
-      update_file.summary = new_image
-    if (data.type == "sorted")
-      update_file.sorted = new_image
-  })
+      if (update_file) {
+        if (data.type == "script")
+          update_file.script = new_image
+        if (data.type == "summary")
+          update_file.summary = new_image
+        if (data.type == "sorted")
+          update_file.sorted = new_image
+      }
+      else {
+        console.log("file not found")
+      }
+
+    }),
+    [openFiles]
+  )
+
+
   // TODO: text_hash
   // set hash
   // NOTE: ---------- end of mermaid Rendering
@@ -195,6 +207,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
+      <button onClick={() => console.log(openFiles)}>TEST </button>
       <div style={{ height: '95vh' }}>
         <div className='FixedContainer'>
           <FileTabBar
