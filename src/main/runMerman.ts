@@ -7,6 +7,7 @@ import { AssignedRenderWindow } from "./env";
 
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
+import { createHash } from "crypto";
 
 
 
@@ -65,29 +66,30 @@ export default async function full_render(
   // TODO: WARNING: the preprocessor might return stuff as a single string separated by \n with \\n in the text. Might have to unpack those strings into arrays and add that to the main array
   // TODO: have a separate debug window that pops up which shows the file output and while line caused the error and which lines were modified by the preprocessor and what the preprocessor actually returned.
   //mb run the entire script again? or not if the preprocessor can use random values
+  // preprocessor returns table which indicates original filenumber, preprocessed file number, and the corresponding line output that can be mapped onto a table with no borders and displayed in a separate window
 
   // TODO: update rendering status if failed or successful in renderer
 
   const mermaid = await translate_merman(merman_script)
 
-  // TODO: check if mermaid translation is successful before starting this create render window
-  // TODO: generate hash from mermaid
-  // TODO: only save X most recent images as cache
+  // TODO: check if mermaid translation is successful or report error
+  console.log(mermaid)
+
+  const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
+
+  // TODO: check if cached image exists
+  // todo: only save X most recent images as cache
 
   const renderWindow = createRenderWindow()
 
   renderWindow.webContents.on('did-finish-load', () => {
     // IPC comms here
-    // TODO: add mmd_filepath to mermaid stuff? or to browserwindow preload?
     renderWindow.webContents.send('start_render', {
       mermaid: mermaid,
-      filepath: filepath
-      // TODO: hash
+      filepath: filepath,
+      hash: hash
     })
   })
-
-  // TODO: send hash with filepath
-
 
   runningRenderWindows.push({
     bWindow: renderWindow,

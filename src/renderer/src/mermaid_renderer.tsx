@@ -20,11 +20,13 @@ mermaid.initialize({
 
 
 const MermaidChart = (
-  { chart, type, isDone, afterDone }: {
+  { chart, type, isDone, afterDone, hash, filepath }: {
     chart: string | null,
     type: string,
     isDone: () => void,
-    afterDone: () => void
+    afterDone: () => void,
+    hash: string,
+    filepath: string
   }
 ) => { // TODO: add type variable for ipccallback
   const divRef = useRef(null);
@@ -46,7 +48,8 @@ const MermaidChart = (
           {
             type: type,
             svg: svg,
-            // TODO: add filepath and hash
+            filepath: filepath,
+            hash: hash
           })
 
         isDone(); // set corresponding done flag to true
@@ -67,13 +70,18 @@ const MermaidChart = (
 
 
 function Renderer(): React.JSX.Element {
+  // NOTE: hash is used to match a generated graph image to specific input merman text, filepath is a universal id used to coordinate mutiple parts of the program
   var [scriptDef, setScriptDef] = useState(null);
   var [summaryDef, setSummaryDef] = useState(null);
   var [sortDef, setSortDef] = useState(null);
+  var [hash, setHash] = useState("");
+  var [filepath, setFilepath] = useState('');
 
 
   window.electron.ipcRenderer.on('start_render', (event, data) => {
     console.log(data)
+    setFilepath(data.filepath)
+    setHash(data.hash)
     setScriptDef(data.mermaid.script.join(''))
     setSummaryDef(data.mermaid.summary.join(''))
     setSortDef(data.mermaid.sorted.join(''))
@@ -106,18 +114,24 @@ function Renderer(): React.JSX.Element {
       type="script"
       isDone={() => scriptDone = true}
       afterDone={checkDone}
+      hash={hash}
+      filepath={filepath}
     />
     <MermaidChart
       chart={summaryDef}
       type="summary"
       isDone={() => summaryDone = true}
       afterDone={checkDone}
+      hash={hash}
+      filepath={filepath}
     />
     <MermaidChart
       chart={sortDef}
       type="sorted"
       isDone={() => sortDone = true}
       afterDone={checkDone}
+      hash={hash}
+      filepath={filepath}
     />
   </>)
 }
