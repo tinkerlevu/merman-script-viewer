@@ -60,7 +60,7 @@ function App(): React.JSX.Element {
   })
 
   window.electron.ipcRenderer.on('file_change', (e, data) => {
-    console.log('recieved', e, data)
+    console.log('recieved', e, data.filepath)
 
     console.log(openFiles.find( // existing file not found
       (item) => item.filepath == data.filepath))
@@ -73,6 +73,7 @@ function App(): React.JSX.Element {
       const newFile = {
         filepath: data.filepath,
         text: data.text
+        // TODO: text_hash
       }
 
       setOpenFiles([...openFiles, newFile]);
@@ -87,20 +88,21 @@ function App(): React.JSX.Element {
 
 
     } else { // NOTE:: File Already opened
-      const changed_file = openFiles.find(
+      const changed_file = openFiles.find( // automatically updates active file anyways if it's open
         (i) => i.filepath == data.filepath)
 
 
       //@ts-ignore then modify entry in array?
-      if (changed_file.text != data.text) {
-        //@ts-ignore
+      if (changed_file.text != data.text)
+        // TODO: text_hash
+        // set hash
+
+        //@ts-ignore then modify entry in array?
         changed_file.text = data.text
-        console.log("reloading")
-      }
     }
 
   })
-  //
+
   // TODO: add a file close method
   // WARNING: file close method is needed to stop file modify monitoring
 
@@ -111,9 +113,19 @@ function App(): React.JSX.Element {
   }
 
 
+  // NOTE: ---------- mermaid Rendering
+  //
+  const mermanEditorRef = useRef({ get_text: () => " " });
+
   const render_merman = () => {
-    window.electron.ipcRenderer.send('render')
+    window.electron.ipcRenderer.send('render', {
+      filepath: activeFile.filepath,
+      merman: mermanEditorRef.current.get_text()
+      // TODO: preprocessor
+    })
   }
+
+  // NOTE: ---------- end of mermaid Rendering
 
 
 
@@ -161,7 +173,10 @@ function App(): React.JSX.Element {
           </div>
 
           <TabPanel > {/* Write */}
-            <MermanEditor ActiveFile={activeFile} />
+            <MermanEditor
+              ActiveFile={activeFile}
+              ref={mermanEditorRef}
+            />
           </TabPanel>
           <TabPanel > {/* Script */}
             <div>

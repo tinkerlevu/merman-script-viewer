@@ -2,10 +2,11 @@
 //
 type EditorType = "javascript" | "merman";
 
-type FileID = string
+type FileIDH = string
 
-type OpenFIle = {
+type OpenFile = {
   filepath: FileID,
   text: string
+  //TODO: text_hash: md5 string, string of specific length
 
 }

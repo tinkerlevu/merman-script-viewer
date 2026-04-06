@@ -1,6 +1,6 @@
-import { BrowserWindow, dialog, ipcMain } from "electron"
+import { BrowserWindow, dialog } from "electron"
 import { extname, parse } from "path"
-import { existsSync, readFile, watch, writeFileSync, open, readFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync } from "fs"
+import { existsSync, watch, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync } from "fs"
 import { MonitoredFile } from "./env"
 
 const supported_extensions = [
@@ -119,7 +119,7 @@ function loadFileContents(filepath: string) {
 
 
 
-  // TODO:  loadFileContents(filepath)
+  // TODO:
   // add md5 hash and image cacheing here
   // send IPC
   // (just use dir from filepath for caching, don't worry about renaming)
@@ -148,7 +148,8 @@ export function writeFileContents(filepath: string, data) {
 
 
 
-// TODO: stop monitoring file
+// TODO: CLOSE FILE
+// stop monitoring file
 // setup ipc in main
 // find item in array using filepath
 // deactivate watcher

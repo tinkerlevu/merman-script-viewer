@@ -4,9 +4,12 @@ import { useRef, useState } from "react";
 
 
 
+
 export default function MermanEditor(
-  { ActiveFile }: { ActiveFile: OpenFile }
-): React.JSX.Element {
+  { ActiveFile, ref }: {
+    ActiveFile: OpenFile,
+    ref: any // supposed to be a ref object idk
+  }): React.JSX.Element {
   const editorRef = useRef<PrismEditor>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false)
 
@@ -24,7 +27,7 @@ export default function MermanEditor(
       setUnsavedChanges(true)
   }
 
-
+  ref.current.get_text = () => editorRef.current?.value
 
 
 

@@ -107,7 +107,9 @@ app.whenReady().then(() => {
     writeFileContents(data.filepath, data.text))
 
   // Render Management
-  ipcMain.on('render', full_render);
+  ipcMain.on('render', (_, data) => full_render(
+    data.filepath, data.merman
+  ));
   ipcMain.on('render_done', handleFinishedRender);
 
   createWindow()

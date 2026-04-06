@@ -45,7 +45,8 @@ const MermaidChart = (
           'render_done',
           {
             type: type,
-            svg: svg
+            svg: svg,
+            // TODO: add filepath and hash
           })
 
         isDone(); // set corresponding done flag to true
@@ -64,10 +65,6 @@ const MermaidChart = (
 // get and render data
 
 
-// TODO: REMOVE
-const test_def = 'graph TB\na-->b'
-
-
 
 function Renderer(): React.JSX.Element {
   var [scriptDef, setScriptDef] = useState(null);
@@ -76,9 +73,11 @@ function Renderer(): React.JSX.Element {
 
 
   window.electron.ipcRenderer.on('start_render', (event, data) => {
-    setScriptDef(data.script.join(''))
-    setSummaryDef(data.summary.join(''))
-    setSortDef(data.sorted.join(''))
+    console.log(data)
+    setScriptDef(data.mermaid.script.join(''))
+    setSummaryDef(data.mermaid.summary.join(''))
+    setSortDef(data.mermaid.sorted.join(''))
+    // TODO: note hash and filename
   })
 
 

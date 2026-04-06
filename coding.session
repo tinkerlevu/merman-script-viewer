@@ -13,17 +13,24 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +118 ~/Development/Merman\ Script\ Viewer/src/main/index.ts
-badd +12 ~/Development/Merman\ Script\ Viewer/src/main/run_merman.ts
-badd +3 ~/Development/Merman\ Script\ Viewer/tsconfig.node.json
-badd +6 ~/Development/Merman\ Script\ Viewer/src/preload/index.d.ts
-badd +1 ~/Development/Merman\ Script\ Viewer/src/main/env.d.ts
-badd +3 ~/Development/Merman\ Script\ Viewer/src/renderer/src/env.d.ts
-badd +15 ~/Development/Merman\ Script\ Viewer/tsconfig.web.json
-badd +4 ~/Development/Merman\ Script\ Viewer/tsconfig.json
+badd +57 src/main/index.ts
+badd +9 tsconfig.node.json
+badd +8 src/preload/index.d.ts
+badd +13 src/main/env.d.ts
+badd +10 src/renderer/src/env.d.ts
+badd +121 ~/Development/Merman\ Script\ Viewer/src/renderer/src/App.tsx
+badd +1711 ~/Development/Merman\ Script\ Viewer/src/main/python-merman/merman2.py
+badd +95 ~/Development/Merman\ Script\ Viewer/src/renderer/src/mermaid_renderer.tsx
+badd +21 ~/Development/Merman\ Script\ Viewer/electron-builder.yml
+badd +15 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/Versions.tsx
+badd +11 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx
+badd +24 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/dynamicSize.tsx
+badd +18 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/CodeEditor.tsx
+badd +1 ~/Development/Merman\ Script\ Viewer/src/main/runMerman.ts
+badd +3 ~/Development/Merman\ Script\ Viewer/src/main/fileManagement.ts
 argglobal
 %argdel
-edit ~/Development/Merman\ Script\ Viewer/src/main/index.ts
+edit ~/Development/Merman\ Script\ Viewer/src/renderer/src/App.tsx
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -40,7 +47,10 @@ wincmd w
 wincmd w
 wincmd _ | wincmd |
 split
-1wincmd k
+wincmd _ | wincmd |
+split
+2wincmd k
+wincmd w
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -51,34 +61,68 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-wincmd =
+exe '1resize ' . ((&lines * 31 + 32) / 65)
+exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
+exe '2resize ' . ((&lines * 31 + 32) / 65)
+exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
+exe '4resize ' . ((&lines * 20 + 32) / 65)
+exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
+exe '5resize ' . ((&lines * 9 + 32) / 65)
+exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
+exe '6resize ' . ((&lines * 32 + 32) / 65)
+exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
 argglobal
-balt ~/Development/Merman\ Script\ Viewer/src/main/run_merman.ts
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/mermaid_renderer.tsx
+setlocal foldmethod=indent
+setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
 setlocal foldignore=#
 setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-78
+44
 sil! normal! zo
-81
+63
 sil! normal! zo
-let s:l = 111 - ((22 * winheight(0) + 15) / 31)
+71
+sil! normal! zo
+91
+sil! normal! zo
+135
+sil! normal! zo
+136
+sil! normal! zo
+137
+sil! normal! zo
+138
+sil! normal! zo
+139
+sil! normal! zo
+148
+sil! normal! zo
+158
+sil! normal! zo
+159
+sil! normal! zo
+173
+sil! normal! zo
+179
+sil! normal! zo
+let s:l = 121 - ((23 * winheight(0) + 15) / 31)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 111
-normal! 03|
+keepjumps 121
+normal! 040|
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/main/index.ts", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/main/index.ts | else | edit ~/Development/Merman\ Script\ Viewer/src/main/index.ts | endif
+if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx | else | edit ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx | endif
 if &buftype ==# 'terminal'
-  silent file ~/Development/Merman\ Script\ Viewer/src/main/index.ts
+  silent file ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx
 endif
-balt ~/Development/Merman\ Script\ Viewer/src/main/run_merman.ts
+balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/dynamicSize.tsx
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -87,25 +131,29 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-7
+8
 sil! normal! zo
-78
+16
 sil! normal! zo
-81
+17
 sil! normal! zo
-let s:l = 118 - ((18 * winheight(0) + 15) / 31)
+34
+sil! normal! zo
+34
+sil! normal! zo
+let s:l = 11 - ((8 * winheight(0) + 15) / 31)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 118
-normal! 045|
+keepjumps 11
+normal! 047|
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/preload/index.d.ts", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/preload/index.d.ts | else | edit ~/Development/Merman\ Script\ Viewer/src/preload/index.d.ts | endif
+if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/main/fileManagement.ts", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/main/fileManagement.ts | else | edit ~/Development/Merman\ Script\ Viewer/src/main/fileManagement.ts | endif
 if &buftype ==# 'terminal'
-  silent file ~/Development/Merman\ Script\ Viewer/src/preload/index.d.ts
+  silent file ~/Development/Merman\ Script\ Viewer/src/main/fileManagement.ts
 endif
-balt ~/Development/Merman\ Script\ Viewer/src/main/env.d.ts
+balt ~/Development/Merman\ Script\ Viewer/src/main/runMerman.ts
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -114,59 +162,119 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 10 - ((9 * winheight(0) + 31) / 63)
+25
+sil! normal! zo
+26
+sil! normal! zo
+26
+sil! normal! zo
+33
+sil! normal! zo
+33
+sil! normal! zo
+78
+sil! normal! zo
+80
+sil! normal! zo
+89
+sil! normal! zo
+95
+sil! normal! zo
+99
+sil! normal! zo
+114
+sil! normal! zo
+let s:l = 26 - ((13 * winheight(0) + 31) / 63)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 26
+normal! 036|
+wincmd w
+argglobal
+if bufexists(fnamemodify("src/main/env.d.ts", ":p")) | buffer src/main/env.d.ts | else | edit src/main/env.d.ts | endif
+if &buftype ==# 'terminal'
+  silent file src/main/env.d.ts
+endif
+balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/App.tsx
+setlocal foldmethod=expr
+setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=99
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 8 - ((7 * winheight(0) + 10) / 20)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 8
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("src/renderer/src/env.d.ts", ":p")) | buffer src/renderer/src/env.d.ts | else | edit src/renderer/src/env.d.ts | endif
+if &buftype ==# 'terminal'
+  silent file src/renderer/src/env.d.ts
+endif
+balt src/main/env.d.ts
+setlocal foldmethod=expr
+setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=99
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 10 - ((6 * winheight(0) + 4) / 9)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 10
-normal! 068|
+normal! 058|
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/tsconfig.node.json", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/tsconfig.node.json | else | edit ~/Development/Merman\ Script\ Viewer/tsconfig.node.json | endif
+if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx | else | edit ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx | endif
 if &buftype ==# 'terminal'
-  silent file ~/Development/Merman\ Script\ Viewer/tsconfig.node.json
+  silent file ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/MermanEditor.tsx
 endif
-balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/env.d.ts
+balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/dynamicSize.tsx
 setlocal foldmethod=expr
-setlocal foldexpr=v:lua.LazyVim.treesitter.foldexpr()
+setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
 setlocal foldignore=#
 setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-1
+8
 sil! normal! zo
-let s:l = 3 - ((2 * winheight(0) + 15) / 31)
+16
+sil! normal! zo
+17
+sil! normal! zo
+34
+sil! normal! zo
+34
+sil! normal! zo
+let s:l = 28 - ((22 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 3
-normal! 099|
+keepjumps 28
+normal! 03|
 wincmd w
-argglobal
-if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/tsconfig.web.json", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/tsconfig.web.json | else | edit ~/Development/Merman\ Script\ Viewer/tsconfig.web.json | endif
-if &buftype ==# 'terminal'
-  silent file ~/Development/Merman\ Script\ Viewer/tsconfig.web.json
-endif
-balt ~/Development/Merman\ Script\ Viewer/src/renderer/src/env.d.ts
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.LazyVim.treesitter.foldexpr()
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=99
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-let s:l = 7 - ((6 * winheight(0) + 15) / 31)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 7
-normal! 019|
-wincmd w
-4wincmd w
-wincmd =
+exe '1resize ' . ((&lines * 31 + 32) / 65)
+exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
+exe '2resize ' . ((&lines * 31 + 32) / 65)
+exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
+exe '4resize ' . ((&lines * 20 + 32) / 65)
+exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
+exe '5resize ' . ((&lines * 9 + 32) / 65)
+exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
+exe '6resize ' . ((&lines * 32 + 32) / 65)
+exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

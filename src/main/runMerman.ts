@@ -53,23 +53,45 @@ var runningRenderWindows: Array<AssignedRenderWindow> = []
 
 
 
-export default async function full_render() {
-  const mermaid = await translate_merman(test_merman)
+export default async function full_render(
+  filepath: string,
+  merman_text: string // one single string that hasn't been broken into an array
+) {
+
+  const merman_script = merman_text.split(/\r?\n/)
+
+  // TODO: Preprocessor stuff here? or handle it in renderer?
+  // to include files have to do it here
+  // TODO: WARNING: the preprocessor might return stuff as a single string separated by \n with \\n in the text. Might have to unpack those strings into arrays and add that to the main array
+  // TODO: have a separate debug window that pops up which shows the file output and while line caused the error and which lines were modified by the preprocessor and what the preprocessor actually returned.
+  //mb run the entire script again? or not if the preprocessor can use random values
+
+  // TODO: update rendering status if failed or successful in renderer
+
+  const mermaid = await translate_merman(merman_script)
 
   // TODO: check if mermaid translation is successful before starting this create render window
+  // TODO: generate hash from mermaid
+  // TODO: only save X most recent images as cache
 
   const renderWindow = createRenderWindow()
 
   renderWindow.webContents.on('did-finish-load', () => {
     // IPC comms here
     // TODO: add mmd_filepath to mermaid stuff? or to browserwindow preload?
-    renderWindow.webContents.send('start_render', mermaid)
+    renderWindow.webContents.send('start_render', {
+      mermaid: mermaid,
+      filepath: filepath
+      // TODO: hash
+    })
   })
+
+  // TODO: send hash with filepath
 
 
   runningRenderWindows.push({
     bWindow: renderWindow,
-    mmn_filepath: "test" // TODO: replace with proper filepath
+    mmn_filepath: filepath
   })
 
 }
