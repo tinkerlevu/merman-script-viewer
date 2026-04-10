@@ -21,6 +21,13 @@ export default function MermanEditor(
     })
   }
 
+  const saveAsFile = () => {
+    window.electron.ipcRenderer.send('save_as_file', {
+      filepath: ActiveFile.filepath,
+      text: editorRef.current?.value // recommended way to get editor state
+    })
+  }
+
   const textUpdated = () => {
     if (editorRef.current?.value == ActiveFile.text)
       setUnsavedChanges(false)
@@ -45,7 +52,10 @@ export default function MermanEditor(
         disabled={!unsavedChanges}>
         Save
       </button>
-      <button >Save As</button>
+      <button
+        onClick={saveAsFile}>
+        Save As
+      </button>
       <button >Verify</button>  {/* run code without rendering or preprocessor */}
       ! unsaved changes !  {/*TODO: Change this to disable enable save button when editor on change is run */}
       error tab that also displays docs for merman syntax

@@ -37,7 +37,7 @@ export default async function openMermaidFile() {
   })
   console.log(pathSelection)
 
-  if (pathSelection.canceled) return
+  if (pathSelection.canceled) return null
 
   var filepath = pathSelection.filePath
 
@@ -58,6 +58,25 @@ export default async function openMermaidFile() {
   //IPC send open existing file and have separate ipc if implementing no auto refresh feature
   startMonitorFile(filepath) // auto update
   loadFileContents(filepath) // send IPC with contents
+
+  return filepath
+}
+
+
+export async function SaveAsFile(old_filepath, text) {
+  const new_filepath = await openMermaidFile()
+
+  if (!new_filepath) return
+
+  writeFileContents(new_filepath, text) // write to new file
+  closeFile(old_filepath) // stop watching and drop old file
+  mainWindow.webContents.send('save_as_change', {
+    old_filepath: old_filepath,
+    new_filepath: new_filepath
+    // rename entries in the interface
+  })
+
+
 }
 
 

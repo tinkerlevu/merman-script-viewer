@@ -180,6 +180,16 @@ function App(): React.JSX.Element {
     console.log('file_save_as', filepath)
   }
 
+  // useEffect(
+  //   window.electron.ipcRenderer.on("save_as_change", (_, data) => {
+  //     file_close_action(data.old_filepath)
+  //     set_active_tab(data.new_filepath)
+  //   }),
+  //   [activeFile, fileTabs]
+  // )
+  //
+  // NOT working
+  // TODO: fix or leave as is? idk
 
   // NOTE: ---------- Tab Management
 
