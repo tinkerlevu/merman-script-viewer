@@ -1,6 +1,6 @@
 import { BrowserWindow, dialog } from "electron"
 import { extname, parse } from "path"
-import { existsSync, watch, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync } from "fs"
+import { existsSync, watch, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync, closeSync } from "fs"
 import { MonitoredFile } from "./env"
 
 const supported_extensions = [
@@ -118,20 +118,6 @@ function loadFileContents(filepath: string) {
   })
 
 
-
-  // TODO:
-  // add md5 hash and image cacheing here
-  // send IPC
-  // (just use dir from filepath for caching, don't worry about renaming)
-
-  // readFile(getFileHandle(filepath), 'utf8', (err, data) => {
-  //   console.log(err)
-  //   if (err)
-  //     return console.error(err); // leave this log here unless proper error indication system is created
-  //   console.log("UPDATING file", data)
-  // });
-
-
 } // NOTE: <--------- end of load File Contents ------>
 
 
@@ -145,13 +131,21 @@ export function writeFileContents(filepath: string, data) {
 
 
 // TODO: saveCachedImage (filepath,  hash, svg data,)
+//
+// TODO: getCachedImage (filepath,  hash)
+// return "" if not found
 
 
 
-// TODO: CLOSE FILE
-// stop monitoring file
-// setup ipc in main
-// find item in array using filepath
-// deactivate watcher
-// remove item from array
-// run fs.closeSync(getFileHandle(filepath))
+export function closeFile(filepath: string) {
+  const to_close = monitoredFiles.find(i => i.filepath == filepath)
+  monitoredFiles = monitoredFiles.filter(i => i.filepath != filepath)
+
+  if (!to_close) return
+
+  to_close.watcher.close() // stop monitoring changes on this file
+
+  closeSync(to_close.handle)
+
+  console.log(monitoredFiles, to_close)
+}

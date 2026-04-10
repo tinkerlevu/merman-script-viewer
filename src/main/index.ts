@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import full_render, { handleFinishedRender, setupMermaidRenderer } from './runMerman'
-import openMermaidFile, { initalizeFS, writeFileContents } from './fileManagement'
+import openMermaidFile, { closeFile, initalizeFS, writeFileContents } from './fileManagement'
 
 
 function createWindow(): void {
@@ -104,6 +104,7 @@ app.whenReady().then(() => {
 
   // File management
   ipcMain.on('file_open', openMermaidFile)
+  ipcMain.on('file_close', (_, data) => closeFile(data))
   ipcMain.on('save_file', (_, data) =>
     writeFileContents(data.filepath, data.text))
 

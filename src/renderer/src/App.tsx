@@ -65,7 +65,7 @@ function App(): React.JSX.Element {
     render_status: "none",
   }
 
-  const [activeFile, setActiveFile] = useState<OpenFile>({
+  const blank_file: OpenFile = {
     filepath: "",
     text: "",
     text_hash: "",
@@ -74,8 +74,9 @@ function App(): React.JSX.Element {
     sorted: blank_img,
     todo: blank_markdown,
     remember: blank_markdown
+  }
 
-  })
+  const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)
 
   useEffect(() => { // Cleanup Pattern, for IPC race conditions
     // set active file to first item with matching filename
@@ -113,17 +114,9 @@ function App(): React.JSX.Element {
       if (-1 >= openFiles.findIndex( // existing file not found
         (item) => item.filepath == data.filepath)) {
 
-        const newFile = {
-          filepath: data.filepath,
-          text: data.text,
-          text_hash: "",
-          script: blank_img,
-          summary: blank_img,
-          sorted: blank_img,
-          todo: blank_markdown,
-          remember: blank_markdown
-          // TODO: assigned preprocessor
-        }
+        const newFile = structuredClone(blank_file)
+        newFile.filepath = data.filepath
+        newFile.text = data.text
 
         setOpenFiles(prev => [...prev, newFile]);
         setActiveFile(newFile)
@@ -158,6 +151,35 @@ function App(): React.JSX.Element {
   const file_open_action = () => {
     window.electron.ipcRenderer.send('file_open')
   }
+
+
+  const file_close_action = (filepath_id: string) => {
+    window.electron.ipcRenderer.send('file_close', filepath_id)
+
+
+    // NOTE: ActiveFile set here
+    if (filepath_id == activeFile.filepath) {
+      const new_active_file = [...openFiles, blank_file].filter(
+        file => file.filepath != filepath_id)
+      [0]
+      setActiveFile(new_active_file)
+      setFileTabs(fileTabs.map((tab) => ( // set which tab is active
+        { ...tab, active: new_active_file.filepath === tab.id })));
+    }
+
+    setOpenFiles(prev =>
+      prev.filter(item => item.filepath != filepath_id))
+
+    setFileTabs(prev => // remove closed tab for file tab display
+      prev.filter(item => item.id != filepath_id))
+
+  }
+
+  // can be used to save the script or the preprocessor
+  const file_save_as_action = (filepath: string) => {
+    console.log('file_save_as', filepath)
+  }
+
 
   // NOTE: ---------- Tab Management
 
@@ -248,16 +270,13 @@ function App(): React.JSX.Element {
 
   return (
     <>
-      <div style={{ height: '92vh' }}>
+      <div style={{ height: '95vh' }}>
         <div className='FixedContainer'>
           <FileTabBar
             // darkMode={false}
             draggable
-            onTabClose={() => console.log("tab close request")}
-            //        onTabReorder={reorder}
+            onTabClose={file_close_action}
             onTabActive={set_active_tab}
-            // onDragBegin={() => console.log('Drag started')}
-            // onDragEnd={() => console.log('Drag ended')}
             tabs={fileTabs}
             pinnedRight={
               <button
@@ -292,9 +311,6 @@ function App(): React.JSX.Element {
             />
           </TabPanel>
           <TabPanel > {/* Script */}
-            <div>
-              <h2 className='FixedContainer'>Test displacement</h2>
-            </div>
             <GraphViewer
               activeFile={activeFile}
               type="script"

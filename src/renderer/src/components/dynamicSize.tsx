@@ -6,7 +6,7 @@ const getWindowHeight = () => {
 const fixed_elements = document.getElementsByClassName("FixedContainer")
 
 
-
+const OFFSET = 10; // NOTE: Pixel Offset
 
 const calculate_new_height = () => {
   const viewport_height = getWindowHeight()
@@ -17,7 +17,7 @@ const calculate_new_height = () => {
   var used_space: number = 0;
 
   for (let item of fixed_elements) {
-    used_space += item.getBoundingClientRect().height
+    used_space += item.getBoundingClientRect().height + OFFSET
   }
 
   return viewport_height - used_space
