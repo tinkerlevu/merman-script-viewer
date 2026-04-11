@@ -12,6 +12,6 @@ type MonitoredFile = {
 }
 
 type RenderJob = {
-  merman_text: string,
-  filepath: string
+  text: string,
+  filepath_id: string
 }
