@@ -46,7 +46,7 @@ export default async function full_render(
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
 
-  handleFinishedRender(null, {
+  handleFinishedRender(null, { // TODO report
     filepath: filepath,
     hash: hash,
     type: 'todo',
@@ -54,13 +54,15 @@ export default async function full_render(
   })
 
 
-  handleFinishedRender(null, {
+  handleFinishedRender(null, { // Remember report
     filepath: filepath,
     hash: hash,
     type: 'remember',
     text: mermaid.remember.join('')
   })
 
+
+  closeExisting(filepath)
 
   // TODO: check if cached image exists
   // todo: only save X most recent images as cache
@@ -83,6 +85,18 @@ export default async function full_render(
 
 }
 
+
+// close any existing browser windows
+async function closeExisting(filepath_id: string) {
+  runningRenderWindows = runningRenderWindows.filter(i => {
+    if (i.mmn_filepath == filepath_id) {
+      i.bWindow.close()
+      return false // remove from array
+    }
+    return true // keep in array
+  })
+
+}
 
 // params are the merman text and  a function to send updates to the terminal window on the interface, and a function to return the results
 

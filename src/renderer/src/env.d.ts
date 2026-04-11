@@ -29,5 +29,6 @@ type OpenFile = {
   sorted: RenderedImage,
   todo: RenderedMD,
   remember: RenderedMD,
+  auto_render: boolean,
 
 }

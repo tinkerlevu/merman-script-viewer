@@ -73,8 +73,11 @@ function App(): React.JSX.Element {
     summary: blank_img,
     sorted: blank_img,
     todo: blank_markdown,
-    remember: blank_markdown
+    remember: blank_markdown,
+    auto_render: false
   }
+
+  useEffect(() => console.log("AAAAAAA", fileTabs), [fileTabs])
 
   const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)
 
@@ -114,6 +117,8 @@ function App(): React.JSX.Element {
       if (-1 >= openFiles.findIndex( // existing file not found
         (item) => item.filepath == data.filepath)) {
 
+        console.log("newFile")
+
         const newFile = structuredClone(blank_file)
         newFile.filepath = data.filepath
         newFile.text = data.text
@@ -135,13 +140,16 @@ function App(): React.JSX.Element {
 
         //@ts-ignore then modify entry in array?
         if (changed_file.text != data.text)
-
           //@ts-ignore then modify entry in array?
           changed_file.text = data.text
+
+        if (changed_file?.auto_render)
+          render_merman(changed_file.filepath, data.text)
+
       }
 
     })
-  }, [openFiles, activeFile])
+  }, [openFiles, activeFile, openFiles])
 
 
   // TODO: add a file close method
@@ -208,10 +216,11 @@ function App(): React.JSX.Element {
 
   const mermanEditorRef = useRef({ get_text: () => " " });
 
-  const render_merman = () => {
+  const render_merman = (
+    specific_filepath, certain_text) => {
     window.electron.ipcRenderer.send('render', {
-      filepath: activeFile.filepath,
-      merman: mermanEditorRef.current.get_text()
+      filepath: specific_filepath || activeFile.filepath,
+      merman: certain_text || mermanEditorRef.current.get_text()
       // TODO: preprocessor
     })
   }
@@ -309,7 +318,10 @@ function App(): React.JSX.Element {
               <Tab>Todo</Tab>
               <Tab>Remember</Tab>
               <Tab>Preprocessor</Tab>
-              <button onClick={render_merman}>Render</button>
+              <button
+                onClick={() => render_merman(null, null)}>
+                Render
+              </button>
               <input type="checkbox" />Darkmode
             </TabList>
           </div>

@@ -1,6 +1,6 @@
 import { PrismEditor } from "prism-react-editor";
 import CodeEditor from "./CodeEditor";
-import { useEffect, useRef, useState } from "react";
+import { act, useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize";
 
 
@@ -35,7 +35,18 @@ export default function MermanEditor(
       setUnsavedChanges(true)
   }
 
-  ref.current.get_text = () => editorRef.current?.value
+
+  const autoRenderRef = useRef(null)
+
+  useEffect(() => { // set current state of checkbox
+    autoRenderRef.current.checked = ActiveFile.auto_render || false
+  }, [ActiveFile])
+
+  const toggleAutoRender = () =>
+    ActiveFile.auto_render = autoRenderRef.current.checked
+
+
+  ref.current.get_text = () => editorRef.current?.value // function that parent components can use to access editor value
 
 
   const container_style = {
@@ -46,7 +57,10 @@ export default function MermanEditor(
 
     <div className="FixedContainer">
       {/*<input type="checkbox" />Auto-Refresh ah have autorefresh on at all times!! */}
-      <input type="checkbox" />Auto-Render
+      <input type="checkbox"
+        onChange={toggleAutoRender}
+        ref={autoRenderRef}
+      /> Auto-Render
       <button
         onClick={saveFile}
         disabled={!unsavedChanges}>

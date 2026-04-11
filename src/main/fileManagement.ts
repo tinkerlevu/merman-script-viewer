@@ -69,7 +69,7 @@ export async function SaveAsFile(old_filepath, text) {
   if (!new_filepath) return
 
   writeFileContents(new_filepath, text) // write to new file
-  closeFile(old_filepath) // stop watching and drop old file
+  // closeFile(old_filepath) // stop watching and drop old file
   mainWindow.webContents.send('save_as_change', {
     old_filepath: old_filepath,
     new_filepath: new_filepath

@@ -97,6 +97,7 @@ function Renderer(): React.JSX.Element {
     if (scriptDone && summaryDone && sortDone) {
       // TODO: send ipc message to close window here
       console.log("ALL DONE")
+
     }
 
     // NOTE: this can be used to pass params to mermaid:
