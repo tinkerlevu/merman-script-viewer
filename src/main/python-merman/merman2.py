@@ -1,5 +1,9 @@
 import re
 import copy
+import sys
+
+sys.setrecursionlimit(20000)
+
 # import json
 
 # Classes ------ -------------
@@ -1886,4 +1890,5 @@ print("< DONE >")
 # NOTE: filedata is the data passed from node to the python code when running in local scope, the value of the last statement is returned
 #
 # run(filedata)
+
 OUTPUTS

@@ -1,7 +1,8 @@
 import { BrowserWindow, dialog } from "electron"
 import { extname, parse } from "path"
-import { existsSync, watch, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync, closeSync } from "fs"
+import { existsSync, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync, closeSync } from "fs"
 import { MonitoredFile } from "./env"
+import chokidar from "chokidar"
 
 const supported_extensions = [
   'mmn',
@@ -82,6 +83,9 @@ export async function SaveAsFile(old_filepath, text) {
 
 // WARNING: make sure there is always corresponding filepath in monitoredFiles
 var monitoredFiles: Array<MonitoredFile> = [] // all files with fs.Watch applied to them
+const watcher = chokidar.watch([])
+watcher.on('change', path => loadFileContents(path)) // send file changes to renderer here
+
 
 // filepath is used as an id to coordinate multiple parts of the app
 const getFileHandle = (filepath: string) =>
@@ -95,20 +99,19 @@ const getFileHandle = (filepath: string) =>
 
 // creates a watcher that auto updates the content of a file if it's modified
 function startMonitorFile(filepath: string) {
-
-  const watcher = watch(filepath, (event, _) => {
-    console.log(`Event type:`, event, _, filepath)
-    if (event == 'change')
-      loadFileContents(filepath)
-    // else rename event
-  })
+  watcher.add(filepath)
+  // const watcher = watch(filepath, (event, _) => {
+  //   console.log(`Event type:`, event, _, filepath)
+  //   if (event == 'change')
+  //     loadFileContents(filepath)
+  //   // else rename event
+  // })
 
   const file_handle: PathOrFileDescriptor = openSync(filepath, 'r+')
 
   monitoredFiles.push({
     filepath: filepath,
     handle: file_handle,
-    watcher: watcher
   })
 
 }
@@ -129,7 +132,6 @@ function loadFileContents(filepath: string) {
 
   const data = buffer.toString('utf8')
 
-  console.log('sending to renderer')
   mainWindow.webContents.send('file_change', {
     filepath: filepath,
     text: data,
@@ -157,12 +159,12 @@ export function writeFileContents(filepath: string, data) {
 
 
 export function closeFile(filepath: string) {
-  const to_close = monitoredFiles.find(i => i.filepath == filepath)
-  monitoredFiles = monitoredFiles.filter(i => i.filepath != filepath)
+  var to_close = monitoredFiles.find(i => i.filepath == filepath)
+  monitoredFiles = monitoredFiles.filter(i => i.filepath != filepath) // remove file to close from monitored
 
   if (!to_close) return
 
-  to_close.watcher.close() // stop monitoring changes on this file
+  watcher.unwatch(filepath) // stop monitoring changes on this file
 
   closeSync(to_close.handle)
 

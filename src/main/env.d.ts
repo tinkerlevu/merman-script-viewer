@@ -9,5 +9,9 @@ type AssignedRenderWindow = {
 type MonitoredFile = {
   filepath: string, // acts as like an id to identify this script in several places within the app
   handle: number, // FileDescriptor int
-  watcher: FSWatcher
+}
+
+type RenderJob = {
+  merman_text: string,
+  filepath: string
 }

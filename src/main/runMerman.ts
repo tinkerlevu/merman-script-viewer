@@ -1,9 +1,9 @@
-import { loadPyodide, toPy } from "pyodide";
-import { BrowserWindow, IpcMainEvent } from "electron";
+import { loadPyodide } from "pyodide";
+import { BrowserWindow } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
 
-import { AssignedRenderWindow } from "./env";
+import { AssignedRenderWindow, RenderJob } from "./env";
 
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
@@ -21,12 +21,22 @@ export const setupMermaidRenderer = (mainInterface: BrowserWindow) =>
 var runningRenderWindows: Array<AssignedRenderWindow> = []
 
 
-
+var currentRender: RenderJob = {
+  merman_text: "",
+  filepath: ""
+}
 
 export default async function full_render(
   filepath: string,
   merman_text: string // one single string that hasn't been broken into an array
 ) {
+
+  if (merman_text == currentRender.text
+    && filepath == currentRender.filepath_id) // multiple triggers from file saves
+    return
+
+  currentRender = { text: merman_text, filepath_id: filepath }
+  closeExisting(filepath) // cancel previous render job
 
   const merman_script = merman_text.split(/\r?\n/)
 
@@ -42,7 +52,8 @@ export default async function full_render(
   const mermaid = await translate_merman(merman_script)
 
   // TODO: check if mermaid translation is successful or report error
-  console.log(mermaid)
+
+  //  console.log(mermaid)
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
 
@@ -62,7 +73,6 @@ export default async function full_render(
   })
 
 
-  closeExisting(filepath)
 
   // TODO: check if cached image exists
   // todo: only save X most recent images as cache
@@ -139,10 +149,6 @@ function createRenderWindow(): BrowserWindow {
   } else {
     renderWindow.loadFile(join(__dirname, '../renderer/mermaid_render_index.html'))
   }
-
-
-  // TODO: remove this
-  console.log("new Render window id:", renderWindow.webContents.id)
 
   return renderWindow;
 }
