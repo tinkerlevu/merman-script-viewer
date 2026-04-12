@@ -35,6 +35,7 @@ type DocPos = { // scroll position for markdown documents
 type OpenFile = {
   filepath: FileID,
   text: string,
+  unsaved_text: string,
   text_hash: string,
   script: RenderedImage,
   summary: RenderedImage,
@@ -49,5 +50,4 @@ type OpenFile = {
     todo: DocPos,
     remember: DocPos,
   },
-
 }

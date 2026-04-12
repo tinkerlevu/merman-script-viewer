@@ -53,27 +53,35 @@ function App(): React.JSX.Element {
   const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([]);
   // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
   //
-  const blank_img: RenderedImage = {
-    svg: "",
-    hash: "",
-    render_status: "none",
+  const blank_img = (): RenderedImage => {
+    return {
+      svg: "",
+      hash: "",
+      render_status: "none",
+    }
   }
 
-  const blank_markdown: RenderedMD = {
-    text: "",
-    hash: "",
-    render_status: "none",
+  const blank_markdown = (): RenderedMD => {
+    return {
+      text: "",
+      hash: "",
+      render_status: "none",
+    }
   }
 
-  const blank_graphpos: GraphPos = {
-    zoom: 1.0,
-    scroll_x: 0,
-    scroll_y: 0,
+  const blank_graphpos = (): GraphPos => {
+    return {
+      zoom: 1.0,
+      scroll_x: 0,
+      scroll_y: 0,
+    }
   }
 
 
-  const blank_docpos: DocPos = {
-    scroll: 0
+  const blank_docpos = (): DocPos => {
+    return {
+      scroll: 0
+    }
   }
 
   const copy = (item: any) => structuredClone(item)
@@ -81,23 +89,22 @@ function App(): React.JSX.Element {
   const blank_file: OpenFile = {
     filepath: "",
     text: "",
+    unsaved_text: "",
     text_hash: "",
-    script: copy(blank_img),
-    summary: copy(blank_img),
-    sorted: copy(blank_img),
-    todo: copy(blank_markdown),
-    remember: copy(blank_markdown),
+    script: blank_img(),
+    summary: blank_img(),
+    sorted: blank_img(),
+    todo: blank_markdown(),
+    remember: blank_markdown(),
     auto_render: false,
     scroll_pos: {
-      script: copy(blank_graphpos),
-      summary: copy(blank_graphpos),
-      sorted: copy(blank_graphpos),
-      todo: copy(blank_docpos),
-      remember: copy(blank_docpos),
+      script: blank_graphpos(),
+      summary: blank_graphpos(),
+      sorted: blank_graphpos(),
+      todo: blank_docpos(),
+      remember: blank_docpos(),
     },
   }
-
-  useEffect(() => console.log("AAAAAAA", fileTabs), [fileTabs])
 
   const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)
 

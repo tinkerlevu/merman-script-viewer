@@ -33,6 +33,7 @@ export default function MermanEditor(
       setUnsavedChanges(false)
     else
       setUnsavedChanges(true)
+    ActiveFile.unsaved_text = editorRef.current?.value
   }
 
 
@@ -52,6 +53,16 @@ export default function MermanEditor(
   const container_style = {
     height: ContentHeight(),
   }
+
+  const [initText, setInitText] = useState<string>("")
+
+  useEffect(() => {
+    setInitText(
+      ActiveFile.unsaved_text != "" ?
+        ActiveFile.unsaved_text : ActiveFile.text
+    )
+    console.log("setting init")
+  }, [ActiveFile])
 
   return (<>
 
@@ -105,7 +116,7 @@ export default function MermanEditor(
       }}>
         <CodeEditor
           type="merman"
-          value={ActiveFile.text}
+          value={initText}
           ref={editorRef}
           onUpdate={textUpdated}
         />
