@@ -66,7 +66,9 @@ function App(): React.JSX.Element {
   }
 
   const blank_graphpos: GraphPos = {
-    zoom: 1.0
+    zoom: 1.0,
+    scroll_x: 0,
+    scroll_y: 0,
   }
 
 

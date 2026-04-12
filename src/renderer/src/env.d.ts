@@ -23,6 +23,8 @@ type RenderedMD = {
 
 type GraphPos = { // scroll and zoom position for flowcharts
   zoom: number,
+  scroll_y: number, // ratio of 1 to 0
+  scroll_x: number
 }
 
 

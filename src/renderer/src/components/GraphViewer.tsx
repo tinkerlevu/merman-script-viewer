@@ -19,11 +19,6 @@ export default function GraphViewer(
 
 
 
-  const handleScroll = (e) => console.log(e) //TODO: this next
-
-  const [zoom, setZoom] = useState(100)
-
-
   const container_style = {
     overflow: "scroll",
     height: ContentHeight(),
@@ -32,26 +27,107 @@ export default function GraphViewer(
 
   const divRef = useRef(null);
 
-  const activeImage =
+  const activeImage: RenderedImage | void = // void should never trigger
     type == "script" ? activeFile.script :
       type == "summary" ? activeFile.summary :
         type == "sorted" ? activeFile.sorted :
           console.error("invalid GraphViewer type")
 
+  const blank_graphpos: GraphPos = {
+    zoom: 1.0,
+    scroll_x: 0,
+    scroll_y: 0,
+  }
+
+  // have to recall this to actually use the stored scroll position to override the current scroll position
+  const restore_scroll = (pos: GraphPos) => {
+    if (!divRef.current) return
+
+    const container = divRef.current
+
+    container.scrollTop = pos.scroll_y * container.scrollHeight
+    container.scrollLeft = pos.scroll_x * container.scrollWidth
+
+    console.log("restoring Current", type, pos)
+
+  }
+
+
+  const [activeScroll, setActiveScroll] = useState<GraphPos>(blank_graphpos)
+
+  useEffect(() => {
+    var data: GraphPos
+
+    if (type == "script")
+      data = activeFile.scroll_pos.script
+    else if (type == "summary")
+      data = activeFile.scroll_pos.summary
+    else if (type == "sorted")
+      data = activeFile.scroll_pos.sorted
+    else {
+      console.error("invalid GraphViewer type")
+      data = blank_graphpos
+    }
+
+    setActiveScroll(data)
+    restore_scroll(data)
+  },
+    [activeFile, type])
+
+
+  const saveScrollPos = data => {
+    console.log(data)
+    // Save position TODO: make it more efficent, stop running these checks every cycle
+
+    if (type == "script")
+      activeFile.scroll_pos.script = data
+    else if (type == "summary")
+      activeFile.scroll_pos.summary = data
+    else if (type == "sorted")
+      activeFile.scroll_pos.sorted = data
+    else
+      console.error("invalid GraphViewer type")
+  }
+
+  const handleScroll = (e) => {
+    if (!divRef.current) return
+
+    const container = divRef.current
+    var data = activeScroll
+
+    data.scroll_y = container.scrollTop / container.scrollHeight
+    data.scroll_x = container.scrollLeft / container.scrollWidth
+
+    setActiveScroll(data)
+    saveScrollPos(data)
+  }
+
+
   useEffect(() => {
     if (!divRef.current) return
 
-    divRef.current.innerHTML = activeImage.svg
-      .replace('width="100%"', 'width="' + zoom + '%"') // zoom in out
+    const container = divRef.current
+
+    container.innerHTML = activeImage.svg
+      .replace('width="100%"',
+        'width="' + activeScroll.zoom * 100 + '%"') // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
         'style="margin-left: auto; margin-right: auto; display: block"') // center image
+
+    console.log(activeScroll)
+
   }, [
     activeFile,
     activeImage,
-    zoom,
+    activeScroll.zoom
   ])
 
   useEffect(() => { }, [refresh]) // force refresh
+
+  const setZoom = (ratio: number | null) => {
+    // Math.max(
+
+  }
 
 
   useEffect(() => {
@@ -60,14 +136,14 @@ export default function GraphViewer(
         // Prevent default browser zoom behavior if desired
         event.preventDefault();
 
-        if (event.deltaY < -1) {
-          setZoom(zoom + 10)
-        } else {
-          setZoom(Math.max(zoom - 10, 10))
-        }
+        if (event.deltaY < -1)
+          setZoom(0.1)
+        else
+          setZoom(-0.1)
+
       }
     }, { passive: false }); // 'passive: false' is required to call preventDefault()
-  }, [zoom])
+  }, [activeScroll.zoom])
 
 
 
@@ -88,13 +164,13 @@ export default function GraphViewer(
         // justifySelf: "right"
       }}>
         <button
-          onClick={() => setZoom(zoom + 10)}
+          onClick={() => setZoom(0.1)}
         >+</button>
         <button
-          onClick={() => setZoom(Math.max(zoom - 10, 10))}
+          onClick={() => setZoom(-0.1)}
         >-</button>
         <button
-          onClick={() => setZoom(100)}
+          onClick={() => setZoom(null)} // reset
         >=</button>
       </div>
     </div>
