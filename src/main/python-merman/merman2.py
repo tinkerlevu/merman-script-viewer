@@ -1774,8 +1774,8 @@ if True:
     # COMMENTS --
     for comment in comments:
         if re.search(   # comment Remember keywords:
-                # r'(XXX|NOTE|REMEMBER|WARNING|MAYBE)',
-                r'\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\W|$)',
+                r'(XXX|NOTE|REMEMBER|WARNING|MAYBE)',
+                # r'\W(XXX|NOTE|REMEMBER|WARNING|MAYBE)(\W|$)',
                 comment.get_text()):
             items.append(comment)
 
