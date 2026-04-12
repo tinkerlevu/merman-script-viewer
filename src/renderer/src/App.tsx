@@ -92,6 +92,11 @@ function App(): React.JSX.Element {
       sorted: blank_graphpos,
       todo: blank_docpos,
       remember: blank_docpos,
+    },
+    zoom: {
+      script: 1,
+      summary: 1,
+      sorted: 1,
     }
   }
 
