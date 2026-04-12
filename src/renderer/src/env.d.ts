@@ -20,6 +20,16 @@ type RenderedMD = {
   render_status: "rendering" | "done" | "none"
 }
 
+
+type GraphPos = { // scroll and zoom position for flowcharts
+  zoom: number,
+}
+
+
+type DocPos = { // scroll position for markdown documents
+  scroll: number,
+}
+
 type OpenFile = {
   filepath: FileID,
   text: string,
@@ -30,5 +40,12 @@ type OpenFile = {
   todo: RenderedMD,
   remember: RenderedMD,
   auto_render: boolean,
+  scroll_pos: {
+    script: GraphPos,
+    summary: GraphPos,
+    sorted: GraphPos,
+    todo: DocPos,
+    remember: DocPos,
+  }
 
 }

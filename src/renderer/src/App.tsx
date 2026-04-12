@@ -65,6 +65,15 @@ function App(): React.JSX.Element {
     render_status: "none",
   }
 
+  const blank_graphpos: GraphPos = {
+    zoom: 1.0
+  }
+
+
+  const blank_docpos: DocPos = {
+    scroll: 0
+  }
+
   const blank_file: OpenFile = {
     filepath: "",
     text: "",
@@ -74,7 +83,14 @@ function App(): React.JSX.Element {
     sorted: blank_img,
     todo: blank_markdown,
     remember: blank_markdown,
-    auto_render: false
+    auto_render: false,
+    scroll_pos: {
+      script: blank_graphpos,
+      summary: blank_graphpos,
+      sorted: blank_graphpos,
+      todo: blank_docpos,
+      remember: blank_docpos,
+    }
   }
 
   useEffect(() => console.log("AAAAAAA", fileTabs), [fileTabs])

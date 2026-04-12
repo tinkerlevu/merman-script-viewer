@@ -32,25 +32,22 @@ export default function GraphViewer(
 
   const divRef = useRef(null);
 
+  const activeImage =
+    type == "script" ? activeFile.script :
+      type == "summary" ? activeFile.summary :
+        type == "sorted" ? activeFile.sorted :
+          console.error("invalid GraphViewer type")
+
   useEffect(() => {
     if (!divRef.current) return
 
-    var image_data: RenderedImage
-
-    if (type == "script") image_data = activeFile.script
-    if (type == "summary") image_data = activeFile.summary
-    if (type == "sorted") image_data = activeFile.sorted
-
-
-    divRef.current.innerHTML = image_data.svg
+    divRef.current.innerHTML = activeImage.svg
       .replace('width="100%"', 'width="' + zoom + '%"') // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
         'style="margin-left: auto; margin-right: auto; display: block"') // center image
   }, [
     activeFile,
-    activeFile.script,
-    activeFile.summary,
-    activeFile.sorted,
+    activeImage,
     zoom,
   ])
 
