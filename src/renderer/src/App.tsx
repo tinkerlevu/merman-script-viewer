@@ -76,22 +76,24 @@ function App(): React.JSX.Element {
     scroll: 0
   }
 
+  const copy = (item: any) => structuredClone(item)
+
   const blank_file: OpenFile = {
     filepath: "",
     text: "",
     text_hash: "",
-    script: blank_img,
-    summary: blank_img,
-    sorted: blank_img,
-    todo: blank_markdown,
-    remember: blank_markdown,
+    script: copy(blank_img),
+    summary: copy(blank_img),
+    sorted: copy(blank_img),
+    todo: copy(blank_markdown),
+    remember: copy(blank_markdown),
     auto_render: false,
     scroll_pos: {
-      script: blank_graphpos,
-      summary: blank_graphpos,
-      sorted: blank_graphpos,
-      todo: blank_docpos,
-      remember: blank_docpos,
+      script: copy(blank_graphpos),
+      summary: copy(blank_graphpos),
+      sorted: copy(blank_graphpos),
+      todo: copy(blank_docpos),
+      remember: copy(blank_docpos),
     },
   }
 
