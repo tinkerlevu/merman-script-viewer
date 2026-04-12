@@ -27,7 +27,7 @@ export default function GraphViewer(
   const container_style = {
     overflow: "scroll",
     height: ContentHeight(),
-    gridArea: "1/1"
+    gridArea: "1/1",
   }
 
   const divRef = useRef(null);
@@ -42,7 +42,10 @@ export default function GraphViewer(
     if (type == "sorted") image_data = activeFile.sorted
 
 
-    divRef.current.innerHTML = image_data.svg.replace('width="100%"', 'width="' + zoom + '%"').replace(/style=\"max-width:[ 0-9.]+px;\"/i, "")
+    divRef.current.innerHTML = image_data.svg
+      .replace('width="100%"', 'width="' + zoom + '%"') // zoom in out
+      .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
+        'style="margin-left: auto; margin-right: auto; display: block"') // center image
   }, [
     activeFile,
     activeFile.script,
@@ -61,10 +64,8 @@ export default function GraphViewer(
         event.preventDefault();
 
         if (event.deltaY < -1) {
-          console.log('Ctrl + Mouse Wheel Up (Zoom In)');
           setZoom(zoom + 10)
         } else {
-          console.log('Ctrl + Mouse Wheel Down (Zoom Out)');
           setZoom(Math.max(zoom - 10, 10))
         }
       }
