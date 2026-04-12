@@ -64,6 +64,17 @@ export default function MermanEditor(
     console.log("setting init")
   }, [ActiveFile])
 
+
+  const divRef = useRef(null)
+
+  useEffect(() => {
+    divRef.current.scrollTop = ActiveFile.scroll_pos.merman.scroll
+  }, [initText])
+
+  const handleScroll = (_) =>
+    ActiveFile.scroll_pos.merman.scroll = divRef.current.scrollTop
+
+
   return (<>
 
     <div className="FixedContainer">
@@ -87,10 +98,9 @@ export default function MermanEditor(
     </div>
 
     <div style={container_style}>
-      <div style={{
-        width: "30%",
-        display: 'inline-block'
-      }}>
+      <div
+        style={{ width: "30%", display: 'inline-block' }}
+      >
         <div style={{ height: ContentHeight() / 2, display: 'block' }}>
           select reference
 
@@ -108,12 +118,16 @@ export default function MermanEditor(
           also includes simple images like for showing node shapes
         </div>
       </div>
-      <div style={{
-        height: '100%',
-        width: "70%",
-        display: 'inline-block',
-        overflow: 'scroll'
-      }}>
+      <div
+        style={{
+          height: '100%',
+          width: "70%",
+          display: 'inline-block',
+          overflow: 'scroll'
+        }}
+        ref={divRef}
+        onScroll={handleScroll}
+      >
         <CodeEditor
           type="merman"
           value={initText}

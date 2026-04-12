@@ -103,6 +103,7 @@ function App(): React.JSX.Element {
       sorted: blank_graphpos(),
       todo: blank_docpos(),
       remember: blank_docpos(),
+      merman: blank_docpos(),
     },
   }
 

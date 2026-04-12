@@ -49,5 +49,6 @@ type OpenFile = {
     sorted: GraphPos,
     todo: DocPos,
     remember: DocPos,
+    merman: DocPos,
   },
 }
