@@ -93,11 +93,6 @@ function App(): React.JSX.Element {
       todo: blank_docpos,
       remember: blank_docpos,
     },
-    zoom: {
-      script: 1,
-      summary: 1,
-      sorted: 1,
-    }
   }
 
   useEffect(() => console.log("AAAAAAA", fileTabs), [fileTabs])

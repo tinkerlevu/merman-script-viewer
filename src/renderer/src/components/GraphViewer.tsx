@@ -42,6 +42,7 @@ export default function GraphViewer(
   // have to recall this to actually use the stored scroll position to override the current scroll position
   const apply_scroll = (pos: GraphPos) => {
     if (!divRef.current) return
+    if (pos.scroll_x == 0 && pos.scroll_y == 0) return // Hacky bugfix
 
     const container = divRef.current
 
@@ -56,50 +57,39 @@ export default function GraphViewer(
 
 
   const [zoom, setZoom] = useState<number>(1)
-  const [restoreScroll, setRestoreScroll] = useState<GraphPos | null>(null)
-  const [restoreZoom, setRestoreZoom] = useState<number | null>(null)
+  const [restore, setRestore] = useState<GraphPos | null>(null)
+  // const [restoreZoom, setRestoreZoom] = useState<number | null>(null)
 
   useEffect(() => {
     var data: GraphPos
-    var stored_zoom: number
 
-    if (type == "script") {
+    if (type == "script")
       data = activeFile.scroll_pos.script
-      stored_zoom = activeFile.zoom.script
-    }
-    else if (type == "summary") {
+    else if (type == "summary")
       data = activeFile.scroll_pos.summary
-      stored_zoom = activeFile.zoom.summary
-    }
-    else if (type == "sorted") {
+    else if (type == "sorted")
       data = activeFile.scroll_pos.sorted
-      stored_zoom = activeFile.zoom.sorted
-    }
     else {
       console.error("invalid GraphViewer type")
       data = blank_graphpos
-      stored_zoom = 1
     }
 
-    setRestoreZoom(stored_zoom)
-    setZoom(stored_zoom)
-    setRestoreScroll(data)
+    setZoom(data.zoom)
+    setRestore(data)
   },
     [activeFile, type])
 
+  const getScrollPos = () => {
+    const container = divRef.current
 
-  const saveScrollPos = data => {
-    console.log(data)
-    // Save position TODO: make it more efficent, stop running these checks every cycle
+    var data = blank_graphpos
 
-    if (type == "script")
-      activeFile.scroll_pos.script = data
-    else if (type == "summary")
-      activeFile.scroll_pos.summary = data
-    else if (type == "sorted")
-      activeFile.scroll_pos.sorted = data
-    else
-      console.error("invalid GraphViewer type")
+    data.scroll_y = container.scrollTop / container.scrollHeight
+    data.scroll_x = container.scrollLeft / container.scrollWidth
+
+    data.zoom = zoom
+
+    return data
   }
 
   const handleScroll = (e) => {
@@ -107,51 +97,50 @@ export default function GraphViewer(
 
     // TODO: exit if activeScroll isn't loaded
 
-    const container = divRef.current
-    var data = blank_graphpos
+    var pos = getScrollPos()
 
-    data.scroll_y = container.scrollTop / container.scrollHeight
-    data.scroll_x = container.scrollLeft / container.scrollWidth
-
-    saveScrollPos(data)
+    // Save position TODO: make it more efficent, stop running these checks every cycle
+    if (type == "script")
+      activeFile.scroll_pos.script = pos
+    else if (type == "summary")
+      activeFile.scroll_pos.summary = pos
+    else if (type == "sorted")
+      activeFile.scroll_pos.sorted = pos
+    else
+      console.error("invalid GraphViewer type")
   }
 
 
-  useEffect(() => {
+  useEffect(() => { // load image and zoom when changed
     if (!divRef.current) return
 
     const container = divRef.current
 
     var size: number
+    var pos: GraphPos
 
-    if (restoreScroll && restoreZoom)
-      size = restoreZoom * 100
-    else
+    if (restore) {
+      size = restore.zoom * 100
+      pos = restore
+      setRestore(null)
+    }
+    else {
       size = zoom * 100
+      pos = getScrollPos()
+    }
 
     container.innerHTML = activeImage.svg
       .replace('width="100%"',
-        'width="' + size + '%"') // zoom in out
+        'height="' + size + '%"') // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
         'style="margin-left: auto; margin-right: auto; display: block"') // center image
 
-    if (restoreScroll && restoreZoom) {
-      console.log("restoring")
-      apply_scroll(restoreScroll)
-      setRestoreScroll(null)
-      setRestoreZoom(null)
-    }
-    else
-      console.log("normal", zoom)
-
-
-
+    apply_scroll(pos) // ignores (0,0) positions like when initalizing
   }, [
     activeFile,
     activeImage,
     zoom,
-    restoreScroll,
-    restoreZoom
+    restore
   ])
 
   useEffect(() => { }, [refresh]) // force refresh
@@ -166,11 +155,11 @@ export default function GraphViewer(
     // TODO: Math.max(
 
     if (type == "script")
-      activeFile.zoom.script = new_zoom
+      activeFile.scroll_pos.script.zoom = new_zoom
     else if (type == "summary")
-      activeFile.zoom.summary = new_zoom
+      activeFile.scroll_pos.summary.zoom = new_zoom
     else if (type == "sorted")
-      activeFile.zoom.sorted = new_zoom
+      activeFile.scroll_pos.sorted.zoom = new_zoom
     else
       console.error("invalid GraphViewer type")
 

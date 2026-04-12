@@ -49,10 +49,5 @@ type OpenFile = {
     todo: DocPos,
     remember: DocPos,
   },
-  zoom: {
-    script: number,
-    summary: number,
-    sorted: number,
-  }
 
 }
