@@ -112,38 +112,48 @@ function App(): React.JSX.Element {
   useEffect(() => { // Cleanup Pattern, for IPC race conditions
     // set active file to first item with matching filename
     // clean up duplicates:
-    const clean: Array<OpenFile> = []
-    var prev: string = ""
-    var duplicates: boolean = false
+    var clean: Array<OpenFile> = []
+    var unique: Array<string> = []
 
     openFiles.forEach((file) => {
-      if (file.filepath != prev) {
+      if (!unique.includes(file.filepath)) {
         clean.push(file)
-        prev = file.filepath
-      } else
-        duplicates = true
+        unique.push(file.filepath)
+      }
     })
 
     console.log("clean", clean)
 
-    if (duplicates) {
+    if (clean.length != openFiles.length) { // there were duplicates
       setActiveFile( // set Active file to the instance in the clean array that has the corresponding filename
         clean.find((i) => i.filepath == activeFile.filepath))
 
       setOpenFiles(clean)
+
     }
 
-  }, [openFiles])
+    var clean_tab: Array<FileTabProperties> = []
+    unique = []
 
-  // TODO: REMOVE
-  useEffect(() => console.log("ACTIVE FILE:", activeFile), [activeFile])
+    fileTabs.forEach((file) => {
+      if (!unique.includes(file.id)) {
+        clean_tab.push(file)
+        unique.push(file.id)
+      }
+    })
+
+    if (clean_tab.length != fileTabs.length)
+      setFileTabs(clean_tab)
+
+  }, [openFiles, fileTabs])
 
 
   useEffect(() => {
     window.electron.ipcRenderer.on('file_change', (_, data) => {
 
-      if (-1 >= openFiles.findIndex( // existing file not found
-        (item) => item.filepath == data.filepath)) {
+      console.log(data)
+
+      if (data.newfile) {
 
         console.log("newFile")
 
@@ -154,7 +164,9 @@ function App(): React.JSX.Element {
         setOpenFiles(prev => [...prev, newFile]);
         setActiveFile(newFile)
 
-        setFileTabs([...fileTabs, {
+        console.log("adding new tab")
+
+        setFileTabs(tabs => [...tabs, {
           id: data.filepath,
           favicon: test_fav, // TODO: replace this with proper favicon
           title: data.title,
@@ -165,19 +177,20 @@ function App(): React.JSX.Element {
       } else { // NOTE:: File Already opened
         const changed_file = getOpenFile(data.filepath) // automatically updates active file anyways if it's open
 
+        if (!changed_file) return
 
-        //@ts-ignore then modify entry in array?
-        if (changed_file.text != data.text)
-          //@ts-ignore then modify entry in array?
+        if (changed_file.text != data.text) {
           changed_file.text = data.text
+          changed_file.unsaved_text = ""
+        }
 
-        if (changed_file?.auto_render)
+        if (changed_file.auto_render)
           render_merman(changed_file.filepath, data.text)
 
       }
 
     })
-  }, [openFiles, activeFile, openFiles])
+  }, [openFiles, activeFile, fileTabs])
 
 
   // TODO: add a file close method

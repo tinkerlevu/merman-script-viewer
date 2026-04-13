@@ -58,7 +58,7 @@ export default async function openMermaidFile() {
   }
   //IPC send open existing file and have separate ipc if implementing no auto refresh feature
   startMonitorFile(filepath) // auto update
-  loadFileContents(filepath) // send IPC with contents
+  loadFileContents(filepath, true) // send IPC with contents, marking as new file
 
   return filepath
 }
@@ -118,7 +118,7 @@ function startMonitorFile(filepath: string) {
 
 
 
-function loadFileContents(filepath: string) {
+function loadFileContents(filepath: string, newfile: boolean | void) {
   const handle = getFileHandle(filepath)
   let stats = fstatSync(handle)
   const buffer = Buffer.alloc(stats.size)
@@ -135,7 +135,8 @@ function loadFileContents(filepath: string) {
   mainWindow.webContents.send('file_change', {
     filepath: filepath,
     text: data,
-    title: parse(filepath).name
+    title: parse(filepath).name,
+    newfile: newfile ? newfile : false
   })
 
 
