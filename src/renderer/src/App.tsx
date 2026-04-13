@@ -237,10 +237,25 @@ function App(): React.JSX.Element {
 
   }
 
-  // can be used to save the script or the preprocessor
-  const file_save_as_action = (filepath: string) => {
-    console.log('file_save_as', filepath)
-  }
+  // // can be used to save the script or the preprocessor
+  // const file_save_as_action = (filepath: string) => {
+  //   console.log('file_save_as', filepath)
+  // }
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on("save_as_change", (_, data) => {
+      console.log("saveas", data)
+      const og = getOpenFile(data.old_filepath)
+      const copy = getOpenFile(data.new_filepath)
+      console.log("og copy", og, copy)
+      if (og && og.unsaved_text)
+        og.unsaved_text = ""
+      if (copy && copy.unsaved_text)
+        copy.unsaved_text = ""
+      console.log("saveas")
+    })
+  }, [openFiles])
+
 
   // useEffect(
   //   window.electron.ipcRenderer.on("save_as_change", (_, data) => {
@@ -252,6 +267,7 @@ function App(): React.JSX.Element {
   //
   // NOT working
   // TODO: fix or leave as is? idk
+  //
 
   // NOTE: ---------- Tab Management
 
@@ -395,6 +411,7 @@ function App(): React.JSX.Element {
                 Render
               </button>
               <input type="checkbox" />Darkmode
+              <button onClick={() => console.log(openFiles)}>test</button>
             </TabList>
           </div>
 

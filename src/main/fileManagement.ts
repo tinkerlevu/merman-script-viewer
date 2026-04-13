@@ -23,7 +23,9 @@ export const initalizeFS = (mainInterface: BrowserWindow) =>
   mainWindow = mainInterface
 
 
-export default async function openMermaidFile() {
+export default async function openMermaidFile(
+  file_contents: string | void
+) {
   const pathSelection = await dialog.showSaveDialog({
     // properties: ['openFile', 'promptToCreate'],
     properties: [
@@ -50,10 +52,14 @@ export default async function openMermaidFile() {
 
     const file_ext = extname(filepath.slice(1))
 
-    if (!supported_extensions.includes(file_ext.toLowerCase()))
+    console.log(file_ext)
+
+    if (!supported_extensions.includes( // requested filename doesn't have extension
+      file_ext.toLowerCase().replace('.', '')))
       filepath += '.merman'
 
-    writeFileSync(filepath, default_newFileContent)
+    writeFileSync(filepath,
+      file_contents ? file_contents : default_newFileContent)
 
   }
   //IPC send open existing file and have separate ipc if implementing no auto refresh feature
@@ -65,16 +71,17 @@ export default async function openMermaidFile() {
 
 
 export async function SaveAsFile(old_filepath, text) {
-  const new_filepath = await openMermaidFile()
+  const new_filepath = await openMermaidFile(text)
 
   if (!new_filepath) return
 
-  writeFileContents(new_filepath, text) // write to new file
+  console.log("save as", new_filepath, text)
+
+  // writeFileContents(new_filepath, text) // write to new file
   // closeFile(old_filepath) // stop watching and drop old file
   mainWindow.webContents.send('save_as_change', {
     old_filepath: old_filepath,
     new_filepath: new_filepath
-    // rename entries in the interface
   })
 
 
