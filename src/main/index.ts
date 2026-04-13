@@ -103,7 +103,7 @@ app.whenReady().then(() => {
   // NOTE: add IPC stuff here
 
   // File management
-  ipcMain.on('file_open', openMermaidFile)
+  ipcMain.on('file_open', () => openMermaidFile())
   ipcMain.on('file_close', (_, data) => closeFile(data))
   ipcMain.on('save_file', (_, data) =>
     writeFileContents(data.filepath, data.text))
