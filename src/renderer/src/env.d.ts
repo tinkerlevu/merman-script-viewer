@@ -37,6 +37,7 @@ type OpenFile = {
   text: string,
   unsaved_text: string,
   text_hash: string,
+  render_status: "running" | "done" | "failed" | "none"
   script: RenderedImage,
   summary: RenderedImage,
   sorted: RenderedImage,

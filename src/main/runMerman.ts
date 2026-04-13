@@ -57,6 +57,11 @@ export default async function full_render(
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
 
+  mainWindow.webContents.send('new_render_hash', {
+    filepath: filepath,
+    hash: hash,
+  })
+
   handleFinishedRender(null, { // TODO report
     filepath: filepath,
     hash: hash,

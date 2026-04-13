@@ -36,9 +36,22 @@ import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
+import TabIcon from './components/TabIcon'
 
 
+// TODO: remove
+function favicon(activeFile: OpenFile) {
+  var icon
+  useEffect(() => {
+    if (activeFile.unsaved_text == "")
+      icon = ""
+    else
+      icon = test_fav
+  }, [activeFile])
 
+  return icon
+
+}
 
 function App(): React.JSX.Element {
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -91,6 +104,7 @@ function App(): React.JSX.Element {
     text: "",
     unsaved_text: "",
     text_hash: "",
+    render_status: "none",
     script: blank_img(),
     summary: blank_img(),
     sorted: blank_img(),
@@ -151,7 +165,6 @@ function App(): React.JSX.Element {
   useEffect(() => {
     window.electron.ipcRenderer.on('file_change', (_, data) => {
 
-      console.log(data)
 
       if (data.newfile) {
 
@@ -168,7 +181,7 @@ function App(): React.JSX.Element {
 
         setFileTabs(tabs => [...tabs, {
           id: data.filepath,
-          favicon: test_fav, // TODO: replace this with proper favicon
+          favicon: test_fav, // Favicon(newFile) // TODO: replace this with proper favicon
           title: data.title,
           active: true
         }])
@@ -266,6 +279,17 @@ function App(): React.JSX.Element {
     })
   }
 
+  useEffect(() => {
+    window.electron.ipcRenderer.on("new_render", (_, data) => {
+      const update_file = getOpenFile(data.filepath)
+
+      if (!update_file) return
+
+      update_file.text_hash = data.hash
+    })
+  }, [openFiles])
+
+
   useEffect(
     window.electron.ipcRenderer.on("new_render", (_, data) => {
       console.log(data.filepath)
@@ -281,7 +305,7 @@ function App(): React.JSX.Element {
         return console.log("file not found")
 
 
-      if (image_types.includes(data.type)) {
+      if (image_types.includes(data.type)) { // new image
         const new_image: RenderedImage = {
           svg: data.svg,
           hash: data.hash,
@@ -295,7 +319,7 @@ function App(): React.JSX.Element {
         if (data.type == "sorted")
           update_file.sorted = new_image
 
-      } else { // markdown types
+      } else { // new markdown doc
 
         const new_markdown: RenderedMD = {
           text: data.text,
@@ -327,6 +351,7 @@ function App(): React.JSX.Element {
   // TODO fix add file button css styling
   // TODO fix tab icon css styling
   // TODO add dark mode
+  // TODO: add favicon manager function? which takes Openfile and applies favicon to setFileTabs
 
   return (
     <>
@@ -353,7 +378,13 @@ function App(): React.JSX.Element {
             <TabList>
               {/* replace with favicon component for the image and markdowntabs*/}
               <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
-              <Tab>Script</Tab>
+              <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.script.hash}
+                />
+                Script
+              </Tab>
               <Tab>Summary</Tab>
               <Tab>Sorted</Tab>
               <Tab>Todo</Tab>
@@ -421,8 +452,8 @@ function App(): React.JSX.Element {
             error, and console log outputs
             <CodeEditor type="javascript" />
           </TabPanel>
-        </Tabs>
-      </div>
+        </Tabs >
+      </div >
     </>
   )
 }
