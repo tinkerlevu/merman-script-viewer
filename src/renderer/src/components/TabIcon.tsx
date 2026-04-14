@@ -7,16 +7,20 @@ import done from '../assets/favicons/done.png'
 import { useEffect, useState } from "react"
 
 export default function TabIcon(
-  { activeFile, monitoredHash }: {
+  { activeFile, monitoredHash, refresh, still_loading }: {
     activeFile: OpenFile,
-    monitoredHash: String,
+    monitoredHash: string,
+    still_loading: boolean | void
+    refresh: number
   }): React.JSX.Element {
 
   const [icon, setIcon] = useState<string>('') // TODO: replace with image url
 
   useEffect(() => {
 
-    if (activeFile.render_status == "failed")
+    if (still_loading)
+      setIcon(loading)
+    else if (activeFile.render_status == "failed")
       setIcon(failed)
     else if (activeFile.text_hash.length <= 0)
       setIcon(none)
@@ -27,7 +31,11 @@ export default function TabIcon(
     else
       setIcon(none)
 
-  }, [activeFile.text_hash, activeFile.render_status, monitoredHash])
+  }, [
+    activeFile.text_hash,
+    activeFile.render_status,
+    monitoredHash,
+    refresh])
 
   return <img src={icon} style={{ maxHeight: "14px", paddingRight: "5px" }} />  // TODO:remove style
 

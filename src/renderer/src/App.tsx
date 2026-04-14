@@ -417,11 +417,41 @@ function App(): React.JSX.Element {
                 />
                 Script
               </Tab>
-              <Tab>Summary</Tab>
-              <Tab>Sorted</Tab>
-              <Tab>Todo</Tab>
-              <Tab>Remember</Tab>
-              <Tab>Preprocessor</Tab>
+              <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.summary.hash}
+                  refresh={refresher}
+                />
+                Summary
+              </Tab>
+              <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.sorted.hash}
+                  refresh={refresher}
+                />
+                Sorted
+              </Tab>
+              <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.todo.hash}
+                  refresh={refresher}
+                />
+                Todo
+              </Tab>
+              <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.remember.hash}
+                  refresh={refresher}
+                />
+                Remember
+              </Tab>
+              <Tab>
+                Preprocessor
+              </Tab>
               <button
                 onClick={() => render_merman(null, null)}>
                 Render
