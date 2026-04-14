@@ -244,15 +244,12 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     window.electron.ipcRenderer.on("save_as_change", (_, data) => {
-      console.log("saveas", data)
       const og = getOpenFile(data.old_filepath)
       const copy = getOpenFile(data.new_filepath)
-      console.log("og copy", og, copy)
       if (og && og.unsaved_text)
         og.unsaved_text = ""
       if (copy && copy.unsaved_text)
         copy.unsaved_text = ""
-      console.log("saveas")
     })
   }, [openFiles])
 
@@ -288,15 +285,21 @@ function App(): React.JSX.Element {
 
   const render_merman = (
     specific_filepath, certain_text) => {
+
+    const filepath_id = specific_filepath || activeFile.filepath
+
     window.electron.ipcRenderer.send('render', {
-      filepath: specific_filepath || activeFile.filepath,
+      filepath: filepath_id,
       merman: certain_text || mermanEditorRef.current.get_text()
       // TODO: preprocessor
     })
+
+    getOpenFile(filepath_id).render_status = "running"
+
   }
 
   useEffect(() => {
-    window.electron.ipcRenderer.on("new_render", (_, data) => {
+    window.electron.ipcRenderer.on("new_render_hash", (_, data) => {
       const update_file = getOpenFile(data.filepath)
 
       if (!update_file) return
@@ -304,7 +307,6 @@ function App(): React.JSX.Element {
       update_file.text_hash = data.hash
     })
   }, [openFiles])
-
 
   useEffect(
     window.electron.ipcRenderer.on("new_render", (_, data) => {
@@ -355,6 +357,17 @@ function App(): React.JSX.Element {
     [openFiles]
   )
 
+  window.electron.ipcRenderer.on("render_failed", (_, data) => {
+    console.log("RENDER FAILED")
+    const failed = getOpenFile(data.filepath)
+    if (failed)
+      failed.render_status = "failed"
+
+    setRefresher(refresher + 1) // refresh all image displays
+  })
+
+
+
 
   // TODO: text_hash
   // set hash
@@ -398,6 +411,7 @@ function App(): React.JSX.Element {
                 <TabIcon
                   activeFile={activeFile}
                   monitoredHash={activeFile.script.hash}
+                  refresh={refresher}
                 />
                 Script
               </Tab>

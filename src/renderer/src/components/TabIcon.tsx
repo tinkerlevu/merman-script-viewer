@@ -10,7 +10,9 @@ export default function TabIcon(
 
   useEffect(() => {
 
-    if (monitoredHash.length <= 0)
+    if (activeFile.render_status == "failed")
+      setIcon('failed')
+    else if (activeFile.text_hash.length <= 0)
       setIcon('none')
     else if (monitoredHash != activeFile.text_hash)
       setIcon('Loading')
@@ -19,8 +21,8 @@ export default function TabIcon(
     else
       setIcon('None')
 
-  }, [activeFile.text_hash, monitoredHash])
+  }, [activeFile.text_hash, activeFile.render_status, monitoredHash])
 
-  return <>{icon} {monitoredHash} {activeFile.text_hash}</> // TODO: wrap in image string
+  return <>{icon}</> // TODO: wrap in image string
 
 }

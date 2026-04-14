@@ -55,6 +55,12 @@ export default async function full_render(
 
   //  console.log(mermaid)
 
+  if (mermaid == '') { // Translation failed Error in script
+    console.log("===== THROWING ERROR =====")
+    mainWindow.webContents.send('render_failed', { filepath: filepath })
+    return
+  }
+
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
 
   mainWindow.webContents.send('new_render_hash', {
@@ -62,7 +68,7 @@ export default async function full_render(
     hash: hash,
   })
 
-  handleFinishedRender(null, { // TODO report
+  handleFinishedRender(null, { // send over TODO report
     filepath: filepath,
     hash: hash,
     type: 'todo',
@@ -70,7 +76,7 @@ export default async function full_render(
   })
 
 
-  handleFinishedRender(null, { // Remember report
+  handleFinishedRender(null, { // send over Remember report
     filepath: filepath,
     hash: hash,
     type: 'remember',
@@ -120,11 +126,21 @@ async function translate_merman(file_lines) {
   const fs = require('fs')
   const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
 
-  const pyodide = await loadPyodide();
-  const locals = pyodide.toPy({ filedata: file_lines })
-  const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
+  const pyodide = await loadPyodide({
+    // TODO: add ipc for sending python print output to interface RENDER_LOG
+    stdout: (text) => console.log("PYTHON PRINT", text)
+  });
 
-  return evaluated.toJs()
+  const locals = pyodide.toPy({ filedata: file_lines })
+  try {
+    const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
+    return evaluated.toJs()
+  }
+  catch (error) { // the Python code itself can throw errors to here if there's issues with the script
+    console.log('PYTHON ERROR', error) //TODO: RENDER ERROR ipc
+    return ''
+  }
+
 }
 
 
