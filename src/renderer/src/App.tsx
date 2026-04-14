@@ -173,6 +173,7 @@ function App(): React.JSX.Element {
         const newFile = structuredClone(blank_file)
         newFile.filepath = data.filepath
         newFile.text = data.text
+        newFile.unsaved_text = data.text
 
         setOpenFiles(prev => [...prev, newFile]);
         setActiveFile(newFile)

@@ -66,6 +66,8 @@ export default async function openMermaidFile(
   startMonitorFile(filepath) // auto update
   loadFileContents(filepath, true) // send IPC with contents, marking as new file
 
+  loadFileContents(filepath) // for bug in formal build ?
+
   return filepath
 }
 
