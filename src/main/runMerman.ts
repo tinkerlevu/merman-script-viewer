@@ -178,7 +178,7 @@ function createRenderWindow(): BrowserWindow {
     }
   })
 
-  // NOTE: enable this to show the window
+  // enable this to show the window
   // renderWindow.on('ready-to-show', () => {
   //   renderWindow.show()
   // })

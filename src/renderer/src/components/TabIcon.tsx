@@ -19,6 +19,8 @@ export default function TabIcon(
 
     if (activeFile.render_status == "failed")
       setIcon(failed)
+    else if (activeFile.render_status == "preprocessing")
+      setIcon(loading)
     else if (activeFile.text_hash.length <= 0)
       setIcon(none)
     else if (monitoredHash != activeFile.text_hash)
@@ -28,7 +30,7 @@ export default function TabIcon(
     else
       setIcon(none)
 
-    console.log(refresh)
+    console.log(activeFile.render_status)
 
   }, [
     activeFile,

@@ -7,9 +7,10 @@ import ContentHeight from "./dynamicSize";
 
 
 export default function MermanEditor(
-  { ActiveFile, ref }: {
+  { ActiveFile, ref, setSavedIcon }: {
     ActiveFile: OpenFile,
-    ref: any // supposed to be a ref object idk
+    ref: any, // supposed to be a ref object idk
+    setSavedIcon: (b: boolean) => void
   }): React.JSX.Element {
   const editorRef = useRef<PrismEditor>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false)
@@ -31,10 +32,14 @@ export default function MermanEditor(
   }
 
   const textUpdated = () => {
-    if (editorRef.current?.value == ActiveFile.text)
+    if (editorRef.current?.value == ActiveFile.text) {
       setUnsavedChanges(false)
-    else
+      setSavedIcon(true)
+    }
+    else {
       setUnsavedChanges(true)
+      setSavedIcon(false)
+    }
     ActiveFile.unsaved_text = editorRef.current?.value
   }
 

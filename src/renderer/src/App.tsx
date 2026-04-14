@@ -1,4 +1,4 @@
-// ------------------------------ TODO REPLACE THESE -------------------------------
+// ------------------------------ TODO: REPLACE THESE -------------------------------
 import Versions from './components/Versions' // replace with WORD COUNT
 import test_fav from "./assets/favicons/test.ico"
 import script_palceholder from "./assets/test-remove/script_placeholder.svg"
@@ -7,6 +7,11 @@ import sorted_placeholder from "./assets/test-remove/sorted_placeholder.svg"
 import remember_placeholder from "./assets/test-remove/remember_placeholder.md?raw"
 import todo_placeholder from "./assets/test-remove/todo_placeholder.md?raw"
 
+import done_fav from "./assets/favicons/filetab_done.ico"
+import fail_fav from "./assets/favicons/filetab_failed.ico"
+import wait_fav from "./assets/favicons/filetab_loading.ico"
+import process_fav from "./assets/favicons/test.ico"
+import none_fav from "./assets/favicons/filetab_none.ico"
 
 
 
@@ -37,6 +42,7 @@ import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
 import TabIcon from './components/TabIcon'
+import CodeIcon from './components/CodeIcon'
 
 
 // TODO: remove
@@ -136,15 +142,6 @@ function App(): React.JSX.Element {
       }
     })
 
-    console.log("clean", clean)
-
-    if (clean.length != openFiles.length) { // there were duplicates
-      setActiveFile( // set Active file to the instance in the clean array that has the corresponding filename
-        clean.find((i) => i.filepath == activeFile.filepath))
-
-      setOpenFiles(clean)
-
-    }
 
     var clean_tab: Array<FileTabProperties> = []
     unique = []
@@ -155,9 +152,22 @@ function App(): React.JSX.Element {
         unique.push(file.id)
       }
     })
+    console.log(activeFile.filepath)
 
     if (clean_tab.length != fileTabs.length)
-      setFileTabs(clean_tab)
+      setFileTabs(clean_tab.map( // apply remove duplicates but keep focus on currently selected tab
+        tab => ({ ...tab, active: activeFile.filepath == tab.id })))
+
+
+    console.log("Clean", clean, clean_tab, activeFile)
+
+    if (clean.length != openFiles.length) { // there were duplicates
+      setActiveFile( // set Active file to the instance in the clean array that has the corresponding filename
+        clean.find((i) => i.filepath == activeFile.filepath))
+
+      setOpenFiles(clean)
+
+    }
 
   }, [openFiles, fileTabs])
 
@@ -182,7 +192,7 @@ function App(): React.JSX.Element {
 
         setFileTabs(tabs => [...tabs, {
           id: data.filepath,
-          favicon: test_fav, // Favicon(newFile) // TODO: replace this with proper favicon
+          favicon: none_fav,
           title: data.title,
           active: true
         }])
@@ -284,6 +294,9 @@ function App(): React.JSX.Element {
   const [refresher, setRefresher] = useState<number>(0)
 
   const mermanEditorRef = useRef({ get_text: () => " " });
+  const mermanFileIconRef = useRef({
+    indicateSaved: (i: boolean) => { }
+  });
 
   const render_merman = (
     specific_filepath, certain_text) => {
@@ -319,8 +332,29 @@ function App(): React.JSX.Element {
 
       update_file.render_status = data.status
       setRefresher(refresher + 1)
+
+      const setFavicon = () => {
+        if (data.status == "done")
+          return done_fav
+        else if (data.status == "failed")
+          return fail_fav
+        else if (data.status == "running")
+          return wait_fav
+        else if (data.status == "preprocessing")
+          return process_fav // TODO: replace with better icon for preprocessing
+        else
+          return none_fav
+      }
+
+      console.log("ACTIVE FILE RENDER STATUS", activeFile)
+
+      setFileTabs(fileTabs.map(tab => ({
+        ...tab,
+        favicon: tab.id != data.filepath ?
+          tab.favicon : setFavicon()
+      })))
     })
-  }, [openFiles])
+  }, [openFiles, activeFile])
 
 
 
@@ -412,7 +446,12 @@ function App(): React.JSX.Element {
           <div className='FixedContainer'>
             <TabList>
               {/* replace with favicon component for the image and markdowntabs*/}
-              <Tab><img src={test_fav} style={{ height: "20px" }} /> Write</Tab>
+              <Tab>
+                <CodeIcon
+                  setSavedRef={mermanFileIconRef}
+                />
+                Write
+              </Tab>
               <Tab>
                 <TabIcon
                   activeFile={activeFile}
@@ -469,6 +508,8 @@ function App(): React.JSX.Element {
             <MermanEditor
               ActiveFile={activeFile}
               ref={mermanEditorRef}
+              setSavedIcon={(show: boolean) =>
+                mermanFileIconRef.current.indicateSaved(show)}
             />
           </TabPanel>
           <TabPanel > {/* Script */}
