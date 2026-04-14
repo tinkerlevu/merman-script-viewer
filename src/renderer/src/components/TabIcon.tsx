@@ -1,4 +1,10 @@
-import { act, useEffect, useState } from "react"
+import failed from '../assets/favicons/failed.png'
+import none from '../assets/favicons/none.png'
+import loading from '../assets/favicons/loading.png'
+import done from '../assets/favicons/done.png'
+
+
+import { useEffect, useState } from "react"
 
 export default function TabIcon(
   { activeFile, monitoredHash }: {
@@ -11,18 +17,18 @@ export default function TabIcon(
   useEffect(() => {
 
     if (activeFile.render_status == "failed")
-      setIcon('failed')
+      setIcon(failed)
     else if (activeFile.text_hash.length <= 0)
-      setIcon('none')
+      setIcon(none)
     else if (monitoredHash != activeFile.text_hash)
-      setIcon('Loading')
+      setIcon(loading)
     else if (monitoredHash == activeFile.text_hash)
-      setIcon('Done')
+      setIcon(done)
     else
-      setIcon('None')
+      setIcon(none)
 
   }, [activeFile.text_hash, activeFile.render_status, monitoredHash])
 
-  return <>{icon}</> // TODO: wrap in image string
+  return <img src={icon} style={{ maxHeight: "14px", paddingRight: "5px" }} />  // TODO:remove style
 
 }
