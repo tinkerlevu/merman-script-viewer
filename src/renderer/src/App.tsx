@@ -295,18 +295,19 @@ function App(): React.JSX.Element {
       merman: certain_text || mermanEditorRef.current.get_text()
       // TODO: preprocessor
     })
-
-    getOpenFile(filepath_id).render_status = "running"
-
   }
 
   useEffect(() => {
     window.electron.ipcRenderer.on("new_render_hash", (_, data) => {
       const update_file = getOpenFile(data.filepath)
 
+      console.log(data.hash)
+
       if (!update_file) return
 
       update_file.text_hash = data.hash
+
+      setRefresher(refresher + 1)
     })
   }, [openFiles])
 

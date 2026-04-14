@@ -26,6 +26,22 @@ var currentRender: RenderJob = {
   filepath: ""
 }
 
+
+// --------------- UTIL funtions
+const send_hash = (filepath, hash) =>
+  mainWindow.webContents.send('new_render_hash', {
+    filepath: filepath,
+    hash: hash,
+  })
+
+const update_render_status = (filepath, status) =>
+  mainWindow.webContents.send('new_render_status', {
+    filepath: filepath,
+    status: status,
+  })
+
+// ---------
+
 export default async function full_render(
   filepath: string,
   merman_text: string // one single string that hasn't been broken into an array
@@ -34,6 +50,8 @@ export default async function full_render(
   if (merman_text == currentRender.text
     && filepath == currentRender.filepath_id) // multiple triggers from file saves
     return
+
+  send_hash(filepath, "pending")
 
   currentRender = { text: merman_text, filepath_id: filepath }
   closeExisting(filepath) // cancel previous render job
@@ -62,11 +80,7 @@ export default async function full_render(
   }
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
-
-  mainWindow.webContents.send('new_render_hash', {
-    filepath: filepath,
-    hash: hash,
-  })
+  send_hash(filepath, hash)
 
   handleFinishedRender(null, { // send over TODO report
     filepath: filepath,

@@ -7,10 +7,9 @@ import done from '../assets/favicons/done.png'
 import { useEffect, useState } from "react"
 
 export default function TabIcon(
-  { activeFile, monitoredHash, refresh, still_loading }: {
+  { activeFile, monitoredHash, refresh }: {
     activeFile: OpenFile,
-    monitoredHash: string,
-    still_loading: boolean | void
+    monitoredHash: String,
     refresh: number
   }): React.JSX.Element {
 
@@ -18,9 +17,7 @@ export default function TabIcon(
 
   useEffect(() => {
 
-    if (still_loading)
-      setIcon(loading)
-    else if (activeFile.render_status == "failed")
+    if (activeFile.render_status == "failed")
       setIcon(failed)
     else if (activeFile.text_hash.length <= 0)
       setIcon(none)
