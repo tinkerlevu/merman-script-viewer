@@ -32,6 +32,9 @@ type DocPos = { // scroll position for markdown documents
   scroll: number,
 }
 
+
+type BookmarkState = 'empty' | 'filled' | 'clearable' | 'disabled'
+
 type OpenFile = {
   filepath: FileID,
   text: string,
@@ -52,4 +55,5 @@ type OpenFile = {
     remember: DocPos,
     merman: DocPos,
   },
+  bookmarks: Map<GraphPos>,
 }

@@ -125,6 +125,7 @@ function App(): React.JSX.Element {
       remember: blank_docpos(),
       merman: blank_docpos(),
     },
+    bookmarks: new Map(),
   }
 
   const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)

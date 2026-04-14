@@ -48,7 +48,8 @@ export default function GraphViewer(
 
     requestAnimationFrame(() => {
       container.scrollTop = pos.scroll_y * container.scrollHeight
-      container.scrollLeft = pos.scroll_x * container.scrollWidth
+      container.scrollLeft = pos.scroll_x * (container.scrollWidth - container.clientWidth)
+      console.log("goto")
     })
     console.log("restoring Current", type, pos)
 
@@ -82,10 +83,13 @@ export default function GraphViewer(
   const getScrollPos = () => {
     const container = divRef.current
 
-    var data = blank_graphpos
+    console.log(container.scrollLeft, container.scrollWidth - container.clientWidth)
+
+    var data = structuredClone(blank_graphpos)
 
     data.scroll_y = container.scrollTop / container.scrollHeight
-    data.scroll_x = container.scrollLeft / container.scrollWidth
+    data.scroll_x = container.scrollLeft /
+      (container.scrollWidth - container.clientWidth)
 
     data.zoom = zoom
 
@@ -133,7 +137,7 @@ export default function GraphViewer(
       .replace('width="100%"',
         'height="' + size + '%"') // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
-        'style="margin-left: auto; margin-right: auto; display: block"') // center image
+        'style="margin-left: 50%; margin-right: 50%; display: block"') // center image
 
     apply_scroll(pos) // ignores (0,0) positions like when initalizing
   }, [
@@ -210,6 +214,17 @@ export default function GraphViewer(
         <button
           onClick={() => setZoomRatio(null)} // reset
         >=</button>
+
+        {Array.from({ length: 10 }, (_, i) => i).map(key =>
+          < Bookmark
+            hotkey={((key + 1) % 10).toString()}
+            cache_prefix={type}
+            activeFile={activeFile}
+            get_scroll={getScrollPos}
+            set_scroll={apply_scroll}
+          />
+        )}
+
       </div>
     </div>
   </>)
@@ -218,3 +233,64 @@ export default function GraphViewer(
 // todo add ctrl + mousewheel zoom and zoom buttons
 // todo remember scroll position when switching tabs
 // background mapping and center
+//
+
+function Bookmark({
+  hotkey,
+  cache_prefix, // used to store and retrieve positions on ActiveFile.bookmarks
+  activeFile,
+  get_scroll,
+  set_scroll,
+}: {
+  hotkey: string,
+  cache_prefix: string,
+  activeFile: OpenFile,
+  get_scroll: () => GraphPos,
+  set_scroll: (p: GraphPos) => void
+
+}): React.JSX.Element {
+
+  const cache_id = cache_prefix + hotkey
+  const [storedPos, setStoredPos] = useState<GraphPos | null>(null)
+  const [state, setState] = useState<BookmarkState>('empty')
+
+
+  useEffect(() => {
+    const retrieve = activeFile.bookmarks.get(cache_id)
+    console.log("RETRIEVED: ", retrieve)
+    setStoredPos(retrieve ? retrieve : null)
+    setState(retrieve ? 'filled' : 'empty')
+
+  }, [activeFile])
+
+  useEffect(() => { // handle css states
+    if (storedPos == null)
+      setState('empty')
+    else
+      setState('filled')
+  }, [storedPos])
+
+  const trigger = () => { // someone pressed button or hotkey
+    // TODO: if clearable
+    console.log("TRIGGER")
+    if (storedPos == null) {
+      var current_pos = get_scroll()
+      setStoredPos(current_pos)
+      activeFile.bookmarks.set(cache_id, current_pos)
+    }
+    else { // GOTO position
+      set_scroll(storedPos)
+
+    }
+  }
+
+  return <button
+    onClick={trigger}
+  >
+    {hotkey}_
+    {cache_id}_
+    {storedPos?.scroll_x}:
+    {storedPos?.scroll_y}_
+    {state}
+  </button>
+}
