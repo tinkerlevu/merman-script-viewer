@@ -14,11 +14,13 @@ export default function MermanEditor(
   const editorRef = useRef<PrismEditor>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false)
 
-  const saveFile = () => {
+  const saveFile = () => { // savefile Button
     window.electron.ipcRenderer.send('save_file', {
       filepath: ActiveFile.filepath,
       text: editorRef.current?.value // recommended way to get editor state
     })
+    // ActiveFile.text = editorRef.current?.value // recommended way to get editor state
+    // setUnsavedChanges(false)
   }
 
   const saveAsFile = () => {
@@ -56,13 +58,13 @@ export default function MermanEditor(
 
   const [initText, setInitText] = useState<string>("")
 
-  useEffect(() => {
-    setInitText(
-      ActiveFile.unsaved_text != "" ?
-        ActiveFile.unsaved_text : ActiveFile.text
-    )
-    console.log("setting init")
-  }, [ActiveFile])
+  const setInit = () => setInitText(
+    ActiveFile.unsaved_text != "" ?
+      ActiveFile.unsaved_text : ActiveFile.text
+  )
+
+  ref.current.reset = () => setInit() // refresh when autoreloading
+  useEffect(() => setInit(), [ActiveFile]) // refresh when changing file tabs
 
 
   const divRef = useRef(null)
