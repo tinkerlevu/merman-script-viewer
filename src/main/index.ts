@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import full_render, { handleFinishedRender, setupMermaidRenderer } from './runMerman'
+import full_render, { handleAllRendersFinished, handleFinishedRender, setupMermaidRenderer } from './runMerman'
 import openMermaidFile, { closeFile, initalizeFS, SaveAsFile, writeFileContents } from './fileManagement'
 
 
@@ -115,6 +115,8 @@ app.whenReady().then(() => {
     data.filepath, data.merman
   ));
   ipcMain.on('render_done', handleFinishedRender);
+  ipcMain.on('rendering_finished', (_, data) =>
+    handleAllRendersFinished(data.filepath_id));
 
   createWindow()
 

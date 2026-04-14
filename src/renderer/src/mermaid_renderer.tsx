@@ -95,8 +95,10 @@ function Renderer(): React.JSX.Element {
   const checkDone = () => {
     console.log("CHECKING if DONE", scriptDone, summaryDone, sortDone)
     if (scriptDone && summaryDone && sortDone) {
-      // TODO: send ipc message to close window here
       console.log("ALL DONE")
+      // TODO: close window
+      window.electron.ipcRenderer.send(
+        'rendering_finished', { filepath_id: filepath })
 
     }
 

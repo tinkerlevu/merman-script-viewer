@@ -51,6 +51,7 @@ export default async function full_render(
     && filepath == currentRender.filepath_id) // multiple triggers from file saves
     return
 
+  update_render_status(filepath, 'running')
   send_hash(filepath, "pending")
 
   currentRender = { text: merman_text, filepath_id: filepath }
@@ -75,7 +76,7 @@ export default async function full_render(
 
   if (mermaid == '') { // Translation failed Error in script
     console.log("===== THROWING ERROR =====")
-    mainWindow.webContents.send('render_failed', { filepath: filepath })
+    update_render_status(filepath, 'failed')
     return
   }
 
@@ -120,6 +121,10 @@ export default async function full_render(
 
 }
 
+export function handleAllRendersFinished(filepath_id: string) {
+  closeExisting(filepath_id)
+  update_render_status(filepath_id, 'done')
+}
 
 // close any existing browser windows
 async function closeExisting(filepath_id: string) {
@@ -173,10 +178,10 @@ function createRenderWindow(): BrowserWindow {
     }
   })
 
-  // TODO: remove this
-  renderWindow.on('ready-to-show', () => {
-    renderWindow.show()
-  })
+  // NOTE: enable this to show the window
+  // renderWindow.on('ready-to-show', () => {
+  //   renderWindow.show()
+  // })
 
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {

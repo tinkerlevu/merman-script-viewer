@@ -10,7 +10,7 @@ export default function TabIcon(
   { activeFile, monitoredHash, refresh }: {
     activeFile: OpenFile,
     monitoredHash: String,
-    refresh: number
+    refresh: number,
   }): React.JSX.Element {
 
   const [icon, setIcon] = useState<string>('') // TODO: replace with image url
@@ -28,9 +28,10 @@ export default function TabIcon(
     else
       setIcon(none)
 
+    console.log(refresh)
+
   }, [
-    activeFile.text_hash,
-    activeFile.render_status,
+    activeFile,
     monitoredHash,
     refresh])
 

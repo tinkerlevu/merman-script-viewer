@@ -301,15 +301,29 @@ function App(): React.JSX.Element {
     window.electron.ipcRenderer.on("new_render_hash", (_, data) => {
       const update_file = getOpenFile(data.filepath)
 
-      console.log(data.hash)
-
       if (!update_file) return
 
       update_file.text_hash = data.hash
+      setRefresher(prev => prev + 1)
+    })
+  }, [openFiles])
 
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on("new_render_status", (_, data) => {
+      const update_file = getOpenFile(data.filepath)
+
+      console.log("render status", data.status)
+
+      if (!update_file) return
+
+      update_file.render_status = data.status
       setRefresher(refresher + 1)
     })
   }, [openFiles])
+
+
+
 
   useEffect(
     window.electron.ipcRenderer.on("new_render", (_, data) => {
@@ -359,17 +373,6 @@ function App(): React.JSX.Element {
     }),
     [openFiles]
   )
-
-  window.electron.ipcRenderer.on("render_failed", (_, data) => {
-    console.log("RENDER FAILED")
-    const failed = getOpenFile(data.filepath)
-    if (failed)
-      failed.render_status = "failed"
-
-    setRefresher(refresher + 1) // refresh all image displays
-  })
-
-
 
 
   // TODO: text_hash
