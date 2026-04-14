@@ -188,7 +188,24 @@ export default function GraphViewer(
   }, [zoom])
 
 
+  const [eraseable, setEraseable] = useState<boolean>(false)
 
+  useEffect(() => {
+    const erase_on = (event) => {
+      if (event.ctrlKey) setEraseable(true)
+    }
+    const erase_off = (event) => {
+      if (!event.ctrlKey) setEraseable(false)
+    }
+
+    window.addEventListener('keydown', erase_on);
+    window.addEventListener('keyup', erase_off);
+
+    return () => {
+      removeEventListener('keydown', erase_on)
+      removeEventListener('keyup', erase_off)
+    }
+  }, [])
 
   return (<>
     <div style={{ display: 'grid' }}>
@@ -215,15 +232,26 @@ export default function GraphViewer(
           onClick={() => setZoomRatio(null)} // reset
         >=</button>
 
-        {Array.from({ length: 10 }, (_, i) => i).map(key =>
-          < Bookmark
-            hotkey={((key + 1) % 10).toString()}
-            cache_prefix={type}
-            activeFile={activeFile}
-            get_scroll={getScrollPos}
-            set_scroll={apply_scroll}
-          />
-        )}
+        {
+          /* NOTE: CHANGE THIS to like an array of letters or sth to bind keyboard keys */
+
+          Array.from({ length: 10 }, (_, i) => i).map(key =>
+            < Bookmark
+              hotkey={((key + 1) % 10).toString()}
+              cache_prefix={type}
+              activeFile={activeFile}
+              get_scroll={getScrollPos}
+              set_scroll={apply_scroll}
+              erase_mode={eraseable}
+              //after_erase={() => setEraseable(false)}
+              after_erase={() => { }}
+            />
+          )
+        }
+        <button
+          onClick={() => { setEraseable(prev => !prev) }}>
+          Clear
+        </button>
 
       </div>
     </div>
@@ -241,13 +269,16 @@ function Bookmark({
   activeFile,
   get_scroll,
   set_scroll,
+  erase_mode,
+  after_erase,
 }: {
   hotkey: string,
   cache_prefix: string,
   activeFile: OpenFile,
   get_scroll: () => GraphPos,
-  set_scroll: (p: GraphPos) => void
-
+  set_scroll: (p: GraphPos) => void,
+  erase_mode: boolean,
+  after_erase: () => void
 }): React.JSX.Element {
 
   const cache_id = cache_prefix + hotkey
@@ -257,7 +288,6 @@ function Bookmark({
 
   useEffect(() => {
     const retrieve = activeFile.bookmarks.get(cache_id)
-    console.log("RETRIEVED: ", retrieve)
     setStoredPos(retrieve ? retrieve : null)
     setState(retrieve ? 'filled' : 'empty')
 
@@ -265,25 +295,47 @@ function Bookmark({
 
   useEffect(() => { // handle css states
     if (storedPos == null)
-      setState('empty')
+      if (erase_mode)
+        setState('disabled')
+      else
+        setState('empty')
     else
-      setState('filled')
-  }, [storedPos])
+      if (erase_mode)
+        setState("eraseable")
+      else
+        setState('filled')
+  }, [storedPos, erase_mode])
+
+
 
   const trigger = () => { // someone pressed button or hotkey
     // TODO: if clearable
-    console.log("TRIGGER")
-    if (storedPos == null) {
+    if (erase_mode) {
+      setStoredPos(null)
+      activeFile.bookmarks.delete(cache_id)
+      after_erase()
+    }
+    else if (storedPos == null) {
       var current_pos = get_scroll()
       setStoredPos(current_pos)
       activeFile.bookmarks.set(cache_id, current_pos)
     }
-    else { // GOTO position
+    else  // Jump to stored position
       set_scroll(storedPos)
-
-    }
   }
 
+
+  useEffect(() => { // use keyboard shortcuts here
+    const keylistener = (event) => {
+      if (event.key == hotkey) trigger()
+    }
+    window.addEventListener('keydown', keylistener);
+
+    return () => removeEventListener('keydown', keylistener) // cleanup function
+  }, [storedPos, erase_mode])
+
+
+  // TODO: use State to set css styling for button
   return <button
     onClick={trigger}
   >

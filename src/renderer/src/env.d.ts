@@ -33,7 +33,7 @@ type DocPos = { // scroll position for markdown documents
 }
 
 
-type BookmarkState = 'empty' | 'filled' | 'clearable' | 'disabled'
+type BookmarkState = 'empty' | 'filled' | 'eraseable' | 'disabled'
 
 type OpenFile = {
   filepath: FileID,
