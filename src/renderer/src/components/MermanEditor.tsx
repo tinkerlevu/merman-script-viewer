@@ -2,6 +2,8 @@ import { PrismEditor } from "prism-react-editor";
 import CodeEditor from "./CodeEditor";
 import { act, useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize";
+import { Console } from "console";
+import ConsoleOutput from "./Console";
 
 
 
@@ -123,6 +125,8 @@ export default function MermanEditor(
         <div style={{ display: 'block' }}>
           sample or debug text
           also includes simple images like for showing node shapes
+          <ConsoleOutput
+            editorRef={editorRef} />
         </div>
       </div>
       <div
@@ -147,6 +151,8 @@ export default function MermanEditor(
     </div>
   </>)
 }
+
+
 
 
 // insert function def for the reference panel
