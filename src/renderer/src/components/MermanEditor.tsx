@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize";
 import ConsoleOutput from "./Console";
 import { ReferenceDisplay, ReferenceTopics } from "./ReferenceInfo";
-import { SplitBottom, SplitLayout, SplitTop } from "./SplitViewLayout";
+import { FixedBar, SplitBottom, SplitLayout, SplitMain, SplitTop } from "./SplitViewLayout";
 
 
 
@@ -89,90 +89,52 @@ export default function MermanEditor(
 
   return (<>
 
-    <div className="FixedContainer">
-      {/*<input type="checkbox" />Auto-Refresh ah have autorefresh on at all times!! */}
-      <input type="checkbox"
-        onChange={toggleAutoRender}
-        ref={autoRenderRef}
-      /> Auto-Render
-      <button
-        onClick={saveFile}
-        disabled={!unsavedChanges}>
-        Save
-      </button>
-      <button
-        onClick={saveAsFile}>
-        Save As
-      </button>
-      <button >Verify</button>  {/* run code without rendering or preprocessor */}
-      ! unsaved changes !  {/*TODO: Change this to disable enable save button when editor on change is run */}
-      error tab that also displays docs for merman syntax
-    </div>
 
 
+    <SplitLayout
+      mainContainerRef={divRef}
+      handleMainScroll={handleScroll}
+    >
+      <FixedBar>
+        {/*<input type="checkbox" />Auto-Refresh ah have autorefresh on at all times!! */}
+        <input type="checkbox"
+          onChange={toggleAutoRender}
+          ref={autoRenderRef}
+        /> Auto-Render
+        <button
+          onClick={saveFile}
+          disabled={!unsavedChanges}>
+          Save
+        </button>
+        <button
+          onClick={saveAsFile}>
+          Save As
+        </button>
+        {/* <button >Verify</button>  {/* run code without rendering or preprocessor */}
+      </FixedBar>
+      <SplitTop>
+        <ReferenceTopics
+          activeFile={ActiveFile}
+          setInfoAbout={setShowInfo}
+          refreshEditor={REFRESH}
+          editorRef={editorRef}
+        />
+      </SplitTop>
 
+      <SplitBottom>
+        <ReferenceDisplay topic={showInfo} />
+        <ConsoleOutput activeFile={ActiveFile} />
+      </SplitBottom>
 
-
-
-
-    <div style={container_style}>
-      <div style={{
-        width: "30%",
-        display: 'inline-block',
-        height: "100%"
-      }}>
-        <div style={{
-          height: ContentHeight() / 2,
-          display: 'block',
-          overflowY: 'scroll'
-
-        }}>
-          <ReferenceTopics
-            activeFile={ActiveFile}
-            setInfoAbout={setShowInfo}
-            refreshEditor={REFRESH}
-            editorRef={editorRef}
-          />
-
-          {/*clicking on each topic will insert one or more lines of text separately to show an example*/}
-        </div>
-        <div style={{
-          display: 'block',
-          overflowY: 'scroll',
-          height: '50%'
-        }}>
-          <ReferenceDisplay topic={showInfo} />
-          <ConsoleOutput activeFile={ActiveFile} />
-        </div>
-      </div>
-      <div
-        style={{
-          height: '100%',
-          width: "70%",
-          display: 'inline-block',
-          overflow: 'scroll'
-        }}
-        ref={divRef}
-        onScroll={handleScroll}
-      >
+      <SplitMain>
         <CodeEditor
           type="merman"
           value={initText}
           ref={editorRef}
           onUpdate={textUpdated}
         />
-      </div>
 
-
-    </div>
-
-    <SplitLayout >
-      <SplitTop>
-        hello
-      </SplitTop>
-      <SplitBottom>
-        world
-      </SplitBottom>
+      </SplitMain>
 
 
     </SplitLayout>

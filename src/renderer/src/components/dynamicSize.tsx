@@ -6,7 +6,7 @@ const getWindowHeight = () => {
 const fixed_elements = document.getElementsByClassName("FixedContainer")
 
 
-const OFFSET = 10; // NOTE: Pixel Offset
+const OFFSET = 12; // NOTE: Pixel Offset
 
 const calculate_new_height = () => {
   const viewport_height = getWindowHeight()
@@ -17,7 +17,7 @@ const calculate_new_height = () => {
   var used_space: number = 0;
 
   for (let item of fixed_elements) {
-    used_space += item.getBoundingClientRect().height + OFFSET
+    used_space += item.clientHeight + OFFSET
   }
 
   return viewport_height - used_space
@@ -28,9 +28,7 @@ const calculate_new_height = () => {
 
 import { useEffect, useState } from "react";
 const ContentHeight = () => {
-  const [windowHeight, setWindowHeight] = useState([
-    100
-  ]);
+  const [windowHeight, setWindowHeight] = useState([100]);
 
   useEffect(() => {
     const windowSizeHandler = () => {
@@ -38,13 +36,17 @@ const ContentHeight = () => {
     };
     window.addEventListener("resize", windowSizeHandler);
 
+
     // OTHER STUFF THAT RUNS AFTER INITIALIZATION
     windowSizeHandler()
 
+    const interval = setInterval(() => {
+      windowSizeHandler; clearInterval(interval)
+    }, 1000);
+
     return () => {
-      window.removeEventListener("resize", windowSizeHandler);
     };
-  }, [fixed_elements]);
+  }, []);
 
 
   return windowHeight[0];

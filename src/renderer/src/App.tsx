@@ -36,6 +36,8 @@ import 'react-tabs/style/react-tabs.css';
 
 // my stuff
 // import layout from './assets/spacing.module.css';
+import windowDimensions from './components/dynamicSize'
+import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
@@ -433,7 +435,10 @@ function App(): React.JSX.Element {
             pinnedRight={
               <button
                 style={{ height: "100%" }}
-                onClick={file_open_action}>
+                onClick={() => {
+                  window.dispatchEvent(new Event('resize')) // hacky way to fix incorrect height calculations after init
+                  file_open_action()
+                }}>
                 +
               </button>
             }
