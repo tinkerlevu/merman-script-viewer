@@ -103,7 +103,6 @@ function App(): React.JSX.Element {
     }
   }
 
-  const copy = (item: any) => structuredClone(item)
 
   const blank_file: OpenFile = {
     filepath: "",
@@ -494,6 +493,9 @@ function App(): React.JSX.Element {
                 Remember
               </Tab>
               <Tab>
+                Processed
+              </Tab>
+              <Tab>
                 Preprocessor
               </Tab>
               <button
@@ -547,6 +549,10 @@ function App(): React.JSX.Element {
               type="remember"
               refresh={refresher}
             />
+          </TabPanel>
+          <TabPanel>
+            Table listing original mermaid line number, generated line number, generated lines, and corresponding console output for each line
+
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}
 
