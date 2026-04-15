@@ -135,8 +135,6 @@ export default function MermanEditor(
           height: '50%'
         }}>
           <ReferenceDisplay topic={showInfo} />
-          sample or debug text
-          also includes simple images like for showing node shapes
           <ConsoleOutput activeFile={ActiveFile} />
         </div>
       </div>

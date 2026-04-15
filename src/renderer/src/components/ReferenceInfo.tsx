@@ -1,14 +1,6 @@
-import { RefObject, useEffect, useRef } from 'react'
+import { RefObject, useState } from 'react'
 import infoItems from '../assets/reference_info.json'
-import { app } from 'electron/main'
 import { PrismEditor } from 'prism-react-editor'
-import { text } from 'stream/consumers'
-
-const scrollable_panel_style = {
-  height: "100%",
-  width: "100%",
-  overflow: "scroll"
-}
 
 // List of topics
 // TODO: remove active file not needed?
@@ -36,15 +28,24 @@ export function ReferenceTopics(
     refreshEditor()
   }
 
+  const [selected, setSelected] = useState<string>("")
+
 
   return <ul>
     {infoItems.map(i =>
       <li
         onMouseEnter={() => setInfoAbout(i.title)}
-        onMouseDown={() => apply_example(i.example)}
+        onMouseLeave={() => setInfoAbout(selected)}
+        onMouseDown={() => setSelected(i.title)}
       // TODO: hover in css Style
+      // TODO add class SelectedRefInfo as selected=i.title
       >
         {i.title}
+        <button
+          onClick={() => apply_example(i.example)}
+        >
+          {">"}
+        </button>
       </li>)
     }
   </ul>
@@ -86,7 +87,3 @@ export function ReferenceDisplay(
 //
 // //reference display
 
-// title, info, example
-
-
-// insert function def for the reference panel
