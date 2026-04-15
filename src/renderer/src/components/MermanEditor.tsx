@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize";
 import ConsoleOutput from "./Console";
 import { ReferenceDisplay, ReferenceTopics } from "./ReferenceInfo";
+import { SplitBottom, SplitLayout, SplitTop } from "./SplitViewLayout";
 
 
 
@@ -108,6 +109,12 @@ export default function MermanEditor(
       error tab that also displays docs for merman syntax
     </div>
 
+
+
+
+
+
+
     <div style={container_style}>
       <div style={{
         width: "30%",
@@ -158,6 +165,20 @@ export default function MermanEditor(
 
 
     </div>
+
+    <SplitLayout >
+      <SplitTop>
+        hello
+      </SplitTop>
+      <SplitBottom>
+        world
+      </SplitBottom>
+
+
+    </SplitLayout>
+
+
+
   </>)
 }
 
