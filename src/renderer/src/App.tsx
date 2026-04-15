@@ -36,8 +36,6 @@ import 'react-tabs/style/react-tabs.css';
 
 // my stuff
 // import layout from './assets/spacing.module.css';
-import windowDimensions from './components/dynamicSize'
-import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'

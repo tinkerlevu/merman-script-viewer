@@ -55,5 +55,5 @@ type OpenFile = {
     remember: DocPos,
     merman: DocPos,
   },
-  bookmarks: Map<GraphPos>,
+  bookmarks: Map<GraphPos>, // !! not able to be converted to JSON
 }

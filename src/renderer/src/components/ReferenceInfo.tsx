@@ -1,0 +1,92 @@
+import { RefObject, useEffect, useRef } from 'react'
+import infoItems from '../assets/reference_info.json'
+import { app } from 'electron/main'
+import { PrismEditor } from 'prism-react-editor'
+import { text } from 'stream/consumers'
+
+const scrollable_panel_style = {
+  height: "100%",
+  width: "100%",
+  overflow: "scroll"
+}
+
+// List of topics
+// TODO: remove active file not needed?
+export function ReferenceTopics(
+  { activeFile, setInfoAbout, refreshEditor, editorRef }: {
+    activeFile: OpenFile,
+    setInfoAbout: (s: string) => void,
+    refreshEditor: () => void,
+    editorRef: RefObject<PrismEditor | null>,
+  }) {
+
+  const apply_example = (example_text) => {
+    var text = editorRef.current?.value + '\n'
+
+    var splitpoint = 0
+    // find n=linenumber occurance of newline. giving start of next line
+    for (var i = 0; i < editorRef.current?.activeLine; i++)
+      splitpoint = text.indexOf('\n', splitpoint + 1)
+
+    activeFile.unsaved_text =
+      text.slice(0, splitpoint)
+      + '\n\n' + example_text + '\n' +
+      text.slice(splitpoint)
+
+    refreshEditor()
+  }
+
+
+  return <ul>
+    {infoItems.map(i =>
+      <li
+        onMouseEnter={() => setInfoAbout(i.title)}
+        onMouseDown={() => apply_example(i.example)}
+      // TODO: hover in css Style
+      >
+        {i.title}
+      </li>)
+    }
+  </ul>
+}
+
+export function ReferenceDisplay(
+  { topic }: {
+    topic: string
+  }) {
+
+  const infoText = new Map(
+    infoItems.map(i => [i.title, i.info]))
+
+  const infoImages = new Map(
+    infoItems.map(i => [i.title, i.image ? i.image.uri : ""]))
+
+
+
+  console.log(infoText)
+
+  return <span>
+    <p style={{ whiteSpace: 'pre-line' }}>
+      {infoText.get(topic)}
+    </p>
+    <img
+      style={{ width: "100%" }}
+      src={infoImages.get(topic)}
+    />
+  </span>
+}
+//  select reference
+//
+//           you have general section topics like --Branching--, --Node Shapes--
+//           which either inserts no examples or an example comment
+//
+//           and specific topics like :
+//           Trapezoid
+//           Rhombus
+//
+// //reference display
+
+// title, info, example
+
+
+// insert function def for the reference panel

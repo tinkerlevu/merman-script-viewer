@@ -1,9 +1,9 @@
 import { PrismEditor } from "prism-react-editor";
 import CodeEditor from "./CodeEditor";
-import { act, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize";
-import { Console } from "console";
 import ConsoleOutput from "./Console";
+import { ReferenceDisplay, ReferenceTopics } from "./ReferenceInfo";
 
 
 
@@ -65,13 +65,13 @@ export default function MermanEditor(
 
   const [initText, setInitText] = useState<string>("")
 
-  const setInit = () => setInitText(
+  const REFRESH = () => setInitText(
     ActiveFile.unsaved_text != "" ?
       ActiveFile.unsaved_text : ActiveFile.text
   )
 
-  ref.current.reset = () => setInit() // refresh when autoreloading
-  useEffect(() => setInit(), [ActiveFile]) // refresh when changing file tabs
+  ref.current.reset = () => REFRESH() // refresh when autoreloading
+  useEffect(() => REFRESH(), [ActiveFile]) // refresh when changing file tabs
 
 
   const divRef = useRef(null)
@@ -82,6 +82,8 @@ export default function MermanEditor(
 
   const handleScroll = (_) =>
     ActiveFile.scroll_pos.merman.scroll = divRef.current.scrollTop
+
+  const [showInfo, setShowInfo] = useState<string>('')
 
 
   return (<>
@@ -107,26 +109,35 @@ export default function MermanEditor(
     </div>
 
     <div style={container_style}>
-      <div
-        style={{ width: "30%", display: 'inline-block' }}
-      >
-        <div style={{ height: ContentHeight() / 2, display: 'block' }}>
-          select reference
+      <div style={{
+        width: "30%",
+        display: 'inline-block',
+        height: "100%"
+      }}>
+        <div style={{
+          height: ContentHeight() / 2,
+          display: 'block',
+          overflowY: 'scroll'
 
-          you have general section topics like --Branching--, --Node Shapes--
-          which either inserts no examples or an example comment
-
-          and specific topics like :
-          Trapezoid
-          Rhombus
+        }}>
+          <ReferenceTopics
+            activeFile={ActiveFile}
+            setInfoAbout={setShowInfo}
+            refreshEditor={REFRESH}
+            editorRef={editorRef}
+          />
 
           {/*clicking on each topic will insert one or more lines of text separately to show an example*/}
         </div>
-        <div style={{ display: 'block' }}>
+        <div style={{
+          display: 'block',
+          overflowY: 'scroll',
+          height: '50%'
+        }}>
+          <ReferenceDisplay topic={showInfo} />
           sample or debug text
           also includes simple images like for showing node shapes
-          <ConsoleOutput
-            editorRef={editorRef} />
+          <ConsoleOutput activeFile={ActiveFile} />
         </div>
       </div>
       <div
@@ -153,6 +164,3 @@ export default function MermanEditor(
 }
 
 
-
-
-// insert function def for the reference panel

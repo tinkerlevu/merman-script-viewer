@@ -1,6 +1,6 @@
 export default function ConsoleOutput(
-  { editorRef }: {
-    editorRef: any
+  { activeFile }: {
+    activeFile: OpenFile
   }): React.JSX.Element {
 
   //TODO: add overflow scroll here
