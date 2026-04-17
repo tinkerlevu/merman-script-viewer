@@ -395,6 +395,14 @@ function App(): React.JSX.Element {
     }
   )
 
+  window.electron.ipcRenderer.on("console_clear", (_, data) => {
+    const target_file = getOpenFile(data.filepath_id)
+
+    if (target_file)
+      target_file.console_buffer = new Set()
+  })
+
+
   // TODO: console_clear getopen.console_buffer = new Set()
 
   // NOTE: ---------- END of IPC handling

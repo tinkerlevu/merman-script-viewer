@@ -23,8 +23,8 @@ var runningRenderWindows: Array<AssignedRenderWindow> = []
 
 
 var currentRender: RenderJob = {
-  merman_text: "",
-  filepath: ""
+  text: "",
+  filepath_id: ""
 }
 
 
@@ -48,6 +48,12 @@ const console_log = (filepath, newline) =>
     hash: Math.random().toString(36).substring(2)
   })
 
+const console_clear = (filepath) =>
+  mainWindow.webContents.send('console_clear', {
+    filepath_id: filepath,
+  })
+
+
 // ---------
 
 export default async function full_render(
@@ -63,6 +69,9 @@ export default async function full_render(
     console_log(filepath, "\n> No changes since the last render \n\n - ABORTING -\n")
     return
   }
+
+  console_clear(filepath)
+  console_log(filepath, "--- Starting render process ---")
 
   update_render_status(filepath, 'running')
   send_hash(filepath, "pending")
