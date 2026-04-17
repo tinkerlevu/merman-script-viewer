@@ -80,7 +80,7 @@ export default async function full_render(
 
   const mermaid = await translate_merman(
     merman_script,
-    (t: string) => console_log(filepath, t)
+    (t: string) => console_log(filepath, t) // send stuff to the console component in the renderer
   )
 
   // TODO: report any errors to renderer
@@ -90,6 +90,8 @@ export default async function full_render(
     update_render_status(filepath, 'failed')
     return
   }
+
+  console_log(filepath, "- Translation successful")
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
   send_hash(filepath, hash)
@@ -110,12 +112,15 @@ export default async function full_render(
   })
 
 
-
   // TODO: check if cached image exists
   // todo: only save X most recent images as cache
   // todo: put this function as something separate so that it can be trigged on file open?
 
+  console_log(filepath, " --- Rendering Graphs --- ")
   const renderWindow = createRenderWindow()
+
+
+  console_log(filepath, "[ Created Rendering Window ]")
 
   renderWindow.webContents.on('did-finish-load', () => {
     // IPC comms here
@@ -125,6 +130,8 @@ export default async function full_render(
       hash: hash
     })
   })
+
+  console_log(filepath, "[ Graph Rendering Started ]")
 
   runningRenderWindows.push({
     bWindow: renderWindow,
@@ -213,6 +220,7 @@ function createRenderWindow(): BrowserWindow {
 
 export function handleFinishedRender(_, data): void {
   mainWindow.webContents.send('new_render', data)
+  console_log(data.filepath, data.type + " - COMPLETE")
 }
 
 
