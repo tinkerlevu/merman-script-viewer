@@ -1,8 +1,7 @@
-import { act, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 
-const console_buffer = new Map<FileID, Set<string>>()
-
+// NOTE: OpenFile.console_buffer stores ConsoleBufferLine objects in a set as Json Strings
 const convert_to_buffer = (
   buffer_set: Set<string> | undefined): string => {
   if (!buffer_set) return ""
@@ -14,9 +13,12 @@ const convert_to_buffer = (
   return full_string
 }
 
+
+
 export default function ConsoleOutput(
-  { activeFile }: {
-    activeFile: OpenFile
+  { activeFile, scrollToBottom }: {
+    activeFile: OpenFile,
+    scrollToBottom: () => void,
   }): React.JSX.Element {
 
 
@@ -28,26 +30,24 @@ export default function ConsoleOutput(
     )
 
   useEffect(() => {
+    // NOTE: Main IPC handling and data entering is handled in App.tsx
     window.electron.ipcRenderer.on("console_log", (_, data) => {
-      // save line object in ref to activefile
-      // get open file activeFile.console_buffer.add(JSON.stringify(data))
-
       refreshBuffer()
-
     })
   }, [activeFile])
 
-  useEffect(() => {
-    refreshBuffer()
-    // TODO: scroll to bottom
 
+  useEffect(() => { // when switching tabs
+    refreshBuffer() // change to current files console output
   }, [activeFile])
+
+  useEffect(() => scrollToBottom(), [currentBuffer])
+
 
 
   // TODO: add ipc on for 'console_log', 'console_error'? and 'clear_console'
 
   //TODO: add overflow scroll here
-  // and saving scroll position
   return <>
     <div style={{ whiteSpace: 'pre-line' }}>
       {currentBuffer}

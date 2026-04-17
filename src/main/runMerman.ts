@@ -8,6 +8,7 @@ import { AssignedRenderWindow, RenderJob } from "./env";
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 import { createHash } from "crypto";
+import { readFileSync } from "fs";
 
 
 var mainWindow: BrowserWindow // very hacky ikik
@@ -54,12 +55,14 @@ export default async function full_render(
   merman_text: string // one single string that hasn't been broken into an array
 ) {
 
-  console_log(filepath, "> Starting render process")
+  console_log(filepath, "--- Starting render process ---")
 
   // TODO: update repeat trigger prevention to include the preprocessor and mb add a cooldown timeout?
   if (merman_text == currentRender.text
-    && filepath == currentRender.filepath_id) // multiple triggers from file saves
+    && filepath == currentRender.filepath_id) { // multiple triggers from file saves
+    console_log(filepath, "\n> No changes since the last render \n\n - ABORTING -\n")
     return
+  }
 
   update_render_status(filepath, 'running')
   send_hash(filepath, "pending")
@@ -151,8 +154,9 @@ async function closeExisting(filepath_id: string) {
 
 // json string has to be an array, where each entry is each line in the file, but it's a single string
 async function translate_merman(file_lines, print) {
-  const fs = require('fs')
-  const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
+  print('[ Initalizing Merman ]')
+
+  const MERMAN_CODE = readFileSync(MERMAN_CODE_FILE, 'utf8');
 
   const pyodide = await loadPyodide({
     // TODO: add ipc for sending python print output to interface RENDER_LOG
@@ -168,9 +172,8 @@ async function translate_merman(file_lines, print) {
     return evaluated.toJs()
   }
   catch (error) { // the Python code itself can throw errors to here if there's issues with the script
-    console.log('MERMAN PYTHON ERROR', error) //TODO: RENDER ERROR ipc
-    // TODO: add this to the console
-    print(error)
+    console.log('MERMAN PYTHON ERROR', error)
+    // TODO: map generated line number to source line number when preprocessor implemented
     return ''
   }
 

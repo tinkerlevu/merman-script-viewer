@@ -16,16 +16,17 @@ export function SplitLayout(
   const Bottom = children.find(c => c.type.name == 'SplitBottom')
   const Main = children.find(c => c.type.name == 'SplitMain')
 
-  console.log(children, Top)
-
   const barRef = useRef(null)
 
   const [barHeight, setBarHeight] = useState<number>(0)
 
   useEffect(() => {
     setBarHeight(barRef.current?.clientHeight)
-
   }, [barRef.current?.clientHeight])
+
+
+
+
 
 
   // TODO: add a container at top called FixedBar for the buttons!
@@ -51,11 +52,15 @@ export function SplitLayout(
         }}>
           {Top} {/*<----------------------------- */}
         </div>
-        <div style={{
-          display: 'block',
-          overflowY: 'scroll',
-          height: '50%'
-        }}>
+        <div
+          style={{
+            display: 'block',
+            overflowY: 'scroll',
+            height: '50%',
+            overflowWrap: 'anywhere'
+          }}
+          ref={Bottom.props.ref}
+        >
           {Bottom} {/*<----------------------------- */}
         </div>
       </div>
@@ -88,7 +93,7 @@ export function SplitTop({ children }): React.JSX.Element {
 }
 
 
-export function SplitBottom({ children }): React.JSX.Element {
+export function SplitBottom({ children, ref }): React.JSX.Element {
   return <>{children}</>
 }
 

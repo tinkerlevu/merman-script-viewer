@@ -101,13 +101,11 @@ class MermanLine:
 
         # print a message saying that line: line_number has and a syntax error
     def throw_error(self, message=None):
-        print("\n\n\033[31m================== ERROR ======================\n")
+        print("\n\n  === ERROR ===  \n")
         if message:
-            print('\033[35m', message, '\n')
-        print("\033[93mLine:", self.line_number,
-              "\t\033[36m", self.text.strip())
-        print('\033[0m')
-        raise Exception
+            print(message)
+        print("\nLine:", self.line_number, " -> ",  self.text.strip())
+        raise Exception  # TODO: include line number here for processing
 
 
 class Comment:
@@ -1272,6 +1270,8 @@ class ReportItem:
 merman_filetext = filedata
 
 
+print("[ Initalization Complete ]")
+
 # --------- THE REST OF THIS RUNS SEQUENTIALLY: --------
 
 print("> Reading Lines.......\t", end='')
@@ -1857,6 +1857,9 @@ for node in script:
 
 OUTPUTS['word_count'] = total_words
 OUTPUTS['node_count'] = total_nodes
+
+print("Word Count: ", total_words)
+print("Total Nodes: ", total_nodes)
 
 print("< DONE >")
 

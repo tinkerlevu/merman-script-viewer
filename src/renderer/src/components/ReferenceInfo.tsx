@@ -61,7 +61,7 @@ export function ReferenceDisplay(
     infoItems.map(i => [i.title, i.info]))
 
   const infoImages = new Map(
-    infoItems.map(i => [i.title, i.image ? i.image.uri : ""]))
+    infoItems.map(i => [i.title, i.image ? i.image.uri : null]))
 
 
 

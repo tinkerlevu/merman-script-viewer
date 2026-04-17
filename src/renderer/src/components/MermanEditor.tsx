@@ -86,6 +86,8 @@ export default function MermanEditor(
 
   const [showInfo, setShowInfo] = useState<string>('')
 
+  const consoleRef = useRef<HTMLDivElement>(null)
+
 
   return (<>
 
@@ -110,6 +112,7 @@ export default function MermanEditor(
           onClick={saveAsFile}>
           Save As
         </button>
+        <button onClick={() => consoleRef.current.scrollTop = 100}>test</button>
         {/* <button >Verify</button>  {/* run code without rendering or preprocessor */}
       </FixedBar>
       <SplitTop>
@@ -121,9 +124,16 @@ export default function MermanEditor(
         />
       </SplitTop>
 
-      <SplitBottom>
+      <SplitBottom ref={consoleRef} >
         <ReferenceDisplay topic={showInfo} />
-        <ConsoleOutput activeFile={ActiveFile} />
+        <ConsoleOutput
+          activeFile={ActiveFile}
+          scrollToBottom={() => {
+            if (consoleRef.current)
+              consoleRef.current.scrollTop =
+                consoleRef.current.scrollHeight
+          }}
+        />
       </SplitBottom>
 
       <SplitMain>

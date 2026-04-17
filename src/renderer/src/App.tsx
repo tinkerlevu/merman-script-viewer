@@ -388,6 +388,17 @@ function App(): React.JSX.Element {
 
 
 
+  window.electron.ipcRenderer.on("console_log",
+    (_, data: ConsoleBufferLine) => {
+      getOpenFile(data.filepath_id)?.console_buffer
+        .add(JSON.stringify(data))
+    }
+  )
+
+  // TODO: console_clear getopen.console_buffer = new Set()
+
+  // NOTE: ---------- END of IPC handling
+
   // TODO implement missing actions from Tabs like selecting active, etc.
   // TODO fix add file button css styling
   // TODO fix tab icon css styling
