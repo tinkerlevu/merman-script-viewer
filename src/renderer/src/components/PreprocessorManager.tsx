@@ -1,14 +1,32 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import CodeEditor from "./CodeEditor";
 import { FixedBar, SplitBottom, SplitLayout, SplitMain, SplitTop } from "./SplitViewLayout";
+import ConsoleOutput from "./Console";
+
+
+const loadedScripts = new Map<FileID, string>()
 
 export default function PreprocessorManager(
-  { }: {
+  { activeFile }: {
+    activeFile: OpenFile
   }): React.JSX.Element {
 
 
   const containerRef = useRef(null)
+  const consoleRef = useRef<HTMLDivElement>(null)
 
+  const openProcessorScript = () => {
+    window.electron.ipcRenderer.send('preprocessor_open')
+  }
+
+
+  useEffect(() => {
+
+    window.electron.ipcRenderer.on("preprocessor_load", (_, data) => {
+      console.log(data)
+
+    })
+  }, [])
 
   return <SplitLayout
     mainContainerRef={containerRef}
@@ -16,19 +34,37 @@ export default function PreprocessorManager(
   >
 
     <FixedBar>
-      <button>New</button>
-      <button>Open</button>
-      <button>Save</button>
-      <button >Save As</button>
-      <input type="checkbox" /> Skip (disable for this file)
+      <button onClick={openProcessorScript}>Open</button>
+      <button >Dry Run</button>
     </FixedBar>
 
     <SplitTop>
       file selector
+      <ul>
+        <li>
+          <input type="checkbox" />
+          filename
+          <button>🔼</button>
+          <button>🔽</button>
+          <button>X</button>
+        </li>
+      </ul>
     </SplitTop>
 
-    <SplitBottom ref={null}>
+    <SplitBottom ref={consoleRef}>
       console
+      <ConsoleOutput
+        activeFile={activeFile}
+        scrollToBottom={() => {
+          if (consoleRef.current)
+            consoleRef.current.scrollTop =
+              consoleRef.current.scrollHeight
+        }}
+        takeFocus={() => { }}
+        style={{}}
+      />
+
+
     </SplitBottom>
 
     <SplitMain>

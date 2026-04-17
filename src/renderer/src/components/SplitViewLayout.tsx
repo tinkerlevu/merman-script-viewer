@@ -24,13 +24,13 @@ export function SplitLayout(
     const calculate_bar = () =>
       setBarHeight(barRef.current.clientHeight)
 
-    const resizeObserver = new ResizeObserver(() => {
+    const obs = new ResizeObserver(() => {
       calculate_bar()
     })
 
-    resizeObserver.observe(barRef.current);
+    obs.observe(barRef.current);
 
-    return () => resizeObserver.disconnect()
+    return () => obs.disconnect()
   }, [])
 
 

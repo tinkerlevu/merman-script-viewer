@@ -23,8 +23,9 @@ export const initalizeFS = (mainInterface: BrowserWindow) =>
   mainWindow = mainInterface
 
 
+// can either open an existing file or create a new one
 export default async function openMermaidFile(
-  file_contents: string | void
+  file_contents: string | void // if using SaveAs option
 ) {
   const pathSelection = await dialog.showSaveDialog({
     // properties: ['openFile', 'promptToCreate'],
@@ -94,7 +95,7 @@ export async function SaveAsFile(old_filepath, text) {
 var monitoredFiles: Array<MonitoredFile> = [] // all files with fs.Watch applied to them
 const watcher = chokidar.watch([],
   { awaitWriteFinish: { stabilityThreshold: 500 }, atomic: true })
-watcher.on('change', path => { loadFileContents(path); console.log(watcher.getWatched()) }) // send file changes to renderer here
+watcher.on('change', path => loadFileContents(path)) // send file changes to renderer here
 
 
 // filepath is used as an id to coordinate multiple parts of the app

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import full_render, { handleAllRendersFinished, handleFinishedRender, setupMermaidRenderer } from './runMerman'
 import openMermaidFile, { closeFile, initalizeFS, SaveAsFile, writeFileContents } from './fileManagement'
+import { initalizePreProcessor, openPreProcessScript } from './preProcessorManagement'
 
 
 function createWindow(): void {
@@ -80,6 +81,7 @@ function createWindow(): void {
 
   initalizeFS(mainWindow)
   setupMermaidRenderer(mainWindow)
+  initalizePreProcessor(mainWindow)
 
 }
 
@@ -117,6 +119,9 @@ app.whenReady().then(() => {
   ipcMain.on('render_done', handleFinishedRender);
   ipcMain.on('rendering_finished', (_, data) =>
     handleAllRendersFinished(data.filepath_id));
+
+  // Preprocessing Scripts
+  ipcMain.on('preprocessor_open', openPreProcessScript);
 
   createWindow()
 

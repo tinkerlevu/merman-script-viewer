@@ -545,7 +545,9 @@ function App(): React.JSX.Element {
 
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}
-            <PreprocessorManager />
+            <PreprocessorManager
+              activeFile={activeFile}
+            />
           </TabPanel>
         </Tabs >
       </div >
