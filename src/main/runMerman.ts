@@ -40,6 +40,13 @@ const update_render_status = (filepath, status) =>
     status: status,
   })
 
+const console_log = (filepath, newline) =>
+  mainWindow.webContents.send('console_log', {
+    filepath_id: filepath,
+    text: newline + '\n',
+    hash: Math.random().toString(36).substring(2)
+  })
+
 // ---------
 
 export default async function full_render(
@@ -47,6 +54,9 @@ export default async function full_render(
   merman_text: string // one single string that hasn't been broken into an array
 ) {
 
+  console_log(filepath, "> Starting render process")
+
+  // TODO: update repeat trigger prevention to include the preprocessor and mb add a cooldown timeout?
   if (merman_text == currentRender.text
     && filepath == currentRender.filepath_id) // multiple triggers from file saves
     return
@@ -59,20 +69,18 @@ export default async function full_render(
 
   const merman_script = merman_text.split(/\r?\n/)
 
-  // TODO: Preprocessor stuff here? or handle it in renderer?
-  // to include files have to do it here
+  // TODO: Preprocessor stuff here
+
   // TODO: WARNING: the preprocessor might return stuff as a single string separated by \n with \\n in the text. Might have to unpack those strings into arrays and add that to the main array
-  // TODO: have a separate debug window that pops up which shows the file output and while line caused the error and which lines were modified by the preprocessor and what the preprocessor actually returned.
-  //mb run the entire script again? or not if the preprocessor can use random values
-  // preprocessor returns table which indicates original filenumber, preprocessed file number, and the corresponding line output that can be mapped onto a table with no borders and displayed in a separate window
 
-  // TODO: update rendering status if failed or successful in renderer
+  // preprocessor returns table which indicates original filenumber, preprocessed file number, and the corresponding line output and only console output from the function, that can be mapped onto a table
 
-  const mermaid = await translate_merman(merman_script)
+  const mermaid = await translate_merman(
+    merman_script,
+    (t: string) => console_log(filepath, t)
+  )
 
-  // TODO: check if mermaid translation is successful or report error
-
-  //  console.log(mermaid)
+  // TODO: report any errors to renderer
 
   if (mermaid == '') { // Translation failed Error in script
     console.log("===== THROWING ERROR =====")
@@ -102,6 +110,7 @@ export default async function full_render(
 
   // TODO: check if cached image exists
   // todo: only save X most recent images as cache
+  // todo: put this function as something separate so that it can be trigged on file open?
 
   const renderWindow = createRenderWindow()
 
@@ -141,13 +150,16 @@ async function closeExisting(filepath_id: string) {
 // params are the merman text and  a function to send updates to the terminal window on the interface, and a function to return the results
 
 // json string has to be an array, where each entry is each line in the file, but it's a single string
-async function translate_merman(file_lines) {
+async function translate_merman(file_lines, print) {
   const fs = require('fs')
   const MERMAN_CODE = fs.readFileSync(MERMAN_CODE_FILE, 'utf8');
 
   const pyodide = await loadPyodide({
     // TODO: add ipc for sending python print output to interface RENDER_LOG
-    stdout: (text) => console.log("PYTHON PRINT", text)
+    stdout: (text) => {
+      console.log("PYTHON MERMAN PRINT", text)
+      print(text)
+    }
   });
 
   const locals = pyodide.toPy({ filedata: file_lines })
@@ -156,7 +168,9 @@ async function translate_merman(file_lines) {
     return evaluated.toJs()
   }
   catch (error) { // the Python code itself can throw errors to here if there's issues with the script
-    console.log('PYTHON ERROR', error) //TODO: RENDER ERROR ipc
+    console.log('MERMAN PYTHON ERROR', error) //TODO: RENDER ERROR ipc
+    // TODO: add this to the console
+    print(error)
     return ''
   }
 

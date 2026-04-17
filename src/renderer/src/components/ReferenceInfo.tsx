@@ -34,6 +34,7 @@ export function ReferenceTopics(
   return <ul>
     {infoItems.map(i =>
       <li
+        key={i.title}
         onMouseEnter={() => setInfoAbout(i.title)}
         onMouseLeave={() => setInfoAbout(selected)}
         onMouseDown={() => setSelected(i.title)}
@@ -64,7 +65,6 @@ export function ReferenceDisplay(
 
 
 
-  console.log(infoText)
 
   return <span>
     <p style={{ whiteSpace: 'pre-line' }}>

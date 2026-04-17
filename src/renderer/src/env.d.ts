@@ -2,13 +2,15 @@
 //
 type EditorType = "javascript" | "merman";
 
-type FileIDH = string
+type FileID = string
+
+type Hash = string
 
 type RenderImageType = "script" | "summary" | "sorted"
 
 type RenderedImage = {
   svg: string,
-  hash: string,
+  hash: Hash,
   render_status: "rendering" | "done" | "none"
 }
 
@@ -16,7 +18,7 @@ type RenderMDType = "todo" | "remember"
 
 type RenderedMD = {
   text: string,
-  hash: string,
+  hash: Hash,
   render_status: "rendering" | "done" | "none"
 }
 
@@ -35,11 +37,12 @@ type DocPos = { // scroll position for markdown documents
 
 type BookmarkState = 'empty' | 'filled' | 'eraseable' | 'disabled'
 
+
 type OpenFile = {
   filepath: FileID,
   text: string,
   unsaved_text: string,
-  text_hash: string,
+  text_hash: Hash,
   render_status: "running" | "done" | "failed" | "none" | "preprocessing"
   script: RenderedImage,
   summary: RenderedImage,
@@ -56,4 +59,11 @@ type OpenFile = {
     merman: DocPos,
   },
   bookmarks: Map<GraphPos>, // !! not able to be converted to JSON
+  //console_buffer: Set<string> // console display in bottom left
+}
+
+type ConsoleBufferLine = {
+  filepath_id: FileID,
+  text: string,
+  hash: Hash
 }

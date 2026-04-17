@@ -152,14 +152,10 @@ function App(): React.JSX.Element {
         unique.push(file.id)
       }
     })
-    console.log(activeFile.filepath)
 
     if (clean_tab.length != fileTabs.length)
       setFileTabs(clean_tab.map( // apply remove duplicates but keep focus on currently selected tab
         tab => ({ ...tab, active: activeFile.filepath == tab.id })))
-
-
-    console.log("Clean", clean, clean_tab, activeFile)
 
     if (clean.length != openFiles.length) { // there were duplicates
       setActiveFile( // set Active file to the instance in the clean array that has the corresponding filename
@@ -361,8 +357,6 @@ function App(): React.JSX.Element {
 
   useEffect(
     window.electron.ipcRenderer.on("new_render", (_, data) => {
-      console.log(data.filepath)
-      console.log("image updating", activeFile)
 
       const update_file = getOpenFile(data.filepath)
 
@@ -424,7 +418,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
-      <div style={{ height: '95vh' }}>
+      <div style={{ height: '100vh' }}>
         <div className='FixedContainer'>
           <FileTabBar
             // darkMode={false}
@@ -509,6 +503,8 @@ function App(): React.JSX.Element {
               <button onClick={() => console.log(openFiles)}>test</button>
             </TabList>
           </div>
+
+          <div className='contentPoint'></div>
 
           <TabPanel forceRender={true}> {/* Write */}
             <MermanEditor
