@@ -125,7 +125,10 @@ export default function MermanEditor(
       </SplitTop>
 
       <SplitBottom ref={consoleRef} >
-        <ReferenceDisplay topic={showInfo} />
+        <ReferenceDisplay
+          topic={showInfo}
+          style={{ display: showInfo != '' ? 'block' : 'none' }}
+        />
         <ConsoleOutput
           activeFile={ActiveFile}
           scrollToBottom={() => {
@@ -133,6 +136,8 @@ export default function MermanEditor(
               consoleRef.current.scrollTop =
                 consoleRef.current.scrollHeight
           }}
+          takeFocus={() => setShowInfo('')}
+          style={{ display: showInfo == '' ? 'block' : 'none' }}
         />
       </SplitBottom>
 

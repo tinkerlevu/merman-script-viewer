@@ -16,9 +16,11 @@ const convert_to_buffer = (
 
 
 export default function ConsoleOutput(
-  { activeFile, scrollToBottom }: {
+  { activeFile, scrollToBottom, takeFocus, style }: {
     activeFile: OpenFile,
     scrollToBottom: () => void,
+    takeFocus: () => void,
+    style: any
   }): React.JSX.Element {
 
 
@@ -41,7 +43,10 @@ export default function ConsoleOutput(
     refreshBuffer() // change to current files console output
   }, [activeFile])
 
-  useEffect(() => scrollToBottom(), [currentBuffer])
+  useEffect(() => {
+    scrollToBottom()
+    takeFocus()
+  }, [currentBuffer])
 
 
 
@@ -49,7 +54,7 @@ export default function ConsoleOutput(
 
   //TODO: add overflow scroll here
   return <>
-    <div style={{ whiteSpace: 'pre-line' }}>
+    <div style={{ ...style, whiteSpace: 'pre-line' }}>
       {currentBuffer}
     </div >
   </>

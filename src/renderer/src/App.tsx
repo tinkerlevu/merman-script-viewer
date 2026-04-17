@@ -402,16 +402,9 @@ function App(): React.JSX.Element {
       target_file.console_buffer = new Set()
   })
 
-
-  // TODO: console_clear getopen.console_buffer = new Set()
-
   // NOTE: ---------- END of IPC handling
 
-  // TODO implement missing actions from Tabs like selecting active, etc.
-  // TODO fix add file button css styling
-  // TODO fix tab icon css styling
-  // TODO add dark mode
-  // TODO: add favicon manager function? which takes Openfile and applies favicon to setFileTabs
+  // TODO: add dark mode
 
   return (
     <>

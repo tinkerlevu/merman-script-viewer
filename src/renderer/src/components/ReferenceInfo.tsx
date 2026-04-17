@@ -53,8 +53,9 @@ export function ReferenceTopics(
 }
 
 export function ReferenceDisplay(
-  { topic }: {
+  { topic, style }: {
     topic: string
+    style: any
   }) {
 
   const infoText = new Map(
@@ -66,7 +67,7 @@ export function ReferenceDisplay(
 
 
 
-  return <span>
+  return <span style={style}>
     <p style={{ whiteSpace: 'pre-line' }}>
       {infoText.get(topic)}
     </p>
