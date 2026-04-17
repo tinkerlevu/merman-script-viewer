@@ -1,11 +1,6 @@
 // ------------------------------ TODO: REPLACE THESE -------------------------------
 import Versions from './components/Versions' // replace with WORD COUNT
 import test_fav from "./assets/favicons/test.ico"
-import script_palceholder from "./assets/test-remove/script_placeholder.svg"
-import summary_placeholder from "./assets/test-remove/summary_placeholder.svg"
-import sorted_placeholder from "./assets/test-remove/sorted_placeholder.svg"
-import remember_placeholder from "./assets/test-remove/remember_placeholder.md?raw"
-import todo_placeholder from "./assets/test-remove/todo_placeholder.md?raw"
 
 import done_fav from "./assets/favicons/filetab_done.ico"
 import fail_fav from "./assets/favicons/filetab_failed.ico"
@@ -36,8 +31,6 @@ import 'react-tabs/style/react-tabs.css';
 
 // my stuff
 // import layout from './assets/spacing.module.css';
-import windowDimensions from './components/dynamicSize'
-import ContentHeight from './components/dynamicSize'
 import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
@@ -45,33 +38,8 @@ import TabIcon from './components/TabIcon'
 import CodeIcon from './components/CodeIcon'
 
 
-// TODO: remove
-function favicon(activeFile: OpenFile) {
-  var icon
-  useEffect(() => {
-    if (activeFile.unsaved_text == "")
-      icon = ""
-    else
-      icon = test_fav
-  }, [activeFile])
-
-  return icon
-
-}
-
 function App(): React.JSX.Element {
-  // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
-
-  const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
-  const getOpenFile = (filepath: string) =>
-    openFiles.find((file) => file.filepath == filepath)
-
-  // NOTE: ---------- file handling
-
-  const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([]);
-  // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
-  //
   const blank_img = (): RenderedImage => {
     return {
       svg: "",
@@ -125,9 +93,22 @@ function App(): React.JSX.Element {
       merman: blank_docpos(),
     },
     bookmarks: new Map(),
+    console_buffer: new Set(),
   }
 
+  const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)
+
+
+  const getOpenFile = (filepath: string) =>
+    openFiles.find((file) => file.filepath == filepath)
+
+
+  const [fileTabs, setFileTabs] = useState<FileTabProperties[]>([]);
+  // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
+
+
+  // NOTE: ---------- Handling Merman Files
 
   useEffect(() => { // Cleanup Pattern, for IPC race conditions
     // set active file to first item with matching filename
@@ -403,10 +384,7 @@ function App(): React.JSX.Element {
   )
 
 
-  // TODO: text_hash
-  // set hash
-  //
-  // NOTE: ---------- end of Displaying Renders
+  // NOTE: ---------- console display
 
 
 

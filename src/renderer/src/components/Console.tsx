@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { act, useEffect, useState } from "react"
 
 
 const console_buffer = new Map<FileID, Set<string>>()
@@ -24,15 +24,13 @@ export default function ConsoleOutput(
 
   const refreshBuffer = () =>
     setCurrentBuffer(
-      convert_to_buffer(console_buffer.get(activeFile.filepath))
+      convert_to_buffer(activeFile.console_buffer)
     )
 
   useEffect(() => {
     window.electron.ipcRenderer.on("console_log", (_, data) => {
       // save line object in ref to activefile
-      console_buffer.set(data.filepath_id,
-        (console_buffer.get(data.filepath_id) || new Set()).add(
-          JSON.stringify(data)))
+      // get open file activeFile.console_buffer.add(JSON.stringify(data))
 
       refreshBuffer()
 
