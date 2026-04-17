@@ -16,13 +16,22 @@ export function SplitLayout(
   const Bottom = children.find(c => c.type.name == 'SplitBottom')
   const Main = children.find(c => c.type.name == 'SplitMain')
 
-  const barRef = useRef(null)
+  const barRef = useRef({ clientHeight: 0 })
 
   const [barHeight, setBarHeight] = useState<number>(0)
 
   useEffect(() => {
-    setBarHeight(barRef.current?.clientHeight)
-  }, [barRef.current?.clientHeight])
+    const calculate_bar = () =>
+      setBarHeight(barRef.current.clientHeight)
+
+    const resizeObserver = new ResizeObserver(() => {
+      calculate_bar()
+    })
+
+    resizeObserver.observe(barRef.current);
+
+    return () => resizeObserver.disconnect()
+  }, [])
 
 
 

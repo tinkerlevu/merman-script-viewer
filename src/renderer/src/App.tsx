@@ -36,6 +36,7 @@ import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
 import TabIcon from './components/TabIcon'
 import CodeIcon from './components/CodeIcon'
+import PreprocessorManager from './components/PreprocessorManager'
 
 
 function App(): React.JSX.Element {
@@ -544,17 +545,7 @@ function App(): React.JSX.Element {
 
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}
-
-            runs function which passes an object as variable STATIC to be called over multiple lines!
-            <button>New</button>
-            <button>Open</button>
-            a single preprocessor file can be linked to multiple open scripts
-            <button>Save</button>
-            <button >Save As</button>
-            <input type="checkbox" /> Skip (disable for this file)
-            list of open preprocessor files that can be assigned to this file with -None- / default option
-            error, and console log outputs
-            <CodeEditor type="javascript" />
+            <PreprocessorManager />
           </TabPanel>
         </Tabs >
       </div >
