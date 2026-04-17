@@ -92,8 +92,9 @@ export async function SaveAsFile(old_filepath, text) {
 
 // WARNING: make sure there is always corresponding filepath in monitoredFiles
 var monitoredFiles: Array<MonitoredFile> = [] // all files with fs.Watch applied to them
-const watcher = chokidar.watch([])
-watcher.on('change', path => loadFileContents(path)) // send file changes to renderer here
+const watcher = chokidar.watch([],
+  { awaitWriteFinish: { stabilityThreshold: 500 }, atomic: true })
+watcher.on('change', path => { loadFileContents(path); console.log(watcher.getWatched()) }) // send file changes to renderer here
 
 
 // filepath is used as an id to coordinate multiple parts of the app

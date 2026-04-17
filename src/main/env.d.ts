@@ -14,4 +14,6 @@ type MonitoredFile = {
 type RenderJob = {
   text: string,
   filepath_id: string
+  request_id: string
+  timestamp: DOMHighResTimeStamp
 }

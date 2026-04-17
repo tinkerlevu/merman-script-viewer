@@ -282,8 +282,8 @@ function App(): React.JSX.Element {
 
     window.electron.ipcRenderer.send('render', {
       filepath: filepath_id,
-      merman: certain_text || mermanEditorRef.current.get_text()
-      // TODO: preprocessor
+      merman: certain_text || mermanEditorRef.current.get_text(),
+      request_id: Math.random().toString(36).substring(2)
     })
   }
 

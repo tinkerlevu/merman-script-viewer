@@ -24,7 +24,9 @@ var runningRenderWindows: Array<AssignedRenderWindow> = []
 
 var currentRender: RenderJob = {
   text: "",
-  filepath_id: ""
+  filepath_id: "",
+  request_id: "",
+  timestamp: performance.now()
 }
 
 
@@ -45,7 +47,7 @@ const console_log = (filepath, newline) =>
   mainWindow.webContents.send('console_log', {
     filepath_id: filepath,
     text: newline + '\n',
-    hash: Math.random().toString(36).substring(2)
+    id: Math.random().toString(36).substring(2) // DO NOT REMOVE makes sure each line stored in active file is unique. otherwise duplicate printouts would be filtered out even if they're supposed to be shown
   })
 
 const console_clear = (filepath) =>
@@ -58,15 +60,23 @@ const console_clear = (filepath) =>
 
 export default async function full_render(
   filepath: string,
-  merman_text: string // one single string that hasn't been broken into an array
+  merman_text: string, // one single string that hasn't been broken into an array
+  request_id: string
 ) {
+  console.log(request_id)
 
-  console_log(filepath, "--- Starting render process ---")
+  if (request_id == currentRender.request_id) // filter out ipc noise
+    return
 
   // TODO: update repeat trigger prevention to include the preprocessor and mb add a cooldown timeout?
   if (merman_text == currentRender.text
     && filepath == currentRender.filepath_id) { // multiple triggers from file saves
-    console_log(filepath, "\n> No changes since the last render \n\n - ABORTING -\n")
+    if (performance.now() - currentRender.timestamp < 500) { // 500ms debouncing
+      currentRender.timestamp = performance.now()
+      return
+    }
+    currentRender.timestamp = performance.now()
+    console_log(filepath, "> No changes since the last render - ABORTING")
     return
   }
 
@@ -76,7 +86,12 @@ export default async function full_render(
   update_render_status(filepath, 'running')
   send_hash(filepath, "pending")
 
-  currentRender = { text: merman_text, filepath_id: filepath }
+  currentRender = {
+    text: merman_text,
+    filepath_id: filepath,
+    request_id: request_id,
+    timestamp: performance.now()
+  }
   closeExisting(filepath) // cancel previous render job
 
   const merman_script = merman_text.split(/\r?\n/)
