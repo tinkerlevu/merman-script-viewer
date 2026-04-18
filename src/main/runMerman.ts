@@ -9,6 +9,7 @@ import { AssignedRenderWindow, FileID, Hash, RenderJob } from "./env";
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 import { createHash } from "crypto";
 import { readFileSync } from "fs";
+import { inspect } from "util";
 
 
 var mainWindow: BrowserWindow // very hacky ikik
@@ -259,7 +260,7 @@ function preprocess(
   // for the script to store variables that can be accessed in subsequent calls
   const presistentData = {}
   const line = {
-    text: "",
+    text: "", // the actual source line itself
     index: 0, // index of line in ALL array
     number: 1, // actual line number
     All: structuredClone(merman_script),
@@ -270,11 +271,11 @@ function preprocess(
   }
 
   const capturedLogs: Array<Array<string>> = []
+  const any_toString = (a: any) => inspect(a,) // TODO: add options here?
   const console_override = {
     log: function(...args: any) {
-      // TODO: create any_toString method below to convert any value to string
-      // TODO add html, load, temp methods, and send console outputs to UI and print to console.
-      capturedLogs.push(args.map(i => String(i)));
+      // TODO: add html, load, temp methods, and send console outputs to UI and print to console.
+      capturedLogs.push(args.map(i => any_toString(i)));
     }
   }
 
@@ -291,7 +292,7 @@ function preprocess(
     var raw_result_string =
       Process(line, presistentData, console_override)
 
-    console.log('PROCESSING RESULT', raw_result_string, capturedLogs)
+    console.log('PROCESSING RESULT', raw_result_string, capturedLogs.join('\n'))
 
     // TODO: handle result, convert to array, add to script, calculate line mapping table, convert to ProcessedLine
     // TODO: if null just pass along existing merman line
@@ -302,6 +303,30 @@ function preprocess(
   return []
 }
 
+
+// TODO: REMOVE:
+//
+// const stringifyAll = (obj) => {
+//   const cache = new WeakSet(); // To handle circular references
+//   return JSON.stringify(obj, (_, value) => {
+//     // 1. Handle Circular References
+//     if (typeof value === "object" && value !== null) {
+//       if (cache.has(value)) return "[Circular]";
+//       cache.add(value);
+//     }
+//     // 2. Handle Functions
+//     if (typeof value === "function") return value.toString();
+//     // 3. Handle Map and Set
+//     if (value instanceof Map) return Object.fromEntries(value.entries());
+//     if (value instanceof Set) return Array.from(value);
+//     // 4. Handle BigInt
+//     if (typeof value === "bigint") return value.toString() + "n";
+//     // 5. Handle RegExp
+//     if (value instanceof RegExp) return value.toString();
+//
+//     return value;
+//   }, 2); // Pretty print with 2 spaces
+// };
 
 // (function() {
 //     // 1. Store the original reference
