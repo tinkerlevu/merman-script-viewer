@@ -26,7 +26,8 @@ var currentRender: RenderJob = {
   text: "",
   filepath_id: "",
   request_id: "",
-  timestamp: performance.now()
+  timestamp: performance.now(),
+  preprocessor: ""
 }
 
 
@@ -61,22 +62,28 @@ const console_clear = (filepath) =>
 export default async function full_render(
   filepath: string,
   merman_text: string, // one single string that hasn't been broken into an array
-  request_id: string
+  request_id: string,
+  preprocessor: string,
+
 ) {
-  console.log(request_id)
+  console.log("PREPROCESSOR", preprocessor)
 
   if (request_id == currentRender.request_id) // filter out ipc noise
     return
 
-  // TODO: update repeat trigger prevention to include the preprocessor and mb add a cooldown timeout?
+  // deal with multiple triggers from rapid file saves
   if (merman_text == currentRender.text
-    && filepath == currentRender.filepath_id) { // multiple triggers from file saves
-    if (performance.now() - currentRender.timestamp < 500) { // 500ms debouncing
+    && filepath == currentRender.filepath_id
+    && preprocessor == currentRender.preprocessor) {
+
+    // 500ms debouncing on abort messages
+    if (performance.now() - currentRender.timestamp < 500) {
       currentRender.timestamp = performance.now()
       return
     }
     currentRender.timestamp = performance.now()
-    console_log(filepath, "> No changes since the last render - ABORTING")
+    console_log(
+      filepath, "> No changes since last render - ABORTING")
     return
   }
 
@@ -90,7 +97,8 @@ export default async function full_render(
     text: merman_text,
     filepath_id: filepath,
     request_id: request_id,
-    timestamp: performance.now()
+    timestamp: performance.now(),
+    preprocessor: preprocessor
   }
   closeExisting(filepath) // cancel previous render job
 

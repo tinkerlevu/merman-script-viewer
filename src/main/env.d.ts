@@ -16,4 +16,5 @@ type RenderJob = {
   filepath_id: string
   request_id: string
   timestamp: DOMHighResTimeStamp
+  preprocessor: string
 }

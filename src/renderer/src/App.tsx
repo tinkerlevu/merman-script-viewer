@@ -10,8 +10,6 @@ import none_fav from "./assets/favicons/filetab_none.ico"
 
 
 
-
-
 import { useEffect, useRef, useState } from 'react';
 import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
@@ -31,7 +29,6 @@ import 'react-tabs/style/react-tabs.css';
 
 // my stuff
 // import layout from './assets/spacing.module.css';
-import CodeEditor from './components/CodeEditor'
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
 import TabIcon from './components/TabIcon'
@@ -227,11 +224,6 @@ function App(): React.JSX.Element {
 
   }
 
-  // // can be used to save the script or the preprocessor
-  // const file_save_as_action = (filepath: string) => {
-  //   console.log('file_save_as', filepath)
-  // }
-
   useEffect(() => {
     window.electron.ipcRenderer.on("save_as_change", (_, data) => {
       const og = getOpenFile(data.old_filepath)
@@ -242,19 +234,6 @@ function App(): React.JSX.Element {
         copy.unsaved_text = ""
     })
   }, [openFiles])
-
-
-  // useEffect(
-  //   window.electron.ipcRenderer.on("save_as_change", (_, data) => {
-  //     file_close_action(data.old_filepath)
-  //     set_active_tab(data.new_filepath)
-  //   }),
-  //   [activeFile, fileTabs]
-  // )
-  //
-  // NOT working
-  // TODO: fix or leave as is? idk
-  //
 
   // NOTE: ---------- Tab Management
 
@@ -273,8 +252,11 @@ function App(): React.JSX.Element {
 
   const mermanEditorRef = useRef({ get_text: () => " " });
   const mermanFileIconRef = useRef({
-    indicateSaved: (i: boolean) => { }
+    indicateSaved: (_: boolean) => { }
   });
+  const preprocessorRef = useRef({
+    get_active_file_contents: () => { "" }
+  })
 
   const render_merman = (
     specific_filepath, certain_text) => {
@@ -284,7 +266,8 @@ function App(): React.JSX.Element {
     window.electron.ipcRenderer.send('render', {
       filepath: filepath_id,
       merman: certain_text || mermanEditorRef.current.get_text(),
-      request_id: Math.random().toString(36).substring(2)
+      request_id: Math.random().toString(36).substring(2),
+      preprocessor: preprocessorRef.current.get_active_file_contents()
     })
   }
 
@@ -547,6 +530,7 @@ function App(): React.JSX.Element {
           <TabPanel forceRender={true}> {/* Preprocessor */}
             <PreprocessorManager
               activeFile={activeFile}
+              ref={preprocessorRef}
             />
           </TabPanel>
         </Tabs >
