@@ -113,8 +113,8 @@ app.whenReady().then(() => {
     SaveAsFile(data.filepath, data.text))
 
   // Render Management
-  ipcMain.on('render', (_, data) => full_render(
-    data.filepath, data.merman, data.request_id, data.preprocessor
+  ipcMain.on('render', (_, data) => full_render( // data.request_id,
+    data.filepath, data.merman, data.preprocessor
   ));
   ipcMain.on('render_done', handleFinishedRender);
   ipcMain.on('rendering_finished', (_, data) =>

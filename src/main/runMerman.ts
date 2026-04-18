@@ -3,7 +3,7 @@ import { BrowserWindow } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
 
-import { AssignedRenderWindow, RenderJob } from "./env";
+import { AssignedRenderWindow, FileID, Hash, RenderJob } from "./env";
 
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
@@ -25,88 +25,80 @@ var runningRenderWindows: Array<AssignedRenderWindow> = []
 var currentRender: RenderJob = {
   text: "",
   filepath_id: "",
-  request_id: "",
   timestamp: performance.now(),
   preprocessor: ""
 }
 
 
 // --------------- UTIL funtions
-const send_hash = (filepath, hash) =>
+const send_hash = (filepath: FileID, hash: Hash) =>
   mainWindow.webContents.send('new_render_hash', {
     filepath: filepath,
     hash: hash,
   })
 
-const update_render_status = (filepath, status) =>
+const update_render_status = (filepath: FileID, status: string) =>
   mainWindow.webContents.send('new_render_status', {
     filepath: filepath,
     status: status,
   })
 
-const console_log = (filepath, newline) =>
+const console_log = (filepath: FileID, newline: string) =>
   mainWindow.webContents.send('console_log', {
     filepath_id: filepath,
     text: newline + '\n',
     id: Math.random().toString(36).substring(2) // DO NOT REMOVE makes sure each line stored in active file is unique. otherwise duplicate printouts would be filtered out even if they're supposed to be shown
   })
 
-const console_clear = (filepath) =>
+const console_clear = (filepath: FileID) =>
   mainWindow.webContents.send('console_clear', {
     filepath_id: filepath,
   })
 
 
-// ---------
+// --------- MAIN RENDER SEQUENCE
 
 export default async function full_render(
   filepath: string,
   merman_text: string, // one single string that hasn't been broken into an array
-  request_id: string,
   preprocessor: string,
 
 ) {
   console.log("PREPROCESSOR", preprocessor)
 
-  if (request_id == currentRender.request_id) // filter out ipc noise
-    return
-
   // deal with multiple triggers from rapid file saves
   if (merman_text == currentRender.text
     && filepath == currentRender.filepath_id
     && preprocessor == currentRender.preprocessor) {
-
-    // 500ms debouncing on abort messages
+    // debouncing on abort messages
     if (performance.now() - currentRender.timestamp < 500) {
       currentRender.timestamp = performance.now()
       return
     }
     currentRender.timestamp = performance.now()
-    console_log(
-      filepath, "> No changes since last render - ABORTING")
+    console_log(filepath, "> No changes since last render - ABORTING")
     return
   }
-
-  console_clear(filepath)
-  console_log(filepath, "--- Starting render process ---")
-
-  update_render_status(filepath, 'running')
-  send_hash(filepath, "pending")
-
   currentRender = {
     text: merman_text,
     filepath_id: filepath,
-    request_id: request_id,
     timestamp: performance.now(),
     preprocessor: preprocessor
   }
+
+  // Update UI
+  console_clear(filepath)
+  console_log(filepath, "--- Starting render process ---")
+  update_render_status(filepath, 'running')
+  send_hash(filepath, "pending")
+
+
   closeExisting(filepath) // cancel previous render job
 
   const merman_script = merman_text.split(/\r?\n/)
 
-  // TODO: Preprocessor stuff here
-
-  // TODO: WARNING: the preprocessor might return stuff as a single string separated by \n with \\n in the text. Might have to unpack those strings into arrays and add that to the main array
+  const [generated] = preprocess(merman_script, preprocessor, filepath)
+  console.log(generated)
 
   // preprocessor returns table which indicates original filenumber, preprocessed file number, and the corresponding line output and only console output from the function, that can be mapped onto a table
 
@@ -115,11 +107,11 @@ export default async function full_render(
     (t: string) => console_log(filepath, t) // send stuff to the console component in the renderer
   )
 
-  // TODO: report any errors to renderer
-
   if (mermaid == '') { // Translation failed Error in script
     console.log("===== THROWING ERROR =====")
     update_render_status(filepath, 'failed')
+    //TODO: indicate failing (generated) line number in the processed table UI Tab with <!> warning tab icon
+    //TODO: show actual line number in processed table
     return
   }
 
@@ -172,24 +164,17 @@ export default async function full_render(
 
 }
 
+export function handleFinishedRender(_, data): void {
+  mainWindow.webContents.send('new_render', data)
+  console_log(data.filepath, data.type + " - COMPLETE")
+}
+
+
 export function handleAllRendersFinished(filepath_id: string) {
   closeExisting(filepath_id)
   update_render_status(filepath_id, 'done')
 }
 
-// close any existing browser windows
-async function closeExisting(filepath_id: string) {
-  runningRenderWindows = runningRenderWindows.filter(i => {
-    if (i.mmn_filepath == filepath_id) {
-      i.bWindow.close()
-      return false // remove from array
-    }
-    return true // keep in array
-  })
-
-}
-
-// params are the merman text and  a function to send updates to the terminal window on the interface, and a function to return the results
 
 // json string has to be an array, where each entry is each line in the file, but it's a single string
 async function translate_merman(file_lines, print) {
@@ -219,6 +204,8 @@ async function translate_merman(file_lines, print) {
 }
 
 
+
+
 function createRenderWindow(): BrowserWindow {
   const renderWindow = new BrowserWindow({
     width: 900,
@@ -229,15 +216,12 @@ function createRenderWindow(): BrowserWindow {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      // NOTE: that this is how to pass args before init, might not be necessary
+      //: that this is how to pass args before init
       // additionalArguments: ['--maxMermaidChars=69420'],
     }
   })
-
   // enable this to show the window
-  // renderWindow.on('ready-to-show', () => {
-  //   renderWindow.show()
-  // })
+  // renderWindow.on('ready-to-show', () => renderWindow.show())
 
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -248,41 +232,95 @@ function createRenderWindow(): BrowserWindow {
 
   return renderWindow;
 }
+// close any existing browser windows
+async function closeExisting(filepath_id: string) {
+  runningRenderWindows = runningRenderWindows.filter(i => {
+    if (i.mmn_filepath == filepath_id) {
+      i.bWindow.close()
+      return false // remove from array
+    }
+    return true // keep in array
+  })
 
-
-export function handleFinishedRender(_, data): void {
-  mainWindow.webContents.send('new_render', data)
-  console_log(data.filepath, data.type + " - COMPLETE")
 }
 
 
-
 //
-// // TODO: remove
-// const test_code = `
-// s = "hello world potato"
-// s
-// print(filedata)
-// `
-// const test_merman = [
-//   'why: "hi here" !my_ID',
-//   '',
-//   '',
-//   'special: "node with \n pointers" ^terminating non_terminating&',
-//   '',
-//   'special: "node with references" *reference1 *reference2',
-// ]
-//
-// const test_render_data = {
-//   script: [
-//     'graph TD\n',
-//     'my_ID("hi here<br>"):::why\n',
-//     '_4("node with <br> pointers<br>"):::special\n',
-//     '_6("node with references<br>"):::special\n',
-//     'my_ID==> _4;\n',
-//     '_4 ==> terminating; _4 ==> non_terminating;\n',
-//     'reference1 ==> _6 ;;reference2 ==> _6;;\n'
-//   ],
-// }
+// NOTE: ----------- PREPROCESSOR STUFF --------------
 //
 
+
+function preprocess(
+  merman_script: Array<string>,
+  preprocessor_code: string,
+  filepath_id: string): Array<any> {
+
+
+  // for the script to store variables that can be accessed in subsequent calls
+  const presistentData = {}
+  const line = {
+    text: "",
+    index: 0, // index of line in ALL array
+    number: 1, // actual line number
+    All: structuredClone(merman_script),
+    END: merman_script.length,
+    //analyze()
+    //last
+    //next
+  }
+
+  const capturedLogs: Array<Array<string>> = []
+  const console_override = {
+    log: function(...args: any) {
+      // TODO: create any_toString method below to convert any value to string
+      // TODO add html, load, temp methods, and send console outputs to UI and print to console.
+      capturedLogs.push(args.map(i => String(i)));
+    }
+  }
+
+  const Process =
+    new Function(
+      'line', 'PERSISTENT', 'console',
+      preprocessor_code)
+
+  for (var lnum = 0; lnum < merman_script.length; lnum++) {
+    line.text = merman_script[lnum]
+    line.index = lnum
+    line.number = lnum + 1
+
+    var raw_result_string =
+      Process(line, presistentData, console_override)
+
+    console.log('PROCESSING RESULT', raw_result_string, capturedLogs)
+
+    // TODO: handle result, convert to array, add to script, calculate line mapping table, convert to ProcessedLine
+    // TODO: if null just pass along existing merman line
+    // add '/n' to end of line if not existing? or strip it? '"hello world"' \n\n
+  }
+
+
+  return []
+}
+
+
+// (function() {
+//     // 1. Store the original reference
+//     const oldLog = console.log;
+//
+//     // 2. Redefine the log function
+//     console.log = function(...args) {
+//         // Capture the output (e.g., store in an array or send to a server)
+//         console.capturedLogs = console.capturedLogs || [];
+//         console.capturedLogs.push(args);
+//
+//         // 3. Call the original log to ensure it still prints to the console
+//         oldLog.apply(console, args);
+//     };
+// })();
+//
+// // Usage:
+// console.log("Hello World!");
+// console.log("Second message", { data: 123 });
+//
+// // Access captured logs:
+// console.table(console.capturedLogs);
