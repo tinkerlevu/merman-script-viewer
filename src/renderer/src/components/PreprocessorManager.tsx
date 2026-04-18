@@ -6,8 +6,9 @@ import ConsoleOutput from "./Console";
 
 
 export default function PreprocessorManager(
-  { activeFile }: {
+  { activeFile, ref = useRef({}) }: {
     activeFile: OpenFile
+    ref: RefObject<any>
   }): React.JSX.Element {
 
 
@@ -15,12 +16,12 @@ export default function PreprocessorManager(
   const consoleRef = useRef<HTMLDivElement>(null)
 
   const [loadedScripts, setLoadedScripts] = useState<Map<FileID, string>>(new Map())
-  const [currentFile, setCurrentFile] = useState<string>('')
+  const [currentFile, setCurrentFile] = useState<FileID>('')
+  const [showText, setShowText] = useState<string>('')
 
   const openProcessorScript = () => {
     window.electron.ipcRenderer.send('preprocessor_open')
   }
-
 
   useEffect(() => {
     window.electron.ipcRenderer.on("preprocessor_load", (_, data) => {
@@ -32,12 +33,34 @@ export default function PreprocessorManager(
   }, [])
 
 
+
+  useEffect(() => {
+    const active_file_contents = () => {
+      var compiled: string = ''
+      for (const file of filemanagerRef
+        .current.get_active_file_order())
+        compiled += (loadedScripts.get(file))
+
+      return compiled
+    }
+
+    if (currentFile != '')
+      setShowText(loadedScripts.get(currentFile) || "")
+    else
+      setShowText(active_file_contents())
+
+    // NOTE: this is how to get the code for rendering
+    ref.current.get_active_file_contents = active_file_contents
+
+  }, [currentFile, loadedScripts])
+
+
   return <SplitLayout splitRatio={0.45}>
     <FixedBar>
       <button onClick={openProcessorScript}>Open</button>
       <button >Dry Run</button>
       <button
-        onClick={() => console.log(filemanagerRef.current.get_active_file_order())}
+        onClick={() => setCurrentFile('')}
       >
         Show Active</button>
     </FixedBar>
@@ -71,10 +94,10 @@ export default function PreprocessorManager(
     </SplitBottom>
 
     <SplitMain>
+      <h1>Preview</h1>
       <CodeEditor type="javascript"
-        value={loadedScripts.get(currentFile) || ""}
+        value={showText}
       />
-      <p>{currentFile} {loadedScripts.get(currentFile)}</p>
     </SplitMain>
 
 
@@ -123,7 +146,7 @@ function ScriptManager({ scripts, onDelete, applyActive, ref }: {
 
       return active
     }
-  }, [fileOrder])
+  }, [fileOrder, activeScripts])
 
 
   useEffect(() => { // re-render the file items
@@ -146,6 +169,7 @@ function ScriptManager({ scripts, onDelete, applyActive, ref }: {
                   setActiveScripts(prev => {
                     prev.delete(path); return structuredClone(prev)
                   })
+                setFileOrder(structuredClone(fileOrder))
               }}
           />
           {/* filename only: */}

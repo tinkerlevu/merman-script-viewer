@@ -59,6 +59,7 @@ export default function CodeEditor(
     value={value}
     ref={ref}
     onUpdate={onUpdate}
+    readOnly={type == "javascript"}
   >
     <BasicSetup />
   </Editor>

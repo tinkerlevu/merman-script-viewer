@@ -10,7 +10,7 @@ export const initalizePreProcessor = (mainInterface: BrowserWindow) =>
 
 const watcher = chokidar.watch([],
   { awaitWriteFinish: { stabilityThreshold: 500 }, atomic: true })
-watcher.on('change', path => loadContents(path))
+watcher.on('change', path => { loadContents(path); console.log("changing ------- ", path) })
 
 
 export function openPreProcessScript() {
@@ -29,7 +29,10 @@ export function openPreProcessScript() {
 
   console.log(pathSelection)
 
-  pathSelection?.forEach(fpath => loadContents(fpath))
+  pathSelection?.forEach(fpath => {
+    loadContents(fpath);
+    watcher.add(fpath)
+  })
 
 }
 
