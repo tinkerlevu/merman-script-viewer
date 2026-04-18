@@ -40,11 +40,11 @@ languages['merman'] = MermanLanguage
 
 
 export default function CodeEditor(
-  { type, ref, value, onUpdate }: {
+  { type, ref, value, onUpdate = () => { } }: {
     type: EditorType,
-    ref: RefObject<PrismEditor | null>,
+    ref?: RefObject<PrismEditor | null>,
     value: string
-    onUpdate: () => void
+    onUpdate?: () => void
   }): React.JSX.Element {
 
   // setup editor stuff here

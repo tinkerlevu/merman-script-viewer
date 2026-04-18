@@ -10,16 +10,17 @@ export default function PreprocessorManager(
     activeFile: OpenFile
   }): React.JSX.Element {
 
-  const [loadedScripts, setLoadedScripts] = useState<Map<FileID, string>>(new Map())
 
-  const containerRef = useRef(null)
+  const filemanagerRef = useRef({})
   const consoleRef = useRef<HTMLDivElement>(null)
+
+  const [loadedScripts, setLoadedScripts] = useState<Map<FileID, string>>(new Map())
+  const [currentFile, setCurrentFile] = useState<string>('')
 
   const openProcessorScript = () => {
     window.electron.ipcRenderer.send('preprocessor_open')
   }
 
-  const [currentFile, setCurrentFile] = useState<string>('')
 
   useEffect(() => {
     window.electron.ipcRenderer.on("preprocessor_load", (_, data) => {
@@ -30,35 +31,30 @@ export default function PreprocessorManager(
     })
   }, [])
 
-  useEffect(() => {
-    setCurrentFile(JSON.stringify(Object.fromEntries(loadedScripts)))
-  }, [loadedScripts])
 
-
-  return <SplitLayout
-    mainContainerRef={containerRef}
-    handleMainScroll={() => { }}
-  >
-
+  return <SplitLayout splitRatio={0.45}>
     <FixedBar>
       <button onClick={openProcessorScript}>Open</button>
       <button >Dry Run</button>
-      <button onClick={() => console.log(loadedScripts, currentFile,)}>Test </button>
+      <button
+        onClick={() => console.log(filemanagerRef.current.get_active_file_order())}
+      >
+        Show Active</button>
     </FixedBar>
 
     <SplitTop>
+      {/*TODO: add a combined button that lets you see all the active processors applied in order */}
       <ScriptManager
         scripts={loadedScripts}
+        ref={filemanagerRef}
+        onDelete={path => {
+          setLoadedScripts(prev => {
+            prev.delete(path);
+            return structuredClone(prev)
+          })
+        }}
+        applyActive={path => setCurrentFile(path)}
       />
-      <ul>
-        <li>
-          <input type="checkbox" />
-          filename
-          <button>🔼</button>
-          <button>🔽</button>
-          <button>X</button>
-        </li>
-      </ul>
     </SplitTop>
 
     <SplitBottom ref={consoleRef}>
@@ -76,13 +72,9 @@ export default function PreprocessorManager(
 
     <SplitMain>
       <CodeEditor type="javascript"
-        value={""}
-        onUpdate={() => { }}
+        value={loadedScripts.get(currentFile) || ""}
       />
-
-      implement file loading into map and show contents here
-
-      <p>{currentFile}</p>
+      <p>{currentFile} {loadedScripts.get(currentFile)}</p>
     </SplitMain>
 
 
@@ -93,18 +85,23 @@ export default function PreprocessorManager(
 
 
 
-function ScriptManager({ scripts }: {
+// managers the file tabs, file order, user input for deleting files and marking which files are active
+function ScriptManager({ scripts, onDelete, applyActive, ref }: {
   scripts: Map<FileID, string>
+  onDelete: (path: string) => void
+  applyActive: (path: string) => void
+  ref: RefObject<any>
 }): React.JSX.Element {
+
   const [fileOrder, setFileOrder] = useState<Array<string>>([])
   const [displayItems, setDisplayItems] = useState<Array<any>>([])
-  const activeScripts = new Set<string>()
+  const [activeScripts, setActiveScripts] = useState<Set<string>>(new Set())
 
 
-
-  useEffect(() => {
+  useEffect(() => { // new Additions
     var additions: Array<string> = []
 
+    // for all filepaths in the master map
     for (const file of scripts.keys())
       if (!fileOrder.includes(file))
         additions.push(file)
@@ -112,23 +109,46 @@ function ScriptManager({ scripts }: {
     setFileOrder(prev => [...prev, ...additions])
   }, [scripts])
 
+  const DeleteFile = (path: string) => {
+    setFileOrder(prev => prev.filter(f => f != path))
+    onDelete(path) // call parent function
+  }
+
+  useEffect(() => {
+    ref.current.get_active_file_order = () => {
+      var active: Array<string> = []
+      for (const file of fileOrder)
+        if (activeScripts.has(file))
+          active.push(file)
+
+      return active
+    }
+  }, [fileOrder])
+
 
   useEffect(() => { // re-render the file items
     var list: Array<any> = []
+
     for (const [i, path] of fileOrder.entries()) {
       list.push(
-        <li key={path}>
+        <li
+          key={path}
+          onClick={() => applyActive(path)}
+        >
           <input
             type="checkbox"
             defaultChecked={activeScripts.has(path)}
             onChange={
               e => {
                 if (e.currentTarget.checked)
-                  activeScripts.add(path)
+                  setActiveScripts(prev => structuredClone(prev.add(path)))
                 else
-                  activeScripts.delete(path)
+                  setActiveScripts(prev => {
+                    prev.delete(path); return structuredClone(prev)
+                  })
               }}
           />
+          {/* filename only: */}
           {path.replace(/^.*[\\\/]/, '')}
           <button
             onClick={() => {
@@ -158,7 +178,11 @@ function ScriptManager({ scripts }: {
           >
             🔽
           </button>
-          <button>X</button>
+          <button
+            onClick={() => DeleteFile(path)}
+          >
+            X
+          </button>
         </li>
       )
     }

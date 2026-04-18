@@ -3,11 +3,15 @@ import ContentHeight from "./dynamicSize"
 import { Element } from "mermaid/dist/diagrams/requirement/types.js"
 
 export function SplitLayout(
-  { mainContainerRef, handleMainScroll, children }: {
-    mainContainerRef: RefObject<any>
-    handleMainScroll: (_: any) => void
-    children: any
-  }
+  { mainContainerRef = useRef<HTMLDivElement | null>(null),
+    handleMainScroll = () => { },
+    splitRatio = 0.3,
+    children }: {
+      mainContainerRef?: RefObject<HTMLDivElement | null>
+      handleMainScroll?: (_: any) => void
+      splitRatio?: number
+      children: any
+    }
 ): React.JSX.Element {
 
 
@@ -16,13 +20,13 @@ export function SplitLayout(
   const Bottom = children.find(c => c.type.name == 'SplitBottom')
   const Main = children.find(c => c.type.name == 'SplitMain')
 
-  const barRef = useRef({ clientHeight: 0 })
+  const barRef = useRef<HTMLDivElement>(null)
 
   const [barHeight, setBarHeight] = useState<number>(0)
 
   useEffect(() => {
     const calculate_bar = () =>
-      setBarHeight(barRef.current.clientHeight)
+      setBarHeight(barRef.current?.clientHeight || 0)
 
     const obs = new ResizeObserver(() => {
       calculate_bar()
@@ -47,7 +51,7 @@ export function SplitLayout(
     }}>
 
       <div style={{
-        width: "30%",
+        width: splitRatio * 100 + '%',
         display: 'inline-block',
         height: "100%"
       }}>
@@ -77,7 +81,7 @@ export function SplitLayout(
       <div
         style={{
           height: '100%',
-          width: "70%",
+          width: (1 - splitRatio) * 100 + '%',
           display: 'inline-block',
           overflow: 'scroll'
         }}
