@@ -98,10 +98,10 @@ export default async function full_render(
 
   const merman_script = merman_text.split(/\r?\n/)
 
-  const [generated] = preprocess(merman_script, preprocessor, filepath)
-  console.log(generated)
+  const generated = await preprocess(
+    merman_script, preprocessor, filepath)
 
-  // preprocessor returns table which indicates original filenumber, preprocessed file number, and the corresponding line output and only console output from the function, that can be mapped onto a table
+  console.log('GENERATED', JSON.stringify(generated, null, 2))
 
   const mermaid = await translate_merman(
     merman_script,
@@ -184,7 +184,6 @@ async function translate_merman(file_lines, print) {
   const MERMAN_CODE = readFileSync(MERMAN_CODE_FILE, 'utf8');
 
   const pyodide = await loadPyodide({
-    // TODO: add ipc for sending python print output to interface RENDER_LOG
     stdout: (text) => {
       console.log("PYTHON MERMAN PRINT", text)
       print(text)
@@ -251,10 +250,11 @@ async function closeExisting(filepath_id: string) {
 //
 
 
-function preprocess(
+async function preprocess(
   merman_script: Array<string>,
   preprocessor_code: string,
-  filepath_id: string): Array<any> {
+  filepath_id: string)
+  : Promise<Array<ProcessedLine>> {
 
 
   // NOTE: --- Processor Base variables ----
@@ -285,12 +285,12 @@ function preprocess(
   // TODO: analyze/ANALYZE,
   // TODO: read(path, from_script=true),
   // TODO: write(path, contents, from_script=true) (from script or processor file location)
-
+  const analyzef = await get_analyze_function()
 
 
   // NOTE: --- create processor function  ----
   const runProcessor = new Function(
-    'line', 'PERSISTENT', 'console',
+    'line', 'PERSISTENT', 'console', 'ANALYZE',
     preprocessor_code)
 
 
@@ -304,7 +304,8 @@ function preprocess(
     line.number = lnum + 1
 
     const raw_result: string = // Actually run the processor code
-      runProcessor(line, presistentData, console_override)
+      runProcessor(line, presistentData, console_override,
+        analyzef) // add read and write
 
     // handle output
     const processed_result: ProcessedLine = {
@@ -315,6 +316,7 @@ function preprocess(
     }
     captured_logs = new Array() // reset for next iteration
 
+    // TODO: throw error if result is not string or undefined
     if (raw_result != undefined) {
       processed_result.generated = raw_result
         .split(/\r?\n/).map(s => {
@@ -335,10 +337,9 @@ function preprocess(
     OUTPUT.push(processed_result)
   }
   console.log("captured logs", captured_logs)
-  console.log('OUTPUT RESULT', JSON.stringify(OUTPUT, null, 2))
 
 
-  return []
+  return OUTPUT
 }
 
 
@@ -354,4 +355,28 @@ function array_toPrintout
     ).join(' '),
     type: html ? 'html' : 'plain'
   }
+}
+
+async function get_analyze_function() {
+
+  const MERMAN_CODE = readFileSync(MERMAN_CODE_FILE, 'utf8');
+  const pyodide = await loadPyodide()
+
+  return function(merman_line: string) {
+    const locals = pyodide.toPy({
+      filedata: ['"hello"'],
+      analyze_only: true
+    }) // setup stuff here and set flag to analyze only
+
+    try {
+      const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
+      console.log("ANALYZED: ", evaluated.toJs())
+      return evaluated.toJs()
+    }
+    catch (error) {
+      console.log('ANALYZE ERROR', error)
+      return '' // TODO: return a generic object that matches a merman line to indicate a failure
+    }
+  }
+
 }

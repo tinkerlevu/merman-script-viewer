@@ -126,10 +126,11 @@ function ScriptManager({ scripts, onDelete, applyActive, ref }: {
 
     // scripts is master map of filename_id -> contents
     for (const file of scripts.keys())
-      if (!fileOrder.includes(file)) {
+      if (!fileOrder.includes(file)) { // new file added
         additions.push(file)
         setActiveScripts( // mark new file as automatically active
           prev => structuredClone(prev.add(file)))
+        applyActive(file)
       }
 
     setFileOrder(prev => [...prev, ...additions])
