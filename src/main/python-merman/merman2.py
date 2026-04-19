@@ -16,6 +16,7 @@ class MermanLine:
   # meta functions ----
 
   def __init__(self, text, line_number):
+    self.line_type = type(self).__name__
     self.text = text
     self.line_number = line_number
     # self.type = 'plainline'
@@ -111,6 +112,7 @@ class Comment:
   global Comment
   # autoremoves '#' at start of line ?
   def __init__(self, single_line_comment=None):
+    self.line_type = type(self).__name__
     self.lines = []
 
     if single_line_comment:
@@ -156,6 +158,7 @@ class MermaidLine():
 
   # get and store MermaidLine object
   def __init__(self, ScriptLine):
+    self.line_type = type(self).__name__
     self.line = ScriptLine
 
   def set_child(self, Node):
@@ -200,6 +203,7 @@ class DescendantLink:
   global DescendantLink
 
   def __init__(self, ID, linktext=None):
+    self.line_type = type(self).__name__
     self.links = [{  # all the links associated with this class
       'ID': ID,
       'linktext': linktext
@@ -396,6 +400,7 @@ class Link(MermaidLine):
   global Link
 
   def __init__(self, ScriptLine):
+    self.line_type = type(self).__name__
     self.ref_ID = None
     self.link_text = None
 
@@ -600,6 +605,7 @@ class Branch(MermaidLine):
   global Branch
 
   def __init__(self, ScriptLine):
+    self.line_type = type(self).__name__ # why tf am i not calling super() here??
     self.line = ScriptLine
     self.link_text = self.extract_any_text(self.line.get_text(), '"')
 
@@ -708,6 +714,7 @@ class Join(Linkable):
   global Join
 
   def __init__(self, ScriptLine):
+    self.line_type = type(self).__name__
     self.line = ScriptLine
     self.pointers = []
     self.references = []
@@ -777,7 +784,9 @@ class GraphNode(Linkable):
   # NOTE IMPLEMENT titles? |hello| or special char: \|
 
   def __init__(self, ScriptLine):
-    # NOTE do not throw error here if no text is found.
+    self.line_type = type(self).__name__
+    #
+    # NOTE: do not throw error here if no text is found, wait till building graph
 
     # all variables ======
     self.script = None
@@ -1233,6 +1242,7 @@ class ReportItem:
 
   # ScriptObject can be either GraphNode or Comment
   def __init__(self, ScriptObject):
+    self.line_type = type(self).__name__
     self.source = ScriptObject
     self.linenumber = ScriptObject.get_linenumber()
     self.text = ScriptObject.get_rich_text()  # ready to display
@@ -1365,7 +1375,9 @@ def run(merman_filetext, only_analyze=False):
 ########################## FOR PREPROCESSOR ANALYZE FUNCTION #####
 
   if only_analyze:
-    for line in unclassified:
+    for line in unfiltered:
+      if line.is_comment():
+        return {''}
       # TODO: also classify comments and block comment start indicator
       analyzed_Line = vars(classify(line))
       # TODO: iterate through arrays in self and convert to vars(object)
