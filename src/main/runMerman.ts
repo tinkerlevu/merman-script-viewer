@@ -364,7 +364,7 @@ async function get_analyze_function() {
 
   return function(merman_line: string) {
     const locals = pyodide.toPy({
-      filedata: ['"hello"'],
+      filedata: ['"hello" ^world *how &is !it! `going` !!!!!'],
       analyze_only: true
     }) // setup stuff here and set flag to analyze only
 

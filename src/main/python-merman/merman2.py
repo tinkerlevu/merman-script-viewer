@@ -805,8 +805,9 @@ class GraphNode(Linkable):
             self.quickconnect = True
 
          # SET PROPER ID ---
-        matches = re.findall(r'![A-Za-z0-9_]+', self.remainder) + \
-            re.findall(r'[A-Za-z0-9_]+!', self.remainder)
+        matches = re.findall(
+            r'![A-Za-z0-9_]+|[A-Za-z0-9_]+!|![A-Za-z0-9_]+!',
+            self.remainder)
         if matches:
            # only one match should be present
             if len(matches) > 1:
@@ -1499,7 +1500,6 @@ else:
 # -------- Map Splits and Joins ---------
 
             # recursive function throws error (from split line) if end of array is encountered before join:
-
 
     def map_split(splitpoint, index, script):
         previous_line = None  # the previous line in the loop
