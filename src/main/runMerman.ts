@@ -279,13 +279,13 @@ async function preprocess(
       console.log(...args)
       // TODO: print UI console
     },
-    html: () => { }, // TODO:
-    push: () => { }, // TODO:
-    temp: () => { }, // TODO:
+    html: () => { }, // TODO: skip UI console
+    push: () => { }, // TODO: direct to table
+    throw: () => { }, // TODO: skip UI console //?? change name to temp? or lose or free
+    // error: ???
   }
 
   // NOTE: --- helper functions  ----
-  // TODO: analyze/ANALYZE,
   // TODO: read(path, from_script=true),
   // TODO: write(path, contents, from_script=true) (from script or processor file location)
   const analyzef = await get_analyze_function()
@@ -306,6 +306,8 @@ async function preprocess(
     line.index = lnum
     line.number = lnum + 1
 
+    // TODO: if there's any syntax errors, print error to actual and UI console and immediately throw error or return [ ] or some null value that merman can send to the UI to show the error log and stuff on the table
+    // UI Console print, preprocessor syntax error on line XYZ, check Processed Tab for more details, and processed tab has full error dump on it along with any remaining console logs that got out
     const raw_result: string = // Actually run the processor code
       runProcessor(line, presistentData, console_override,
         analyzef) // add read and write
