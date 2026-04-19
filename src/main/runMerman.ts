@@ -1,6 +1,6 @@
 import { loadPyodide } from "pyodide";
 import { BrowserWindow } from "electron";
-import { join } from "path";
+import { dirname, join } from "path";
 import { is } from "@electron-toolkit/utils";
 
 import { AssignedRenderWindow, FileID, Hash, ProcessedLine, ProcessorPrintout, RenderJob } from "./env";
@@ -8,7 +8,7 @@ import { AssignedRenderWindow, FileID, Hash, ProcessedLine, ProcessorPrintout, R
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
 import { createHash } from "crypto";
-import { readFileSync } from "fs";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { inspect } from "util";
 
 
@@ -96,12 +96,22 @@ export default async function full_render(
 
   closeExisting(filepath) // cancel previous render job
 
-  const merman_script = merman_text.split(/\r?\n/)
+  const merman_script = merman_text.split(/\r?\n/) // TODO: rename to source
 
   const generated = await preprocess(
     merman_script, preprocessor, filepath)
 
-  console.log('GENERATED', JSON.stringify(generated, null, 2))
+  if (generated == "error") {
+    update_render_status(filepath, 'failed')
+    return
+    // UI CONSOLE PRINT check Processed Tab for more details, and processed tab has full error dump on it along with any remaining console logs that got out
+  }
+
+  console_log(filepath, "> Finished")
+
+  console.log('GENERATED', JSON.stringify(generated, null, 2)) // TODO: REMOVE
+  // TODO: send generated to UI
+  // TODO: convert generated to merman script
 
   const mermaid = await translate_merman(
     merman_script,
@@ -253,9 +263,10 @@ async function closeExisting(filepath_id: string) {
 async function preprocess(
   merman_script: Array<string>,
   preprocessor_code: string,
-  filepath_id: string)
-  : Promise<Array<ProcessedLine>> {
+  filepath_id: string,)
+  : Promise<Array<ProcessedLine> | "error"> {
 
+  console_log(filepath_id, "[ Initalizing Preprocessor ]")
 
   // NOTE: --- Processor Base variables ----
   const presistentData = {} // store variables that can be accessed in subsequent process line calls
@@ -269,35 +280,66 @@ async function preprocess(
     //next
   }
 
-  // TODO: print to ui console <running preprocessor>
-
   // NOTE: --- Console.log override  ----
   var captured_logs: Array<ProcessorPrintout> = []
   const console_override = {
     log: (...args: any) => {
-      captured_logs.push(array_toPrintout(args, false))
-      console.log(...args)
-      // TODO: print UI console
+      captured_logs.push(array_toPrintout(args, 'plain'))
+      console_log(filepath_id, args.join(' ')) // print to UI console
+      console.log("REGULAR LOG >>", ...args)
     },
-    html: () => { }, // TODO: skip UI console
-    push: () => { }, // TODO: direct to table
-    throw: () => { }, // TODO: skip UI console //?? change name to temp? or lose or free
+    html: (...args: any) => { // html table entry no UI console
+      captured_logs.push(array_toPrintout(args, 'html'))
+      console.log("HTML LOG >>", ...args)
+    },
+    push: (...args: any) => { // prints plain but not to console
+      captured_logs.push(array_toPrintout(args, 'plain'))
+    },
+    throw: (...args: any) => {
+      console_log(filepath_id, args.join(' ')) // print to UI console only
+      console.log("QUIET LOG >>", ...args)
+    }, //?? change name to temp? or lose or free
     // error: ???
   }
 
   // NOTE: --- helper functions  ----
-  // TODO: read(path, from_script=true),
-  // TODO: write(path, contents, from_script=true) (from script or processor file location)
-  const analyzef = await get_analyze_function()
+
+  const analyzehf = await get_analyze_function()
+  const readhf = (relpath: string) => readFileSync(
+    join(dirname(filepath_id), relpath), 'utf8')
+  const writehf = (relpath: string, contents: string, append = true) => {
+
+    const path = join(dirname(filepath_id), relpath)
+    mkdirSync(dirname(path), { recursive: true }) // autocreate missing dir
+    writeFileSync(
+      path, contents, { encoding: 'utf8', flag: append ? 'a' : 'w' })
+  } // if append is false it will override
+
 
 
   // NOTE: --- create processor function  ----
-  const runProcessor = new Function(
-    'line', 'PERSISTENT', 'console', 'ANALYZE',
-    preprocessor_code)
+
+  var runProcessor: any
+  try {
+
+    runProcessor = new Function(
+      'line', 'PERSISTENT', 'console', 'ANALYZE', 'read', 'write',
+      preprocessor_code + // keeps stack trace numbers accurate:
+      "\n//# sourceURL=preprocessor-all-active-combined.js")
+
+  } catch (err) {
+    console_log(filepath_id, // print in UI console
+      "======= ERROR =======\n" +
+      "Error Creating Preprocessor code (Probably Syntax Error) " +
+      dumpError(err))
+    return "error"
+  }
 
 
   // NOTE: --- run Processing ---
+
+  console_log(filepath_id, "[ Running Preprocessor ]")
+
   const OUTPUT: Array<ProcessedLine> = []
   var gen_lnum = 1 // generated line number
 
@@ -306,11 +348,33 @@ async function preprocess(
     line.index = lnum
     line.number = lnum + 1
 
-    // TODO: if there's any syntax errors, print error to actual and UI console and immediately throw error or return [ ] or some null value that merman can send to the UI to show the error log and stuff on the table
-    // UI Console print, preprocessor syntax error on line XYZ, check Processed Tab for more details, and processed tab has full error dump on it along with any remaining console logs that got out
-    const raw_result: string = // Actually run the processor code
-      runProcessor(line, presistentData, console_override,
-        analyzef) // add read and write
+
+    // DOCUMENT: the ANALYZE("<merman text>"), read(<path relative to script location>), write(<path relative to script location>, contents)
+    var raw_result: string = ""
+
+    try { // Actually run the processor code
+      raw_result = runProcessor(line, presistentData, console_override,
+        analyzehf, readhf, writehf)
+    } catch (err) {
+      // handle output
+      OUTPUT.push({
+        source: merman_script[lnum],
+        line_num: lnum + 1,
+        printed: captured_logs,
+        generated: [],
+        error: {
+          type: "preprocessor",
+          message: dumpError(err)
+        }
+      })
+      console_log(filepath_id, // print in UI console
+        "======= ERROR =======\n" +
+        "Preprocessing error on merman line: " + (lnum + 1) +
+        '\n' + merman_script[lnum] + '\n' +
+        dumpError(err))
+      return "error"
+    }
+
 
     // handle output
     const processed_result: ProcessedLine = {
@@ -318,13 +382,14 @@ async function preprocess(
       line_num: lnum + 1,
       printed: captured_logs,
       generated: [],
+      error: null
     }
     captured_logs = new Array() // reset for next iteration
 
     // TODO: throw error if result is not string or undefined
     if (raw_result != undefined) {
       processed_result.generated = raw_result
-        .split(/\r?\n/).map(s => {
+        .split(/\r?\n/).map(s => { // separete by newlines
           return {
             content: s,
             line_num: gen_lnum++  // make sure to increment lmao
@@ -352,13 +417,13 @@ async function preprocess(
 // Converts console.log input array to ProcessorPrintout objects
 // html determines if printout type is html or plain text as is
 function array_toPrintout
-  (a: Array<any>, html = false)
+  (a: Array<any>, msg_type: ProcessorPrintout["type"])
   : ProcessorPrintout {
   return {
     content: a.map(// add more format args to inspect?
       a => typeof a === 'string' ? a : inspect(a)
     ).join(' '),
-    type: html ? 'html' : 'plain'
+    type: msg_type
   }
 }
 
@@ -384,4 +449,19 @@ async function get_analyze_function() {
     }
   }
 
+}
+
+
+
+function dumpError(err) {
+  var dump = ""
+  if (typeof err === 'object') {
+    if (err.message)
+      dump += '\nMessage: ' + err.message
+    if (err.stack)
+      dump += '\nStacktrace:\n====================\n' + err.stack
+  }
+  else
+    dump += 'dumpError :: argument is not an object'
+  return dump
 }

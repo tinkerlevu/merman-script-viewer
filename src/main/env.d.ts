@@ -32,7 +32,7 @@ type GeneratedLine = {
 
 type ProcessorPrintout = {
   content: string
-  type: "plain" | "html"
+  type: "plain" | "html"  // add error here
 }
 
 
@@ -41,8 +41,8 @@ type ProcessedLine = {
   line_num: number, // as shown in table display not index
   generated: Array<GeneratedLine>,
   printed: Array<PrintLine>,
-  // add error: null | {
-  // type: "merman" | "preprocessor"
-  // message: string
-  // } property here for showing syntax
+  error: null | {
+    type: "merman" | "preprocessor",
+    message: string
+  }
 }
