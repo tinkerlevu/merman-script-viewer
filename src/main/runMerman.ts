@@ -3,7 +3,7 @@ import { BrowserWindow } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
 
-import { AssignedRenderWindow, FileID, Hash, RenderJob } from "./env";
+import { AssignedRenderWindow, FileID, Hash, ProcessedLine, ProcessorPrintout, RenderJob } from "./env";
 
 // TODO: TEST THIS FILE PATH FOR PRODUCTION AND BUILD
 import MERMAN_CODE_FILE from './python-merman/merman2.py?asset'
@@ -257,95 +257,101 @@ function preprocess(
   filepath_id: string): Array<any> {
 
 
-  // for the script to store variables that can be accessed in subsequent calls
-  const presistentData = {}
+  // NOTE: --- Processor Base variables ----
+  const presistentData = {} // store variables that can be accessed in subsequent process line calls
   const line = {
     text: "", // the actual source line itself
     index: 0, // index of line in ALL array
     number: 1, // actual line number
     All: structuredClone(merman_script),
     END: merman_script.length,
-    //analyze()
     //last
     //next
   }
 
-  const capturedLogs: Array<Array<string>> = []
-  const any_toString = (a: any) => inspect(a,) // TODO: add options here?
+  // NOTE: --- Console.log override  ----
+  var captured_logs: Array<ProcessorPrintout> = []
   const console_override = {
-    log: function(...args: any) {
-      // TODO: add html, load, temp methods, and send console outputs to UI and print to console.
-      capturedLogs.push(args.map(i => any_toString(i)));
-    }
+    log: (...args: any) => {
+      captured_logs.push(array_toPrintout(args, false))
+      // TODO: print to console. and UI console
+    },
+    html: () => { }, // TODO:
+    push: () => { }, // TODO:
+    temp: () => { }, // TODO:
   }
 
-  const Process =
-    new Function(
-      'line', 'PERSISTENT', 'console',
-      preprocessor_code)
+  // NOTE: --- helper functions  ----
+  // TODO: analyze/ANALYZE,
+  // TODO: read(path, from_script=true),
+  // TODO: write(path, contents, from_script=true) (from script or processor file location)
+
+
+
+  // NOTE: --- create processor function  ----
+  const runProcessor = new Function(
+    'line', 'PERSISTENT', 'console',
+    preprocessor_code)
+
+
+  // NOTE: --- run Processing ---
+  const OUTPUT: Array<ProcessedLine> = []
+  var gen_lnum = 1 // generated line number
 
   for (var lnum = 0; lnum < merman_script.length; lnum++) {
     line.text = merman_script[lnum]
     line.index = lnum
     line.number = lnum + 1
 
-    var raw_result_string =
-      Process(line, presistentData, console_override)
+    const raw_result: string = // Actually run the processor code
+      runProcessor(line, presistentData, console_override)
 
-    console.log('PROCESSING RESULT', raw_result_string, capturedLogs.join('\n'))
+    // handle output
+    const processed_result: ProcessedLine = {
+      source: merman_script[lnum],
+      line_num: lnum + 1,
+      printed: captured_logs,
+      generated: [],
+    }
+    captured_logs = new Array() // reset for next iteration
 
-    // TODO: handle result, convert to array, add to script, calculate line mapping table, convert to ProcessedLine
-    // TODO: if null just pass along existing merman line
-    // add '/n' to end of line if not existing? or strip it? '"hello world"' \n\n
+    if (raw_result != undefined) {
+      processed_result.generated = raw_result
+        .split(/\r?\n/).map(s => {
+          return {
+            content: s,
+            line_num: gen_lnum++  // make sure to increment lmao
+          }
+        })
+    }
+    else { // nothing returned from processor
+      processed_result.generated = [{
+        content: merman_script[lnum], // pass original line through
+        line_num: gen_lnum++
+      }]
+    }
+    // NOTE: ---- end of processing loop
+
+    OUTPUT.push(processed_result)
   }
+  console.log("captured logs", captured_logs)
+  console.log('OUTPUT RESULT', JSON.stringify(OUTPUT, null, 2))
 
 
   return []
 }
 
 
-// TODO: REMOVE:
-//
-// const stringifyAll = (obj) => {
-//   const cache = new WeakSet(); // To handle circular references
-//   return JSON.stringify(obj, (_, value) => {
-//     // 1. Handle Circular References
-//     if (typeof value === "object" && value !== null) {
-//       if (cache.has(value)) return "[Circular]";
-//       cache.add(value);
-//     }
-//     // 2. Handle Functions
-//     if (typeof value === "function") return value.toString();
-//     // 3. Handle Map and Set
-//     if (value instanceof Map) return Object.fromEntries(value.entries());
-//     if (value instanceof Set) return Array.from(value);
-//     // 4. Handle BigInt
-//     if (typeof value === "bigint") return value.toString() + "n";
-//     // 5. Handle RegExp
-//     if (value instanceof RegExp) return value.toString();
-//
-//     return value;
-//   }, 2); // Pretty print with 2 spaces
-// };
 
-// (function() {
-//     // 1. Store the original reference
-//     const oldLog = console.log;
-//
-//     // 2. Redefine the log function
-//     console.log = function(...args) {
-//         // Capture the output (e.g., store in an array or send to a server)
-//         console.capturedLogs = console.capturedLogs || [];
-//         console.capturedLogs.push(args);
-//
-//         // 3. Call the original log to ensure it still prints to the console
-//         oldLog.apply(console, args);
-//     };
-// })();
-//
-// // Usage:
-// console.log("Hello World!");
-// console.log("Second message", { data: 123 });
-//
-// // Access captured logs:
-// console.table(console.capturedLogs);
+// Converts console.log input array to ProcessorPrintout objects
+// html determines if printout type is html or plain text as is
+function array_toPrintout
+  (a: Array<any>, html = false)
+  : ProcessorPrintout {
+  return {
+    content: a.map(// add more format args to inspect?
+      a => typeof a === 'string' ? a : inspect(a)
+    ).join(' '),
+    type: html ? 'html' : 'plain'
+  }
+}

@@ -13,13 +13,15 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +117 src/main/index.ts
-badd +23 src/main/env.d.ts
+badd +106 src/main/index.ts
+badd +33 src/main/env.d.ts
 badd +5 src/renderer/src/env.d.ts
-badd +29 src/renderer/src/App.tsx
+badd +57 src/renderer/src/App.tsx
 badd +1735 src/main/python-merman/merman2.py
-badd +282 src/main/runMerman.ts
+badd +262 src/main/runMerman.ts
 badd +27 src/main/fileManagement.ts
+badd +14 ../processor\ 5\ test.js
+badd +178 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/PreprocessorManager.tsx
 argglobal
 %argdel
 edit src/renderer/src/App.tsx
@@ -35,10 +37,6 @@ wincmd _ | wincmd |
 split
 1wincmd k
 wincmd w
-wincmd w
-wincmd _ | wincmd |
-split
-1wincmd k
 wincmd w
 wincmd w
 wincmd _ | wincmd |
@@ -61,16 +59,13 @@ exe '1resize ' . ((&lines * 32 + 33) / 66)
 exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
 exe '2resize ' . ((&lines * 31 + 33) / 66)
 exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe '3resize ' . ((&lines * 31 + 33) / 66)
 exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
-exe '4resize ' . ((&lines * 32 + 33) / 66)
+exe '4resize ' . ((&lines * 21 + 33) / 66)
 exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
 exe '5resize ' . ((&lines * 21 + 33) / 66)
 exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
-exe '6resize ' . ((&lines * 21 + 33) / 66)
+exe '6resize ' . ((&lines * 20 + 33) / 66)
 exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
-exe '7resize ' . ((&lines * 20 + 33) / 66)
-exe 'vert 7resize ' . ((&columns * 79 + 120) / 240)
 argglobal
 balt src/main/index.ts
 setlocal foldmethod=expr
@@ -81,174 +76,19 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-39
-sil! normal! zo
-41
-sil! normal! zo
-49
-sil! normal! zo
-57
-sil! normal! zo
-66
-sil! normal! zo
-73
-sil! normal! zo
-111
-sil! normal! zo
-111
-sil! normal! zo
-117
-sil! normal! zo
-117
-sil! normal! zo
-128
-sil! normal! zo
-128
-sil! normal! zo
-136
-sil! normal! zo
-139
-sil! normal! zo
-150
-sil! normal! zo
-150
-sil! normal! zo
-151
-sil! normal! zo
-151
-sil! normal! zo
-154
-sil! normal! zo
-168
-sil! normal! zo
-168
-sil! normal! zo
-168
-sil! normal! zo
-176
-sil! normal! zo
-205
-sil! normal! zo
-210
-sil! normal! zo
-215
-sil! normal! zo
-215
-sil! normal! zo
-219
-sil! normal! zo
-222
-sil! normal! zo
-227
-sil! normal! zo
-227
-sil! normal! zo
-228
-sil! normal! zo
-241
-sil! normal! zo
-242
-sil! normal! zo
-242
-sil! normal! zo
-254
-sil! normal! zo
-257
-sil! normal! zo
-261
-sil! normal! zo
-266
-sil! normal! zo
-274
-sil! normal! zo
-274
-sil! normal! zo
-275
-sil! normal! zo
-286
-sil! normal! zo
-286
-sil! normal! zo
-287
-sil! normal! zo
-287
-sil! normal! zo
-312
-sil! normal! zo
-312
-sil! normal! zo
-312
-sil! normal! zo
-323
-sil! normal! zo
-324
-sil! normal! zo
-324
-sil! normal! zo
-336
-sil! normal! zo
-350
-sil! normal! zo
-375
-sil! normal! zo
-382
-sil! normal! zo
-393
-sil! normal! zo
-394
-sil! normal! zo
-395
-sil! normal! zo
-396
-sil! normal! zo
-399
-sil! normal! zo
-404
-sil! normal! zo
-405
-sil! normal! zo
-416
-sil! normal! zo
-417
-sil! normal! zo
-418
-sil! normal! zo
-426
-sil! normal! zo
-434
-sil! normal! zo
-442
-sil! normal! zo
-450
-sil! normal! zo
-458
-sil! normal! zo
-483
-sil! normal! zo
-485
-sil! normal! zo
-491
-sil! normal! zo
-498
-sil! normal! zo
-505
-sil! normal! zo
-512
-sil! normal! zo
-519
-sil! normal! zo
-let s:l = 270 - ((17 * winheight(0) + 16) / 32)
+let s:l = 250 - ((5 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 270
-normal! 017|
+keepjumps 250
+normal! 0
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/index.ts", ":p")) | buffer src/main/index.ts | else | edit src/main/index.ts | endif
 if &buftype ==# 'terminal'
   silent file src/main/index.ts
 endif
+balt src/renderer/src/App.tsx
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -257,14 +97,6 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-10
-sil! normal! zo
-12
-sil! normal! zo
-43
-sil! normal! zo
-43
-sil! normal! zo
 91
 sil! normal! zo
 94
@@ -273,14 +105,12 @@ sil! normal! zo
 sil! normal! zo
 116
 sil! normal! zo
-120
-sil! normal! zo
-let s:l = 117 - ((15 * winheight(0) + 15) / 31)
+let s:l = 106 - ((17 * winheight(0) + 15) / 31)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 117
-normal! 033|
+keepjumps 106
+normal! 0
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
@@ -296,244 +126,14 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-24
+254
 sil! normal! zo
-31
-sil! normal! zo
-32
-sil! normal! zo
-36
-sil! normal! zo
-45
-sil! normal! zo
-46
-sil! normal! zo
-48
-sil! normal! zo
-48
-sil! normal! zo
-53
-sil! normal! zo
-54
-sil! normal! zo
-54
-sil! normal! zo
-61
-sil! normal! zo
-72
-sil! normal! zo
-74
-sil! normal! zo
-82
-sil! normal! zo
-105
-sil! normal! zo
-108
-sil! normal! zo
-110
-sil! normal! zo
-123
-sil! normal! zo
-123
-sil! normal! zo
-129
-sil! normal! zo
-130
-sil! normal! zo
-131
-sil! normal! zo
-130
-sil! normal! zo
-131
-sil! normal! zo
-131
-sil! normal! zo
-131
-sil! normal! zo
-144
-sil! normal! zo
-148
-sil! normal! zo
-149
-sil! normal! zo
-151
-sil! normal! zo
-151
-sil! normal! zo
-165
-sil! normal! zo
-171
-sil! normal! zo
-180
-sil! normal! zo
-185
-sil! normal! zo
-185
-sil! normal! zo
-187
-sil! normal! zo
-194
-sil! normal! zo
-166
-sil! normal! zo
-167
-sil! normal! zo
-173
-sil! normal! zo
-180
-sil! normal! zo
-184
-sil! normal! zo
-185
-sil! normal! zo
-187
-sil! normal! zo
-209
-sil! normal! zo
-210
-sil! normal! zo
-236
-sil! normal! zo
-237
-sil! normal! zo
-237
-sil! normal! zo
-253
-sil! normal! zo
-274
-sil! normal! zo
-let s:l = 115 - ((14 * winheight(0) + 15) / 31)
+let s:l = 264 - ((6 * winheight(0) + 32) / 64)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 115
-normal! 03|
-wincmd w
-argglobal
-if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
-if &buftype ==# 'terminal'
-  silent file src/main/runMerman.ts
-endif
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.vim.lsp.foldexpr()
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=99
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-24
-sil! normal! zo
-31
-sil! normal! zo
-32
-sil! normal! zo
-36
-sil! normal! zo
-45
-sil! normal! zo
-46
-sil! normal! zo
-48
-sil! normal! zo
-48
-sil! normal! zo
-53
-sil! normal! zo
-54
-sil! normal! zo
-54
-sil! normal! zo
-61
-sil! normal! zo
-72
-sil! normal! zo
-74
-sil! normal! zo
-82
-sil! normal! zo
-105
-sil! normal! zo
-108
-sil! normal! zo
-110
-sil! normal! zo
-123
-sil! normal! zo
-123
-sil! normal! zo
-129
-sil! normal! zo
-130
-sil! normal! zo
-131
-sil! normal! zo
-130
-sil! normal! zo
-131
-sil! normal! zo
-131
-sil! normal! zo
-131
-sil! normal! zo
-144
-sil! normal! zo
-148
-sil! normal! zo
-149
-sil! normal! zo
-151
-sil! normal! zo
-151
-sil! normal! zo
-165
-sil! normal! zo
-171
-sil! normal! zo
-180
-sil! normal! zo
-185
-sil! normal! zo
-185
-sil! normal! zo
-187
-sil! normal! zo
-194
-sil! normal! zo
-166
-sil! normal! zo
-167
-sil! normal! zo
-173
-sil! normal! zo
-180
-sil! normal! zo
-184
-sil! normal! zo
-185
-sil! normal! zo
-187
-sil! normal! zo
-209
-sil! normal! zo
-210
-sil! normal! zo
-236
-sil! normal! zo
-237
-sil! normal! zo
-237
-sil! normal! zo
-253
-sil! normal! zo
-274
-sil! normal! zo
-let s:l = 282 - ((9 * winheight(0) + 16) / 32)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 282
-normal! 064|
+keepjumps 264
+normal! 037|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/env.d.ts", ":p")) | buffer src/main/env.d.ts | else | edit src/main/env.d.ts | endif
@@ -549,12 +149,12 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 23 - ((10 * winheight(0) + 10) / 21)
+let s:l = 33 - ((9 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 23
-normal! 026|
+keepjumps 33
+normal! 022|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/renderer/src/env.d.ts", ":p")) | buffer src/renderer/src/env.d.ts | else | edit src/renderer/src/env.d.ts | endif
@@ -570,18 +170,19 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 4 - ((3 * winheight(0) + 10) / 21)
+let s:l = 37 - ((15 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 4
+keepjumps 37
 normal! 0
 wincmd w
 argglobal
-if bufexists(fnamemodify("src/renderer/src/App.tsx", ":p")) | buffer src/renderer/src/App.tsx | else | edit src/renderer/src/App.tsx | endif
+if bufexists(fnamemodify("../processor\ 5\ test.js", ":p")) | buffer ../processor\ 5\ test.js | else | edit ../processor\ 5\ test.js | endif
 if &buftype ==# 'terminal'
-  silent file src/renderer/src/App.tsx
+  silent file ../processor\ 5\ test.js
 endif
+balt src/renderer/src/App.tsx
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -590,194 +191,25 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-39
-sil! normal! zo
-41
-sil! normal! zo
-49
-sil! normal! zo
-57
-sil! normal! zo
-66
-sil! normal! zo
-73
-sil! normal! zo
-111
-sil! normal! zo
-111
-sil! normal! zo
-117
-sil! normal! zo
-117
-sil! normal! zo
-128
-sil! normal! zo
-128
-sil! normal! zo
-136
-sil! normal! zo
-139
-sil! normal! zo
-150
-sil! normal! zo
-150
-sil! normal! zo
-151
-sil! normal! zo
-151
-sil! normal! zo
-154
-sil! normal! zo
-168
-sil! normal! zo
-168
-sil! normal! zo
-168
-sil! normal! zo
-176
-sil! normal! zo
-205
-sil! normal! zo
-210
-sil! normal! zo
-215
-sil! normal! zo
-215
-sil! normal! zo
-219
-sil! normal! zo
-222
-sil! normal! zo
-227
-sil! normal! zo
-227
-sil! normal! zo
-228
-sil! normal! zo
-241
-sil! normal! zo
-242
-sil! normal! zo
-242
-sil! normal! zo
-254
-sil! normal! zo
-257
-sil! normal! zo
-261
-sil! normal! zo
-266
-sil! normal! zo
-274
-sil! normal! zo
-274
-sil! normal! zo
-275
-sil! normal! zo
-286
-sil! normal! zo
-286
-sil! normal! zo
-287
-sil! normal! zo
-287
-sil! normal! zo
-312
-sil! normal! zo
-312
-sil! normal! zo
-312
-sil! normal! zo
-323
-sil! normal! zo
-324
-sil! normal! zo
-324
-sil! normal! zo
-336
-sil! normal! zo
-350
-sil! normal! zo
-375
-sil! normal! zo
-381
-sil! normal! zo
-382
-sil! normal! zo
-393
-sil! normal! zo
-394
-sil! normal! zo
-395
-sil! normal! zo
-396
-sil! normal! zo
-399
-sil! normal! zo
-404
-sil! normal! zo
-405
-sil! normal! zo
-416
-sil! normal! zo
-417
-sil! normal! zo
-418
-sil! normal! zo
-426
-sil! normal! zo
-434
-sil! normal! zo
-442
-sil! normal! zo
-450
-sil! normal! zo
-458
-sil! normal! zo
-483
-sil! normal! zo
-485
-sil! normal! zo
-491
-sil! normal! zo
-498
-sil! normal! zo
-505
-sil! normal! zo
-512
-sil! normal! zo
-519
-sil! normal! zo
-549
-sil! normal! zo
-549
-sil! normal! zo
-549
-sil! normal! zo
-549
-sil! normal! zo
-let s:l = 64 - ((14 * winheight(0) + 10) / 20)
+let s:l = 27 - ((5 * winheight(0) + 10) / 20)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 64
-normal! 0
+keepjumps 27
+normal! 014|
 wincmd w
-4wincmd w
+6wincmd w
 exe '1resize ' . ((&lines * 32 + 33) / 66)
 exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
 exe '2resize ' . ((&lines * 31 + 33) / 66)
 exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe '3resize ' . ((&lines * 31 + 33) / 66)
 exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
-exe '4resize ' . ((&lines * 32 + 33) / 66)
+exe '4resize ' . ((&lines * 21 + 33) / 66)
 exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
 exe '5resize ' . ((&lines * 21 + 33) / 66)
 exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
-exe '6resize ' . ((&lines * 21 + 33) / 66)
+exe '6resize ' . ((&lines * 20 + 33) / 66)
 exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
-exe '7resize ' . ((&lines * 20 + 33) / 66)
-exe 'vert 7resize ' . ((&columns * 79 + 120) / 240)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -793,6 +225,7 @@ if filereadable(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

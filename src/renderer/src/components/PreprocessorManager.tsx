@@ -124,17 +124,20 @@ function ScriptManager({ scripts, onDelete, applyActive, ref }: {
   useEffect(() => { // new Additions
     var additions: Array<string> = []
 
-    // for all filepaths in the master map
+    // scripts is master map of filename_id -> contents
     for (const file of scripts.keys())
-      if (!fileOrder.includes(file))
+      if (!fileOrder.includes(file)) {
         additions.push(file)
+        setActiveScripts( // mark new file as automatically active
+          prev => structuredClone(prev.add(file)))
+      }
 
     setFileOrder(prev => [...prev, ...additions])
   }, [scripts])
 
   const DeleteFile = (path: string) => {
     setFileOrder(prev => prev.filter(f => f != path))
-    onDelete(path) // call parent function
+    onDelete(path) // call parent element function
   }
 
   useEffect(() => {

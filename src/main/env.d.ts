@@ -26,11 +26,11 @@ type RenderJob = {
 
 
 type GeneratedLine = {
-  content: string
+  content: string // as shown in table display not index
   line_num: number
 }
 
-type PrintLine = {
+type ProcessorPrintout = {
   content: string
   type: "plain" | "html"
 }
@@ -38,7 +38,7 @@ type PrintLine = {
 
 type ProcessedLine = {
   source: string,
-  line_num: number,
+  line_num: number, // as shown in table display not index
   generated: Array<GeneratedLine>,
   printed: Array<PrintLine>,
 }
