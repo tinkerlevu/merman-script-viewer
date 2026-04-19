@@ -14,17 +14,18 @@ else
   set shortmess=aoO
 endif
 badd +106 src/main/index.ts
-badd +33 src/main/env.d.ts
+badd +41 src/main/env.d.ts
 badd +5 src/renderer/src/env.d.ts
-badd +57 src/renderer/src/App.tsx
-badd +1735 src/main/python-merman/merman2.py
-badd +262 src/main/runMerman.ts
-badd +27 src/main/fileManagement.ts
-badd +14 ../processor\ 5\ test.js
-badd +178 ~/Development/Merman\ Script\ Viewer/src/renderer/src/components/PreprocessorManager.tsx
+badd +250 src/renderer/src/App.tsx
+badd +26 src/main/python-merman/merman2.py
+badd +287 src/main/runMerman.ts
+badd +7 src/main/fileManagement.ts
+badd +11 ~/Development/processor\ 5\ test.js
+badd +189 src/renderer/src/components/PreprocessorManager.tsx
+badd +29 ~/Development/Merman\ Script\ Viewer/coding.session
 argglobal
 %argdel
-edit src/renderer/src/App.tsx
+edit src/main/runMerman.ts
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -55,19 +56,19 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 32 + 33) / 66)
+exe '1resize ' . ((&lines * 33 + 33) / 66)
 exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
-exe '2resize ' . ((&lines * 31 + 33) / 66)
+exe '2resize ' . ((&lines * 30 + 33) / 66)
 exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 83 + 120) / 240)
 exe '4resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
-exe '5resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
-exe '6resize ' . ((&lines * 20 + 33) / 66)
-exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 4resize ' . ((&columns * 75 + 120) / 240)
+exe '5resize ' . ((&lines * 22 + 33) / 66)
+exe 'vert 5resize ' . ((&columns * 75 + 120) / 240)
+exe '6resize ' . ((&lines * 19 + 33) / 66)
+exe 'vert 6resize ' . ((&columns * 75 + 120) / 240)
 argglobal
-balt src/main/index.ts
+balt src/main/fileManagement.ts
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -76,48 +77,19 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 250 - ((5 * winheight(0) + 16) / 32)
+let s:l = 196 - ((13 * winheight(0) + 16) / 33)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 250
-normal! 0
-wincmd w
-argglobal
-if bufexists(fnamemodify("src/main/index.ts", ":p")) | buffer src/main/index.ts | else | edit src/main/index.ts | endif
-if &buftype ==# 'terminal'
-  silent file src/main/index.ts
-endif
-balt src/renderer/src/App.tsx
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.vim.lsp.foldexpr()
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=99
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-91
-sil! normal! zo
-94
-sil! normal! zo
-116
-sil! normal! zo
-116
-sil! normal! zo
-let s:l = 106 - ((17 * winheight(0) + 15) / 31)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 106
-normal! 0
+keepjumps 196
+normal! 09|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
 if &buftype ==# 'terminal'
   silent file src/main/runMerman.ts
 endif
-balt src/renderer/src/App.tsx
+balt src/main/fileManagement.ts
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -126,14 +98,33 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-254
-sil! normal! zo
-let s:l = 264 - ((6 * winheight(0) + 32) / 64)
+let s:l = 367 - ((13 * winheight(0) + 15) / 30)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 264
-normal! 037|
+keepjumps 367
+normal! 060|
+wincmd w
+argglobal
+if bufexists(fnamemodify("src/main/python-merman/merman2.py", ":p")) | buffer src/main/python-merman/merman2.py | else | edit src/main/python-merman/merman2.py | endif
+if &buftype ==# 'terminal'
+  silent file src/main/python-merman/merman2.py
+endif
+balt src/main/runMerman.ts
+setlocal foldmethod=expr
+setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=99
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 26 - ((25 * winheight(0) + 32) / 64)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 26
+normal! 0
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/env.d.ts", ":p")) | buffer src/main/env.d.ts | else | edit src/main/env.d.ts | endif
@@ -149,12 +140,12 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 33 - ((9 * winheight(0) + 10) / 21)
+let s:l = 41 - ((17 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 33
-normal! 022|
+keepjumps 41
+normal! 058|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/renderer/src/env.d.ts", ":p")) | buffer src/renderer/src/env.d.ts | else | edit src/renderer/src/env.d.ts | endif
@@ -170,17 +161,17 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 37 - ((15 * winheight(0) + 10) / 21)
+let s:l = 20 - ((16 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 37
-normal! 0
+keepjumps 20
+normal! 015|
 wincmd w
 argglobal
-if bufexists(fnamemodify("../processor\ 5\ test.js", ":p")) | buffer ../processor\ 5\ test.js | else | edit ../processor\ 5\ test.js | endif
+if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
 if &buftype ==# 'terminal'
-  silent file ../processor\ 5\ test.js
+  silent file src/main/runMerman.ts
 endif
 balt src/renderer/src/App.tsx
 setlocal foldmethod=expr
@@ -191,25 +182,25 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 27 - ((5 * winheight(0) + 10) / 20)
+let s:l = 18 - ((12 * winheight(0) + 9) / 19)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 27
-normal! 014|
+keepjumps 18
+normal! 023|
 wincmd w
-6wincmd w
-exe '1resize ' . ((&lines * 32 + 33) / 66)
+3wincmd w
+exe '1resize ' . ((&lines * 33 + 33) / 66)
 exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
-exe '2resize ' . ((&lines * 31 + 33) / 66)
+exe '2resize ' . ((&lines * 30 + 33) / 66)
 exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe 'vert 3resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 83 + 120) / 240)
 exe '4resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
-exe '5resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
-exe '6resize ' . ((&lines * 20 + 33) / 66)
-exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 4resize ' . ((&columns * 75 + 120) / 240)
+exe '5resize ' . ((&lines * 22 + 33) / 66)
+exe 'vert 5resize ' . ((&columns * 75 + 120) / 240)
+exe '6resize ' . ((&lines * 19 + 33) / 66)
+exe 'vert 6resize ' . ((&columns * 75 + 120) / 240)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
