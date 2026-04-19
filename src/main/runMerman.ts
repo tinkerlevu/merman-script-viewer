@@ -22,15 +22,6 @@ export const setupMermaidRenderer = (mainInterface: BrowserWindow) =>
 // NOTE: this is where all the currently open mermaid render windows are
 var runningRenderWindows: Array<AssignedRenderWindow> = []
 
-
-var currentRender: RenderJob = {
-  text: "",
-  filepath_id: "",
-  timestamp: performance.now(),
-  preprocessor: ""
-}
-
-
 // --------------- UTIL funtions
 const send_hash = (filepath: FileID, hash: Hash) =>
   mainWindow.webContents.send('new_render_hash', {
@@ -65,27 +56,8 @@ export default async function full_render(
   preprocessor: string,
 
 ) {
-  console.log("PREPROCESSOR", preprocessor)
-
-  // deal with multiple triggers from rapid file saves
-  if (merman_text == currentRender.text
-    && filepath == currentRender.filepath_id
-    && preprocessor == currentRender.preprocessor) {
-    // debouncing on abort messages
-    if (performance.now() - currentRender.timestamp < 500) {
-      currentRender.timestamp = performance.now()
-      return
-    }
-    currentRender.timestamp = performance.now()
-    console_log(filepath, "> No changes since last render - ABORTING")
-    return
-  }
-  currentRender = {
-    text: merman_text,
-    filepath_id: filepath,
-    timestamp: performance.now(),
-    preprocessor: preprocessor
-  }
+  if (prevent_duplicate(filepath, merman_text, preprocessor))
+    return // duplicate of last job, cancelling
 
   // Update UI
   console_clear(filepath)
@@ -93,8 +65,7 @@ export default async function full_render(
   update_render_status(filepath, 'running')
   send_hash(filepath, "pending")
 
-
-  closeExisting(filepath) // cancel previous render job
+  closeExisting(filepath) // cancel previous render job and render windows
 
   const merman_script = merman_text.split(/\r?\n/) // TODO: rename to source
 
@@ -255,6 +226,41 @@ async function closeExisting(filepath_id: string) {
 }
 
 
+var currentRender: RenderJob = {
+  text: "",
+  filepath_id: "",
+  timestamp: performance.now(),
+  preprocessor: ""
+}
+
+function prevent_duplicate(
+  filepath: string,
+  merman_text: string,
+  preprocessor: string): boolean {
+  // deal with multiple triggers from rapid file saves
+  if (merman_text == currentRender.text
+    && filepath == currentRender.filepath_id
+    && preprocessor == currentRender.preprocessor) {
+    // debouncing on abort messages
+    if (performance.now() - currentRender.timestamp < 500) {
+      currentRender.timestamp = performance.now()
+      return true
+    }
+    currentRender.timestamp = performance.now()
+    console_log(filepath, "> No changes since last render - ABORTING")
+    return true
+  }
+  currentRender = {
+    text: merman_text,
+    filepath_id: filepath,
+    timestamp: performance.now(),
+    preprocessor: preprocessor
+  }
+
+  return false // do not prevent render because not a duplicate
+}
+
+
 //
 // NOTE: ----------- PREPROCESSOR STUFF --------------
 //
@@ -308,7 +314,6 @@ async function preprocess(
   const readhf = (relpath: string) => readFileSync(
     join(dirname(filepath_id), relpath), 'utf8')
   const writehf = (relpath: string, contents: string, append = true) => {
-
     const path = join(dirname(filepath_id), relpath)
     mkdirSync(dirname(path), { recursive: true }) // autocreate missing dir
     writeFileSync(
