@@ -269,12 +269,15 @@ async function preprocess(
     //next
   }
 
+  // TODO: print to ui console <running preprocessor>
+
   // NOTE: --- Console.log override  ----
   var captured_logs: Array<ProcessorPrintout> = []
   const console_override = {
     log: (...args: any) => {
       captured_logs.push(array_toPrintout(args, false))
-      // TODO: print to console. and UI console
+      console.log(...args)
+      // TODO: print UI console
     },
     html: () => { }, // TODO:
     push: () => { }, // TODO:
@@ -364,18 +367,18 @@ async function get_analyze_function() {
 
   return function(merman_line: string) {
     const locals = pyodide.toPy({
-      filedata: ['"hello" ^world *how &is !it! `going` !!!!!'],
+      // filedata: ['"hello" ^world *how &is !it! `going` !!!!! ((('],
+      filedata: [merman_line],
       analyze_only: true
     }) // setup stuff here and set flag to analyze only
 
     try {
       const evaluated = pyodide.runPython(MERMAN_CODE, { locals })
-      console.log("ANALYZED: ", evaluated.toJs())
       return evaluated.toJs()
     }
     catch (error) {
-      console.log('ANALYZE ERROR', error)
-      return '' // TODO: return a generic object that matches a merman line to indicate a failure
+      console.log('ANALYZE ERROR', error) // TODO: remove
+      return { ERROR: 'syntax error', line_type: 'ERROR' }
     }
   }
 

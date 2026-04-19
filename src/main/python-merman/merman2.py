@@ -788,6 +788,7 @@ class GraphNode(Linkable):
     #
     # NOTE: do not throw error here if no text is found, wait till building graph
 
+    # TODO: add word wrap variable, mb _wordwrap:56 or sth? or ?56 or --> _60 <-- or =60  60= ===60= <--- also a good option
     # all variables ======
     self.script = None
     self.summary = None
@@ -801,6 +802,7 @@ class GraphNode(Linkable):
     self.node_word_wrap = 25  # default value for word wrapping
     self.node_type = ''  # bracket type
     self.node_type_variant = 0  # how many brackets
+    # TODO: add and compute self.note_type_label when updating to new syntax
     self.pointers = []
     self.references = []
 
@@ -1372,18 +1374,31 @@ def run(merman_filetext, only_analyze=False):
     return GraphNode(line)
 
 
-########################## FOR PREPROCESSOR ANALYZE FUNCTION #####
+  # NOTE: ######################### FOR PREPROCESSOR ANALYZE FUNCTION #####
 
   if only_analyze:
     for line in unfiltered:
       if line.is_comment():
-        return {''}
-      # TODO: also classify comments and block comment start indicator
-      analyzed_Line = vars(classify(line))
-      # TODO: iterate through arrays in self and convert to vars(object)
+        analyzed_Line = vars(Comment(line))
+      elif line.is_block_comment_marker():
+        return {'line_type': 'BlockCommentMarker'} # NOTE: this if changing line_type
+      else:
+        analyzed_Line = vars(classify(line))
+      #
+      # convert objects within arrays within objects to dicts
+      for attr in analyzed_Line:
+        if isinstance(analyzed_Line[attr], list):
+          analyzed_Line[attr] = [vars(x) for x in analyzed_Line[attr]]
+
+        # Nevermind: multiline nodes can have individual lines with invalid syntax
+          # turns out incorrect syntax doesnt throw an error till much later
+      # if type(analyzed_Line == "GraphNode") and \
+      #   not analyzed_Line['script'] and not analyzed_Line['summary']:
+      #   analyzed_Line['line_type'] += " (INCORRECT SYNTAX)"
+
       return analyzed_Line
 
-# END OF PREPROCESSOR ANALYZE FUNCTION
+  # NOTE:  END OF PREPROCESSOR ANALYZE FUNCTION
 
   unconsolidated = []  # with multiline nodes, and pointers + references
 
