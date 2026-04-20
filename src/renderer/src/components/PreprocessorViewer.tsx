@@ -1,6 +1,7 @@
 import { GeneratedLine, OpenFile, ProcessedLine, ProcessorPrintout } from "@renderer/env";
 import { useEffect, useState } from "react";
 import parse from 'html-react-parser';
+import ContentHeight from "./dynamicSize";
 
 
 
@@ -10,13 +11,32 @@ export default function PreprocessorViewer(
     refresher: number
   }): React.JSX.Element {
 
+  const container_style = {
+    overflow: "scroll",
+    height: ContentHeight(),
+    width: "100%"
+  }
+
   const [processedRows, setProcessedRows] =
-    useState<HTMLTableRowElement>()
+    useState<HTMLTableRowElement>([])
 
   useEffect(() => {
     var tablerows: Array<any> = []
     for (const line of activeFile.preprocessed.lines) {
-      tablerows.push(
+
+      var error: any = null
+      if (line.error) {
+        error = <tr>
+          <td
+            colSpan={4}
+            style={{ whiteSpace: 'pre-wrap' }}
+          >
+            {line.error.message}
+          </td>
+        </tr>
+      }
+
+      tablerows.push(<>
         < tr
           key={line.line_num}
         >
@@ -36,8 +56,9 @@ export default function PreprocessorViewer(
               printout_lines={line.printed}
             />
           </td>
-          todo error
         </tr >
+        {error}
+      </>
       )
     }
     setProcessedRows(tablerows)
@@ -45,7 +66,26 @@ export default function PreprocessorViewer(
 
 
 
-  return <><table>{processedRows}</table></>
+  return <>
+    <div
+      style={container_style}
+    >
+      <table>
+        <tr>
+          <th colSpan={2}>
+            Source
+          </th>
+          <th>
+            Generated
+          </th>
+          <th>
+            Console Output
+          </th>
+        </tr>
+        {processedRows}
+      </table>
+    </div>
+  </>
 }
 
 

@@ -483,6 +483,11 @@ function App(): React.JSX.Element {
                 Remember
               </Tab>
               <Tab>
+                <TabIcon
+                  activeFile={activeFile}
+                  monitoredHash={activeFile.preprocessed.hash}
+                  refresh={refresher}
+                />
                 Processed
               </Tab>
               <Tab>
