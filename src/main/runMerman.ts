@@ -69,23 +69,23 @@ export default async function full_render(
 
   const merman_script = merman_text.split(/\r?\n/) // TODO: rename to source
 
-  const generated = await preprocess(
+  const [generated, status] = await preprocess(
     merman_script, preprocessor, filepath)
 
-  if (generated == "error") {
+  handleFinishedRender(null, { // send over generated lines with possible error data
+    filepath: filepath,
+    hash: "pending",
+    type: 'preprocessor',
+    lines: generated
+  })
+
+  if (status == "error") { // update UI and halt if error
     update_render_status(filepath, 'failed')
     return
     // UI CONSOLE PRINT check Processed Tab for more details, and processed tab has full error dump on it along with any remaining console logs that got out
   }
 
   console_log(filepath, "> Finished")
-
-  handleFinishedRender(null, { // send over generated lines
-    filepath: filepath,
-    hash: "pending",
-    type: 'preprocessor',
-    lines: generated
-  })
 
   console.log('GENERATED', JSON.stringify(generated, null, 2)) // TODO: REMOVE
   // TODO: send generated to UI
@@ -285,7 +285,7 @@ async function preprocess(
   merman_script: Array<string>,
   preprocessor_code: string,
   filepath_id: string,)
-  : Promise<Array<ProcessedLine> | "error"> {
+  : Promise<[Array<ProcessedLine>, 'error' | 'success']> {
 
   console_log(filepath_id, "[ Initalizing Preprocessor ]")
 
@@ -352,7 +352,7 @@ async function preprocess(
       "======= ERROR =======\n" +
       "Error Creating Preprocessor code (Probably Syntax Error) " +
       dumpError(err))
-    return "error"
+    return [[], "error"]
   }
 
 
@@ -392,7 +392,7 @@ async function preprocess(
         "Preprocessing error on merman line: " + (lnum + 1) +
         '\n' + merman_script[lnum] + '\n' +
         dumpError(err))
-      return "error"
+      return [OUTPUT, "error"]
     }
 
 
@@ -429,7 +429,7 @@ async function preprocess(
     OUTPUT.push(processed_result)
   }
 
-  return OUTPUT
+  return [OUTPUT, 'success']
 }
 
 
