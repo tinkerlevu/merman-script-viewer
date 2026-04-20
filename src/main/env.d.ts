@@ -41,7 +41,7 @@ type ProcessedLine = {
   source: string,
   line_num: number, // as shown in table display not index
   generated: Array<GeneratedLine>,
-  printed: Array<PrintLine>,
+  printed: Array<ProcessorPrintout>,
   error: null | {
     type: "merman" | "preprocessor",
     message: string

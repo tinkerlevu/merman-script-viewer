@@ -67,10 +67,10 @@ export default async function full_render(
 
   closeExisting(filepath) // cancel previous render job and render windows
 
-  const merman_script = merman_text.split(/\r?\n/) // TODO: rename to source
+  const source = merman_text.split(/\r?\n/) // TODO: rename to source
 
   const [generated, status] = await preprocess(
-    merman_script, preprocessor, filepath)
+    source, preprocessor, filepath)
 
   handleFinishedRender(null, { // send over generated lines with possible error data
     filepath: filepath,
@@ -87,9 +87,13 @@ export default async function full_render(
 
   console_log(filepath, "> Finished")
 
-  console.log('GENERATED', JSON.stringify(generated, null, 2)) // TODO: REMOVE
-  // TODO: send generated to UI
-  // TODO: convert generated to merman script
+  var merman_script: Array<string> = []
+
+  // convert the generated merman script to array of strings
+  for (const processed_line of generated)
+    merman_script = [...merman_script, ...processed_line.generated.map(
+      line => line.content
+    )]
 
   const mermaid = await translate_merman(
     merman_script,

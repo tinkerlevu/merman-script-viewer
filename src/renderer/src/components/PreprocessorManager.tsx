@@ -62,7 +62,7 @@ export default function PreprocessorManager(
       <button
         onClick={() => setCurrentFile('')}
       >
-        Show Active</button>
+        Show Result</button>
     </FixedBar>
 
     <SplitTop>

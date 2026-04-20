@@ -35,6 +35,7 @@ import TabIcon from './components/TabIcon'
 import CodeIcon from './components/CodeIcon'
 import PreprocessorManager from './components/PreprocessorManager'
 import { DocPos, GraphPos, OpenFile, RenderedImage, RenderedMD, Hash, RenderMDType, RenderImageType } from './env'
+import PreprocessorViewer from './components/PreprocessorViewer'
 
 
 function App(): React.JSX.Element {
@@ -379,7 +380,7 @@ function App(): React.JSX.Element {
 
       }
 
-      setRefresher(refresher + 1) // refresh all image displays
+      setRefresher(prev => prev + 1) // refresh all image displays
 
     }),
     [openFiles]
@@ -542,7 +543,10 @@ function App(): React.JSX.Element {
             />
           </TabPanel>
           <TabPanel>
-            Table listing original mermaid line number, generated line number, generated lines, and corresponding console output for each line
+            <PreprocessorViewer
+              activeFile={activeFile}
+              refresh={refresher}
+            />
 
 
           </TabPanel>

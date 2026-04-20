@@ -75,6 +75,7 @@ type ConsoleBufferLine = {
 type GeneratedLine = {
   content: string // as shown in table display not index
   line_num: number
+  default: boolean
 }
 
 type ProcessorPrintout = {
@@ -87,7 +88,7 @@ type ProcessedLine = {
   source: string,
   line_num: number, // as shown in table display not index
   generated: Array<GeneratedLine>,
-  printed: Array<PrintLine>,
+  printed: Array<ProcessorPrintout>,
   error: null | {
     type: "merman" | "preprocessor",
     message: string
