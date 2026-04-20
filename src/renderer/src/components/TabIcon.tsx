@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 export default function TabIcon(
   { activeFile, monitoredHash, refresh }: {
     activeFile: OpenFile,
-    monitoredHash: String,
+    monitoredHash: string,
     refresh: number,
   }): React.JSX.Element {
 

@@ -87,9 +87,9 @@ export default async function full_render(
 
   console_log(filepath, "> Finished")
 
+  // convert the generated merman script to array of strings
   var merman_script: Array<string> = []
 
-  // convert the generated merman script to array of strings
   for (const processed_line of generated)
     merman_script = [...merman_script, ...processed_line.generated.map(
       line => line.content

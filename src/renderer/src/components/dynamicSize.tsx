@@ -30,7 +30,7 @@ function getScrollbarWidth() {
 }
 
 
-const OFFSET = 12; // NOTE: Pixel Offset
+// const OFFSET = 12; // NOTE: Pixel Offset
 
 const calculate_new_height = () => {
   const viewport_height = getWindowHeight()
@@ -41,7 +41,7 @@ const calculate_new_height = () => {
   var used_space: number = 0;
 
   for (let item of fixed_elements) {
-    used_space += item.clientHeight + OFFSET
+    used_space += item.clientHeight // + OFFSET
   }
 
   return viewport_height - used_space - getScrollbarWidth()

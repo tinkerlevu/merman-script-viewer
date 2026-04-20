@@ -41,7 +41,7 @@ export function ReferenceTopics(
       // TODO: hover in css Style
       // TODO add class SelectedRefInfo as selected=i.title
       >
-        {i.title}
+        <span className="refinfo_title">{i.title}</span>
         <button
           onClick={() => apply_example(i.example)}
         >

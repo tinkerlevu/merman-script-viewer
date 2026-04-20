@@ -21,12 +21,14 @@ export function SplitLayout(
   const Main = children.find(c => c.type.name == 'SplitMain')
 
   const barRef = useRef<HTMLDivElement>(null)
+  const hrRef = useRef<HTMLDivElement>(null)
 
   const [barHeight, setBarHeight] = useState<number>(0)
 
   useEffect(() => {
     const calculate_bar = () =>
-      setBarHeight(barRef.current?.clientHeight || 0)
+      setBarHeight(barRef.current?.clientHeight +
+        hrRef.current?.clientHeight || 0)
 
     const obs = new ResizeObserver(() => {
       calculate_bar()
@@ -65,6 +67,9 @@ export function SplitLayout(
         }}>
           {Top} {/*<----------------------------- */}
         </div>
+        <div ref={hrRef}>
+          <hr />
+        </div>
         <div
           style={{
             display: 'block',
@@ -83,7 +88,7 @@ export function SplitLayout(
           height: '100%',
           width: (1 - splitRatio) * 100 + '%',
           display: 'inline-block',
-          overflow: 'scroll'
+          overflowY: 'scroll'
         }}
         ref={mainContainerRef}
         onScroll={handleMainScroll}
@@ -92,7 +97,7 @@ export function SplitLayout(
       </div>
 
 
-    </div>
+    </div >
   </>)
 
 }

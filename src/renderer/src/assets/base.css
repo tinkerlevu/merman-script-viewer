@@ -1,4 +1,4 @@
-:root {
+/*:root {
   --ev-c-white: #ffffff;
   --ev-c-white-soft: #f8f8f8;
   --ev-c-white-mute: #f2f2f2;
@@ -30,7 +30,7 @@
 
   --color-text: var(--ev-c-text-1);
 }
-
+*/
 *,
 *::before,
 *::after {
@@ -39,15 +39,18 @@
   font-weight: normal;
 }
 
+
+/*
 ul {
   list-style: none;
 }
+*/
 
 body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
-  line-height: 1.6;
+  line-height: 1.25;
   font-family:
     Inter,
     -apple-system,
@@ -65,3 +68,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+hr {
+  height: 0.1em;
+  background-color: dark-blue;
+  border-color: var(--color-background);
+}
+
+
+

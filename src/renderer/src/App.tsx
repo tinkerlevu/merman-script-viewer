@@ -1,13 +1,14 @@
 // ------------------------------ TODO: REPLACE THESE -------------------------------
-import Versions from './components/Versions' // replace with WORD COUNT
-import test_fav from "./assets/favicons/test.ico"
+import Versions from './components/Versions' // TODO: replace with WORD COUNT, and put word count on processed tab
+
+import light_mode_icon from "./assets/favicons/lightmode.png"
+import dark_mode_icon from "./assets/favicons/darkmode.png"
 
 import done_fav from "./assets/favicons/filetab_done.ico"
 import fail_fav from "./assets/favicons/filetab_failed.ico"
 import wait_fav from "./assets/favicons/filetab_loading.ico"
-import process_fav from "./assets/favicons/test.ico"
+import process_fav from "./assets/favicons/test.ico" // FIX: change this
 import none_fav from "./assets/favicons/filetab_none.ico"
-
 
 
 import { useEffect, useRef, useState } from 'react';
@@ -15,19 +16,14 @@ import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-// my components
-import GraphViewer from './components/GraphViewer';
-
-
-
 // for file tabs
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import '@sinm/react-chrome-tabs/css/chrome-tabs-dark-theme.css';
 // for regular tabs
-import 'react-tabs/style/react-tabs.css';
+//import 'react-tabs/style/react-tabs.css';
 
 
-// my stuff
+// my components and stuff
 // import layout from './assets/spacing.module.css';
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
@@ -36,10 +32,18 @@ import CodeIcon from './components/CodeIcon'
 import PreprocessorManager from './components/PreprocessorManager'
 import { DocPos, GraphPos, OpenFile, RenderedImage, RenderedMD, Hash, RenderMDType, RenderImageType } from './env'
 import PreprocessorViewer from './components/PreprocessorViewer'
+import GraphViewer from './components/GraphViewer';
+
+// my styles
+import './assets/base.css'
+import './assets/react-tabs.css'
+import './assets/buttons.css'
+import './assets/lists.css'
 
 
 function App(): React.JSX.Element {
 
+  // NOTE: --------- Meta file stuff
   const blank_img = (): RenderedImage => {
     return {
       svg: "",
@@ -59,7 +63,7 @@ function App(): React.JSX.Element {
   const blank_graphpos = (): GraphPos => {
     return {
       zoom: 1.0,
-      scroll_x: 0,
+      scroll_x: 0.5, // middle of page
       scroll_y: 0,
     }
   }
@@ -101,6 +105,8 @@ function App(): React.JSX.Element {
     }
   }
 
+  // NOTE: ---------- Merman File variables
+
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeFile, setActiveFile] = useState<OpenFile>(blank_file)
 
@@ -113,7 +119,7 @@ function App(): React.JSX.Element {
   // {id: "abc", favicon: test_fav, title: "test_Doc_name", active: true }, // active selects which tab to show
 
 
-  // NOTE: ---------- Handling Merman Files
+  // NOTE: ---------- Handling Merman Files and file tabs
 
   useEffect(() => { // Cleanup Pattern, for IPC race conditions
     // set active file to first item with matching filename
@@ -405,16 +411,31 @@ function App(): React.JSX.Element {
       target_file.console_buffer = new Set()
   })
 
-  // NOTE: ---------- END of IPC handling
+  // NOTE: ---------- UI color theme
 
-  // TODO: add dark mode
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    const darkmode = `
+      --color-text: #ddd;
+      --color-background: #222436;
+      --selected-tab-background: #000;
+      scrollbar-color: #993399 #2d3034;
+`
+    const lightmode = `
+      --color-text: #000;
+      --color-background: #eee;
+      --selected-tab-background: #fff;
+`
+    document.body.style = theme == 'light' ? lightmode : darkmode
+  }, [theme])
 
   return (
     <>
       <div style={{ height: '100vh' }}>
         <div className='FixedContainer'>
           <FileTabBar
-            // darkMode={false}
+            darkMode={theme == 'dark'}
             draggable
             onTabClose={file_close_action}
             onTabActive={set_active_tab}
@@ -423,7 +444,6 @@ function App(): React.JSX.Element {
               <button
                 style={{ height: "100%" }}
                 onClick={() => {
-                  window.dispatchEvent(new Event('resize')) // hacky way to fix incorrect height calculations after init
                   file_open_action()
                 }}>
                 +
@@ -493,12 +513,27 @@ function App(): React.JSX.Element {
               <Tab>
                 Preprocessor
               </Tab>
-              <button
-                onClick={() => render_merman(null, null)}>
-                Render
-              </button>
-              <input type="checkbox" />Darkmode
-              <button onClick={() => console.log(openFiles)}>test</button>
+              <Tab
+                disabled={true}>
+                <button
+                  onClick={() => render_merman(null, null)}>
+                  Render
+                </button>
+              </Tab>
+              <Tab
+                disabled={true}>
+                <span
+                  onClick={() => setTheme(prev =>
+                    prev == 'light' ? 'dark' : 'light')}
+                >
+                  <img
+                    src={theme == "light" ?
+                      light_mode_icon : dark_mode_icon}
+                    style={{ height: "2vh" }}
+                  />
+                </span>
+              </Tab>
+              {/* <button onClick={() => console.log(openFiles)}>test</button> */}
             </TabList>
           </div>
 
@@ -552,8 +587,6 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               refresh={refresher}
             />
-
-
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}
             <PreprocessorManager

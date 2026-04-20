@@ -1,0 +1,18 @@
+ul {
+  list-style-type: none;
+  padding: 0;
+  border: none; /* 1px solid #ddd; */
+}
+
+ul li {
+  padding: 4px 8px;
+  border-bottom: none;/*1px solid #ddd;*/
+}
+
+ul li:last-child {
+  border-bottom: none;
+}
+
+.refinfo_title {
+  margin: 0 auto; /* center title put proper arrow torwards right */
+}

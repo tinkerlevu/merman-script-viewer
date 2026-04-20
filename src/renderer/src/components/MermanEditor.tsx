@@ -98,11 +98,6 @@ export default function MermanEditor(
       handleMainScroll={handleScroll}
     >
       <FixedBar>
-        {/*<input type="checkbox" />Auto-Refresh ah have autorefresh on at all times!! */}
-        <input type="checkbox"
-          onChange={toggleAutoRender}
-          ref={autoRenderRef}
-        /> Auto-Render
         <button
           onClick={saveFile}
           disabled={!unsavedChanges}>
@@ -112,7 +107,15 @@ export default function MermanEditor(
           onClick={saveAsFile}>
           Save As
         </button>
-        <button onClick={() => consoleRef.current.scrollTop = 100}>test</button>
+        <label class="switch">
+          <input type="checkbox"
+            onChange={toggleAutoRender}
+            ref={autoRenderRef}
+          />
+          <span class="slider"></span>
+        </label>
+        Auto-Render
+        {/*<button onClick={() => consoleRef.current.scrollTop = 100}>test</button>
         {/* <button >Verify</button>  {/* run code without rendering or preprocessor */}
       </FixedBar>
       <SplitTop>
