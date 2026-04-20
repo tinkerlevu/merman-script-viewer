@@ -1,4 +1,7 @@
 /// <reference types="vite/client" />
+
+import { Hash } from "crypto";
+
 //
 type EditorType = "javascript" | "merman";
 
@@ -18,7 +21,7 @@ type RenderMDType = "todo" | "remember"
 
 type RenderedMD = {
   text: string,
-  hash: Hash,
+  hash: Hash | string,
   render_status: "rendering" | "done" | "none"
 }
 
@@ -42,7 +45,7 @@ type OpenFile = {
   filepath: FileID,
   text: string,
   unsaved_text: string,
-  text_hash: Hash,
+  text_hash: Hash | string,
   render_status: "running" | "done" | "failed" | "none" | "preprocessing"
   script: RenderedImage,
   summary: RenderedImage,
@@ -60,10 +63,40 @@ type OpenFile = {
   },
   bookmarks: Map<GraphPos>, // !! not able to be converted to JSON
   console_buffer: Set<string> // console display in bottom left
+  preprocessed: RenderedProcessedLines
 }
 
 type ConsoleBufferLine = {
   filepath_id: FileID,
   text: string,
-  hash: Hash
+  hash: Hash | string
 }
+
+type GeneratedLine = {
+  content: string // as shown in table display not index
+  line_num: number
+}
+
+type ProcessorPrintout = {
+  content: string
+  type: "plain" | "html"  // add error here
+}
+
+
+type ProcessedLine = {
+  source: string,
+  line_num: number, // as shown in table display not index
+  generated: Array<GeneratedLine>,
+  printed: Array<PrintLine>,
+  error: null | {
+    type: "merman" | "preprocessor",
+    message: string
+  }
+}
+
+RenderedProcessedLines = {
+  lines: Array<ProcessedLine>,
+  hash: Hash | string, // FIX: set type to hash without causing errors in app.tsx
+  render_status: "rendering" | "done" | "none"
+}
+

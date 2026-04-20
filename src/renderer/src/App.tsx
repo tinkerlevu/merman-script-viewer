@@ -34,6 +34,7 @@ import MermanEditor from './components/MermanEditor'
 import TabIcon from './components/TabIcon'
 import CodeIcon from './components/CodeIcon'
 import PreprocessorManager from './components/PreprocessorManager'
+import { DocPos, GraphPos, OpenFile, RenderedImage, RenderedMD, Hash, RenderMDType, RenderImageType } from './env'
 
 
 function App(): React.JSX.Element {
@@ -92,6 +93,11 @@ function App(): React.JSX.Element {
     },
     bookmarks: new Map(),
     console_buffer: new Set(),
+    preprocessed: {
+      lines: [],
+      hash: "",
+      render_status: "none"
+    }
   }
 
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
@@ -328,6 +334,9 @@ function App(): React.JSX.Element {
       const image_types: Array<RenderImageType>
         = ["script", "summary", "sorted"]
 
+      const doc_types: Array<RenderMDType>
+        = ['todo', 'remember']
+
 
       if (!update_file)
         return console.log("file not found")
@@ -347,11 +356,11 @@ function App(): React.JSX.Element {
         if (data.type == "sorted")
           update_file.sorted = new_image
 
-      } else { // new markdown doc
+      }
+      else if (doc_types.includes(data.type)) { // new markdown doc
 
         const new_markdown: RenderedMD = {
-          text: data.text,
-          hash: data.hash,
+          text: data.text, hash: data.hash,
           render_status: "done"
         }
 
@@ -359,6 +368,15 @@ function App(): React.JSX.Element {
           update_file.todo = new_markdown
         if (data.type == "remember")
           update_file.remember = new_markdown
+      }
+      else { // Preprocessor Generated output
+        update_file.preprocessed = {
+          lines: data.lines,
+          hash: data.hash,
+          render_status: 'done'
+        }
+        // TODO: reset scroll here
+
       }
 
       setRefresher(refresher + 1) // refresh all image displays
@@ -525,6 +543,7 @@ function App(): React.JSX.Element {
           </TabPanel>
           <TabPanel>
             Table listing original mermaid line number, generated line number, generated lines, and corresponding console output for each line
+
 
           </TabPanel>
           <TabPanel forceRender={true}> {/* Preprocessor */}

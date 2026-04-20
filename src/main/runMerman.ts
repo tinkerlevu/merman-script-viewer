@@ -80,6 +80,13 @@ export default async function full_render(
 
   console_log(filepath, "> Finished")
 
+  handleFinishedRender(null, { // send over generated lines
+    filepath: filepath,
+    hash: "pending",
+    type: 'preprocessor',
+    lines: generated
+  })
+
   console.log('GENERATED', JSON.stringify(generated, null, 2)) // TODO: REMOVE
   // TODO: send generated to UI
   // TODO: convert generated to merman script
@@ -101,6 +108,14 @@ export default async function full_render(
 
   const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
   send_hash(filepath, hash)
+
+  handleFinishedRender(null, { // send generated lines with actual hash
+    filepath: filepath,
+    hash: hash,
+    type: 'preprocessor',
+    lines: generated
+  })
+
 
   handleFinishedRender(null, { // send over TODO report
     filepath: filepath,
@@ -397,22 +412,22 @@ async function preprocess(
         .split(/\r?\n/).map(s => { // separete by newlines
           return {
             content: s,
-            line_num: gen_lnum++  // make sure to increment lmao
+            line_num: gen_lnum++,  // make sure to increment lmao
+            default: false  // mark as processor generated output
           }
         })
     }
     else { // nothing returned from processor
       processed_result.generated = [{
         content: merman_script[lnum], // pass original line through
-        line_num: gen_lnum++
+        line_num: gen_lnum++,
+        default: true // mark as passed through
       }]
     }
     // NOTE: ---- end of processing loop
 
     OUTPUT.push(processed_result)
   }
-  console.log("captured logs", captured_logs)
-
 
   return OUTPUT
 }

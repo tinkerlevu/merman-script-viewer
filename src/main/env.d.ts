@@ -26,8 +26,9 @@ type RenderJob = {
 
 
 type GeneratedLine = {
-  content: string // as shown in table display not index
-  line_num: number
+  content: string
+  line_num: number // as shown in table display not index
+  default: boolean // true if preprocessor returned "" and the existing merman line was passed through
 }
 
 type ProcessorPrintout = {
