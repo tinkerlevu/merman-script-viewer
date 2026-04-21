@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import parse from 'html-react-parser';
 import ContentHeight from "./dynamicSize";
 
-
+import '../assets/processed_viewer.css'
 
 export default function PreprocessorViewer(
   { activeFile, refresher }: {
@@ -35,9 +35,11 @@ export default function PreprocessorViewer(
           </td>
         </tr>
       }
+      var type = line.line_num % 2 == 0 ? 'main-A' : 'main-B'
 
       tablerows.push(<>
         < tr
+          className={type}
           key={line.line_num}
         >
           <td>
@@ -70,7 +72,14 @@ export default function PreprocessorViewer(
     <div
       style={container_style}
     >
-      <table>
+      <table className="processed-table">
+        <colgroup>
+          <col className="small-column" />
+          <col className="big-column" />
+          <col className="small-column" />
+          <col className="big-column" />
+          <col className="big-column" />
+        </colgroup>
         <tr>
           <th colSpan={2}>
             Source
@@ -95,17 +104,19 @@ function GeneratedLinesTable(
   }): React.JSX.Element {
 
   const [rows, setRows] = useState<HTMLTableRowElement>()
+  var alternate = 1
 
   useEffect(() => {
     var tablerows: Array<any> = []
     for (const line of generated_lines) {
       tablerows.push(
         <tr
+          className={alternate++ % 2 == 0 ? 'even' : 'odd'}
           key={line.line_num}
         // TODO: mark row as line.default in css
         >
-          <td>
-            {line.line_num}
+          <td className={"generated-linenum "}>
+            &nbsp;{line.line_num}&nbsp;
           </td>
           <td>
             {line.content}
@@ -117,7 +128,14 @@ function GeneratedLinesTable(
   }, [generated_lines])
 
 
-  return <table>{rows}</table>
+  return <table className='sub-table' >
+    < colgroup >
+      <col className="sub-table-number" />
+      <col className="sub-table-text" />
+
+    </ colgroup>
+    {rows}
+  </table>
 }
 
 
@@ -131,9 +149,10 @@ function PrintoutTable(
 
   useEffect(() => {
     var tablerows: Array<any> = []
+    var alternate = 1
     for (const line of printout_lines) {
       tablerows.push(
-        <tr>
+        <tr className={alternate++ % 2 == 0 ? 'even' : 'odd'}>
           <td>
             {line.type == "html" ? parse(line.content) : line.content}
           </td>
@@ -145,6 +164,11 @@ function PrintoutTable(
   }, [printout_lines])
 
 
-  return <table>{rows}</table>
+  return <table className="sub-table">
+    <colgroup>
+      <col className="sub-table-text" />
+    </colgroup>
+    {rows}
+  </table>
 }
 

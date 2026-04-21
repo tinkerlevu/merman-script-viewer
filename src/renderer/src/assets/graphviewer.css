@@ -1,1 +1,55 @@
+.graph-controls {
+  justify-self: right;
+  margin-right: 60px;
+}
 
+.graph-controls button {
+  padding: 0px;
+  height: 32px;
+  width: 32px;
+  line-height: 0px;
+  transition: 0.15s;
+}
+
+.graph-controls .disabled {
+  background-color: gray;
+  color: black;
+  opacity: 0.6;
+}
+
+.graph-controls .empty {
+  background-color: black;
+  color: white;
+}
+
+.graph-controls .eraseable {
+  background-color: red;
+  color: white;
+  font-weight: 600;
+  border: 3px solid white; /* Width Style Color */
+}
+
+
+@keyframes s-ripple {
+    0% {
+        transform: scale(0.5);
+    }
+    20% {
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+}
+
+.graph-controls .activated {
+  border: 2px solid orange; /* Width Style Color */
+animation: s-ripple 250ms ease-out;
+}
+
+.graph-controls .exit-erase {
+  background-color: darkorange
+}
+/* red */
+/* yellow */

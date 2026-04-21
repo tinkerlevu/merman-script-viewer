@@ -1,0 +1,63 @@
+
+table, th, td {
+  /* border: 1px solid black; */
+  height: 100%
+}
+
+.processed-table {
+  width: fit-content;
+  border-collapse: collapse;
+  height: 1px;
+}
+
+
+
+.big-column {
+  min-width: 30vw;
+  font-size: 3px;
+}
+
+
+.small-column {
+  min-width: 3vw;
+}
+
+.sub-table  {
+  width: 100%;
+}
+
+.sub-table tr td{
+  height: 0%
+}
+
+.sub-table-number {
+  max-width: 1vw;
+  min-width: 2vw;
+  border-spacing: 5px;
+}
+
+.sub-table-text {
+  width: 100%;
+}
+
+.generated-linenum {
+  word-wrap: none
+}
+
+
+/* alternating table colors: */
+.main-A {
+  background: #ccffff
+}
+
+.main-A .even {
+  background: #e6ffff
+}
+
+.main-B {
+  background: #ff99cc
+}
+
+.main-B .even {
+  background: #ffe6f2
+}

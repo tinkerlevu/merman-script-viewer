@@ -1,8 +1,11 @@
 
-// TODO PUT ALL CSS ELEMENTS INTO A CENTRAL SPACING FILE WHERE VH is defined for everything !!
-
 import { useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMagnifyingGlassMinus, faMagnifyingGlassPlus, faExpand, faTrashArrowUp } from '@fortawesome/free-solid-svg-icons'
+
+
+import '../assets/graphviewer.css'
 
 
 // ------------- working setup :
@@ -217,21 +220,28 @@ export default function GraphViewer(
       >
         {/*image displayed here */}
       </div>
-      <div style={{
-        gridArea: "1/1",
-        height: "1%",
-        width: "1%",
-        // justifySelf: "right"
-      }}>
+      <div className="graph-controls"
+        style={{
+          gridArea: "1/1",
+          height: "1%",
+          width: "1%",
+          // justifySelf: "right"
+        }}>
         <button
           onClick={() => setZoomRatio(0.1)}
-        >+</button>
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+        </button>
         <button
           onClick={() => setZoomRatio(-0.1)}
-        >-</button>
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlassMinus} />
+        </button>
         <button
           onClick={() => setZoomRatio(null)} // reset
-        >=</button>
+        >
+          <FontAwesomeIcon icon={faExpand} />
+        </button>
 
         {
           /* NOTE: CHANGE THIS to like an array of letters or sth to bind keyboard keys */
@@ -250,8 +260,10 @@ export default function GraphViewer(
           )
         }
         <button
-          onClick={() => { setEraseable(prev => !prev) }}>
-          Clear
+          onClick={() => { setEraseable(prev => !prev) }}
+          className={eraseable ? 'exit-erase' : 'start-erase'}
+        >
+          <FontAwesomeIcon icon={faTrashArrowUp} />
         </button>
 
       </div>
@@ -285,6 +297,7 @@ function Bookmark({
   const cache_id = cache_prefix + hotkey
   const [storedPos, setStoredPos] = useState<GraphPos | null>(null)
   const [state, setState] = useState<BookmarkState>('empty')
+  const [triggered, setTriggered] = useState<boolean>(false)
 
 
   useEffect(() => {
@@ -321,16 +334,20 @@ function Bookmark({
       setStoredPos(current_pos)
       activeFile.bookmarks.set(cache_id, current_pos)
     }
-    else  // Jump to stored position
+    else   // activate Jump to stored position
       set_scroll(storedPos)
+
   }
 
 
   useEffect(() => { // use keyboard shortcuts here
     const keylistener = (event) => {
-      if (event.key == hotkey) trigger()
+      if (event.key != hotkey) return
+      trigger()
+      setTriggered(true)
     }
     window.addEventListener('keydown', keylistener);
+    window.addEventListener('keyup', () => setTriggered(false));
 
     return () => removeEventListener('keydown', keylistener) // cleanup function
   }, [storedPos, erase_mode])
@@ -339,11 +356,12 @@ function Bookmark({
   // TODO: use State to set css styling for button
   return <button
     onClick={trigger}
+    className={state + " " + (triggered ? 'activated' : '')}
   >
-    {hotkey}_
-    {cache_id}_
-    {storedPos?.scroll_x}:
-    {storedPos?.scroll_y}_
-    {state}
+    {hotkey}
+    {/* _{cache_id}_ */}
+    {/* {storedPos?.scroll_x}: */}
+    {/* {storedPos?.scroll_y}_ */}
+    {/* {state} */}
   </button>
 }
