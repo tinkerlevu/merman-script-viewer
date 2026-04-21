@@ -201,6 +201,7 @@ function ScriptManager(
 
           <span className="right preprocessor-file-controls">
             <button
+              className="preprocessor-button"
               onClick={() => {
                 setFileOrder(prev => {
                   var prev = structuredClone(prev)
@@ -215,6 +216,7 @@ function ScriptManager(
               <FontAwesomeIcon icon={faAngleUp} />
             </button>
             <button
+              className="preprocessor-button"
               onClick={() => {
                 setFileOrder(prev => {
                   var prev = structuredClone(prev)
@@ -229,7 +231,7 @@ function ScriptManager(
               <FontAwesomeIcon icon={faAngleDown} />
             </button>
             <button
-              className="close"
+              className="preprocessor-close preprocessor-button"
               onClick={() => DeleteFile(path)}
             >
               <FontAwesomeIcon icon={faXmark} />

@@ -1,24 +1,35 @@
-.preprocessor-file-controls button {
+.preprocessor-button {
   padding: 1px;
   opacity: 0.8;
   margin: 0px 2px ;
   vertical-align: middle;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  background: #008CBA;
+  border-radius: 4px;
+  transition: 0.3s
 }
 
-.preprocessor-file-controls button:disabled {
+.preprocessor-button:disabled {
   opacity: 0.3;
   background: grey;
 }
 
 
 
-.preprocessor-file-controls .close {
+.preprocessor-close {
   background: red;
   opacity: 0.7;
 }
 
 
 
+/* checkbox stuff: */
 
 
 .control {
