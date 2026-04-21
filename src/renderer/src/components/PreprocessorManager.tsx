@@ -2,8 +2,11 @@ import { RefObject, useEffect, useRef, useState } from "react";
 import CodeEditor from "./CodeEditor";
 import { FixedBar, SplitBottom, SplitLayout, SplitMain, SplitTop } from "./SplitViewLayout";
 import ConsoleOutput from "./Console";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleUp, faAngleDown, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 
+import '../assets/preprocessor_manager.css'
 
 export default function PreprocessorManager(
   { activeFile, ref = useRef({}) }: {
@@ -57,9 +60,13 @@ export default function PreprocessorManager(
 
   return <SplitLayout splitRatio={0.45}>
     <FixedBar>
-      <button onClick={openProcessorScript}>Open</button>
+      <button
+        onClick={openProcessorScript}>
+        Open
+      </button>
       <button >Dry Run</button>
       <button
+        className="right"
         onClick={() => setCurrentFile('')}
       >
         Show Result</button>
@@ -77,6 +84,7 @@ export default function PreprocessorManager(
           })
         }}
         applyActive={path => setCurrentFile(path)}
+        selected={currentFile}
       />
     </SplitTop>
 
@@ -109,12 +117,14 @@ export default function PreprocessorManager(
 
 
 // managers the file tabs, file order, user input for deleting files and marking which files are active
-function ScriptManager({ scripts, onDelete, applyActive, ref }: {
-  scripts: Map<FileID, string>
-  onDelete: (path: string) => void
-  applyActive: (path: string) => void
-  ref: RefObject<any>
-}): React.JSX.Element {
+function ScriptManager(
+  { scripts, onDelete, applyActive, ref, selected }: {
+    scripts: Map<FileID, string>
+    onDelete: (path: string) => void
+    applyActive: (path: string) => void
+    ref: RefObject<any>
+    selected: string
+  }): React.JSX.Element {
 
   const [fileOrder, setFileOrder] = useState<Array<string>>([])
   const [displayItems, setDisplayItems] = useState<Array<any>>([])
@@ -161,63 +171,78 @@ function ScriptManager({ scripts, onDelete, applyActive, ref }: {
         <li
           key={path}
           onClick={() => applyActive(path)}
+          className={
+            (selected == path ? "selected " : " ") +
+            (activeScripts.has(path) ? "active" : 'unactive')}
         >
-          <input
-            type="checkbox"
-            defaultChecked={activeScripts.has(path)}
-            onChange={
-              e => {
-                if (e.currentTarget.checked)
-                  setActiveScripts(prev => structuredClone(prev.add(path)))
-                else
-                  setActiveScripts(prev => {
-                    prev.delete(path); return structuredClone(prev)
-                  })
-                setFileOrder(structuredClone(fileOrder))
-              }}
-          />
+          <label className="control control-checkbox left">
+            <input
+              type="checkbox"
+              defaultChecked={activeScripts.has(path)}
+              onChange={
+                e => {
+                  if (e.currentTarget.checked)
+                    setActiveScripts(
+                      prev => structuredClone(prev.add(path)))
+                  else
+                    setActiveScripts(prev => {
+                      prev.delete(path); return structuredClone(prev)
+                    })
+                  setFileOrder(structuredClone(fileOrder))
+                }}
+            />
+            <div className="control_indicator"></div>
+          </label>
+
           {/* filename only: */}
-          {path.replace(/^.*[\\\/]/, '')}
-          <button
-            onClick={() => {
-              setFileOrder(prev => {
-                var prev = structuredClone(prev)
-                var above = prev[i - 1]
-                prev[i - 1] = prev[i]
-                prev[i] = above
-                return [...prev]
-              })
-            }}
-            disabled={i == 0}
-          >
-            🔼
-          </button>
-          <button
-            onClick={() => {
-              setFileOrder(prev => {
-                var prev = structuredClone(prev)
-                var below = prev[i + 1]
-                prev[i + 1] = prev[i]
-                prev[i] = below
-                return [...prev]
-              })
-            }}
-            disabled={i >= fileOrder.length - 1}
-          >
-            🔽
-          </button>
-          <button
-            onClick={() => DeleteFile(path)}
-          >
-            X
-          </button>
+          <span className="title">
+            {path.replace(/^.*[\\\/]/, '')}
+          </span>
+
+          <span className="right preprocessor-file-controls">
+            <button
+              onClick={() => {
+                setFileOrder(prev => {
+                  var prev = structuredClone(prev)
+                  var above = prev[i - 1]
+                  prev[i - 1] = prev[i]
+                  prev[i] = above
+                  return [...prev]
+                })
+              }}
+              disabled={i == 0}
+            >
+              <FontAwesomeIcon icon={faAngleUp} />
+            </button>
+            <button
+              onClick={() => {
+                setFileOrder(prev => {
+                  var prev = structuredClone(prev)
+                  var below = prev[i + 1]
+                  prev[i + 1] = prev[i]
+                  prev[i] = below
+                  return [...prev]
+                })
+              }}
+              disabled={i >= fileOrder.length - 1}
+            >
+              <FontAwesomeIcon icon={faAngleDown} />
+            </button>
+            <button
+              className="close"
+              onClick={() => DeleteFile(path)}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+
+            </button>
+          </span>
         </li>
       )
     }
 
     setDisplayItems(list)
 
-  }, [fileOrder])
+  }, [fileOrder, selected, activeScripts])
 
   return <><ul>{displayItems}</ul></>
 }

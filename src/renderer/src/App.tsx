@@ -15,6 +15,8 @@ import { useEffect, useRef, useState } from 'react';
 import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFile, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 // for file tabs
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
@@ -38,7 +40,6 @@ import GraphViewer from './components/GraphViewer';
 import './assets/base.css'
 import './assets/react-tabs.css'
 import './assets/buttons.css'
-import './assets/lists.css'
 
 
 function App(): React.JSX.Element {
@@ -446,7 +447,8 @@ function App(): React.JSX.Element {
                 onClick={() => {
                   file_open_action()
                 }}>
-                +
+                <FontAwesomeIcon icon={faFile} />
+                <FontAwesomeIcon icon={faPlus} />
               </button>
             }
           />
@@ -532,6 +534,7 @@ function App(): React.JSX.Element {
                     style={{ height: "2vh" }}
                   />
                 </span>
+                {/* <FontAwesomeIcon icon={faEnvelope} /> */}
               </Tab>
               {/* <button onClick={() => console.log(openFiles)}>test</button> */}
             </TabList>
@@ -596,6 +599,7 @@ function App(): React.JSX.Element {
           </TabPanel>
         </Tabs >
       </div >
+
     </>
   )
 }

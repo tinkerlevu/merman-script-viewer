@@ -1,0 +1,124 @@
+
+/* --- topic / file selector --- */
+
+.splitview ul {
+  list-style-type: none;
+  padding: 0;
+  border: none; /* 1px solid #ddd; */
+  margin: 2px 5px;
+}
+
+.splitview ul li {
+  padding: 4px 8px;
+  border-bottom: none;/*1px solid #ddd;*/
+  display: flex;
+  align-items: center;
+}
+
+.splitview ul li:last-child {
+  border-bottom: none;
+}
+
+.splitview ul li .left {
+  margin-right: auto
+}
+
+.splitview ul li .right {
+  margin-left: auto
+}
+
+.splitview ul li .title {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  word-spacing: 5px;
+}
+
+
+.splitview ul li:hover, ul .selected {
+  background-color: white;
+  color: black;
+  transition: 0.3s;
+}
+
+.splitview ul .active .title { /* not showing in text display but checkbox ticked*/
+  font-weight: 800;
+}
+
+.splitview ul .unactive .title { /* not showing in text display but checkbox ticked*/
+  font-weight: 300;
+}
+
+
+/* ---  END of topic / file selector --- */
+
+
+
+
+.splitview .sidebar .bottom {
+  padding: 8px;
+}
+
+.splitview .sidebar .topbar {
+  display: flex;
+  justify-content: space-evenly;
+  margin-right: 3%
+}
+
+.splitview .sidebar .topbar .right {
+  margin-left: auto;
+}
+
+
+
+
+
+
+/**/
+/* ul li .insert { */
+/*   position: relative; */
+/*   display: inline-block; */
+/*   width: 30px; */
+/*   height: 17px; */
+/*   margin: 5px; */
+/* } */
+/**/
+/**/
+
+/* ul li .triangle { */
+/*     width: 0; */
+/*     height: 0; */
+/*     border-width: 5px 0 5px 15px; */
+/*     border-color: transparent transparent transparent #008cba; */
+/*     border-style: solid; */
+/*     display: inline-block; */
+/*     margin-right: 3px; */
+/* } */
+/**/
+/* /* HTML: <div class="chevron"></div> */
+/* .chevron { */
+/*   --s: 40%; /* control the shape (can be percentage) */
+/**/
+/*   height: 15px; */
+/*   aspect-ratio: 5/5; */
+/*   clip-path: polygon(0 0,var(--s) 0,100% 50%,var(--s) 100%,0 100%,calc(100% - var(--s)) 50%); */
+/*   background: #008cba; */
+/*   margin-right: 3px */
+/* } */
+/**/
+
+/* HTML: <div class="folded-rectangle"></div> */
+/* .folded-rectangle { */
+/*   --r: 15px; /* radius */ */
+/**/
+/*   width: 15px; */
+/*   aspect-ratio: 1.5; */
+/*   background: #008cba; */
+/*   border-radius: var(--r) 0/calc(2*var(--r)) 0; */
+/*   padding-block: var(--r); */
+/*   --_m:#0000 100%,#000 calc(100% + 1px); */
+/*   mask: */
+/*     conic-gradient(#000 0 0) content-box, */
+/*     radial-gradient(var(--r) at 100% 100%,var(--_m)) 0 100% no-repeat, */
+/*     radial-gradient(var(--r) at 0    0   ,var(--_m)) 100% 0 no-repeat; */
+/*   mask-size: var(--r) var(--r); */
+/* } */

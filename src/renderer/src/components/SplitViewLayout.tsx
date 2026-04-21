@@ -1,6 +1,9 @@
 import { RefObject, useEffect, useRef, useState } from "react"
 import ContentHeight from "./dynamicSize"
-import { Element } from "mermaid/dist/diagrams/requirement/types.js"
+
+
+import '../assets/splitview.css'
+
 
 export function SplitLayout(
   { mainContainerRef = useRef<HTMLDivElement | null>(null),
@@ -48,16 +51,21 @@ export function SplitLayout(
   return (<>
 
 
-    <div style={{
-      height: ContentHeight()
-    }}>
+    <div
+      className="splitview"
+      style={{
+        height: ContentHeight()
+      }}
+    >
 
-      <div style={{
-        width: splitRatio * 100 + '%',
-        display: 'inline-block',
-        height: "100%"
-      }}>
-        <div ref={barRef}>
+      <div
+        className="sidebar"
+        style={{
+          width: splitRatio * 100 + '%',
+          display: 'inline-block',
+          height: "100%"
+        }}>
+        <div className="topbar" ref={barRef}>
           {Bar} {/*<----------------------------- */}
         </div>
         <div style={{
@@ -71,6 +79,7 @@ export function SplitLayout(
           <hr />
         </div>
         <div
+          className="bottom"
           style={{
             display: 'block',
             overflowY: 'scroll',

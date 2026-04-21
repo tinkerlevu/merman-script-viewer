@@ -15,10 +15,6 @@ button {
 
 
 
-
-
-
-
 /* checkbox slider */
 .switch {
   position: relative;
@@ -61,7 +57,7 @@ button {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #009CcA; /* TODO: set color override here */
 }
 
 input:focus + .slider {

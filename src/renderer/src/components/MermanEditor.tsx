@@ -66,10 +66,15 @@ export default function MermanEditor(
 
   const [initText, setInitText] = useState<string>("")
 
-  const REFRESH = () => setInitText(
-    ActiveFile.unsaved_text != "" ?
+  const REFRESH = () => {
+    var change = ActiveFile.unsaved_text != "" ?
       ActiveFile.unsaved_text : ActiveFile.text
-  )
+
+    if (change == editorRef.current?.value) // cancel if no changes e.g. file reload etc.
+      setSavedIcon(true)
+    else
+      setInitText(change)
+  }
 
   ref.current.reset = () => REFRESH() // refresh when autoreloading
   useEffect(() => REFRESH(), [ActiveFile]) // refresh when changing file tabs
@@ -107,16 +112,18 @@ export default function MermanEditor(
           onClick={saveAsFile}>
           Save As
         </button>
-        <label class="switch">
-          <input type="checkbox"
-            onChange={toggleAutoRender}
-            ref={autoRenderRef}
-          />
-          <span class="slider"></span>
-        </label>
-        Auto-Render
-        {/*<button onClick={() => consoleRef.current.scrollTop = 100}>test</button>
+        <div className="right spaced" >
+          <label class="switch">
+            <input type="checkbox"
+              onChange={toggleAutoRender}
+              ref={autoRenderRef}
+            />
+            <span class="slider"></span>
+          </label>
+          Auto-Render
+          {/*<button onClick={() => consoleRef.current.scrollTop = 100}>test</button>
         {/* <button >Verify</button>  {/* run code without rendering or preprocessor */}
+        </div>
       </FixedBar>
       <SplitTop>
         <ReferenceTopics
@@ -145,13 +152,13 @@ export default function MermanEditor(
       </SplitBottom>
 
       <SplitMain>
+        {/*TODO: individual Code editor instances for each active file that are hidden (but still loaded) on other tabs and only the appropriate one is shown for */}
         <CodeEditor
           type="merman"
           value={initText}
           ref={editorRef}
           onUpdate={textUpdated}
         />
-
       </SplitMain>
 
 

@@ -13,19 +13,31 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +106 src/main/index.ts
-badd +41 src/main/env.d.ts
-badd +5 src/renderer/src/env.d.ts
-badd +250 src/renderer/src/App.tsx
+badd +54 src/main/index.ts
+badd +23 src/main/env.d.ts
+badd +12 src/renderer/src/env.d.ts
+badd +599 src/renderer/src/App.tsx
 badd +26 src/main/python-merman/merman2.py
-badd +287 src/main/runMerman.ts
+badd +118 src/main/runMerman.ts
 badd +7 src/main/fileManagement.ts
-badd +11 ~/Development/processor\ 5\ test.js
-badd +189 src/renderer/src/components/PreprocessorManager.tsx
-badd +29 ~/Development/Merman\ Script\ Viewer/coding.session
+badd +18 ~/Development/processor\ 5\ test.js
+badd +66 src/renderer/src/components/PreprocessorManager.tsx
+badd +29 coding.session
+badd +1 src/renderer/src/components/PreprocessorViewer.tsx
+badd +7 src/renderer/src/components/GraphViewer.tsx
+badd +12 src/renderer/src/components/TabIcon.tsx
+badd +8 src/renderer/src/components/MermanEditor.tsx
+badd +47 src/renderer/src/assets/react-tabs.css
+badd +50 src/renderer/src/assets/base.css
+badd +71 src/renderer/src/components/SplitViewLayout.tsx
+badd +56 src/renderer/src/assets/buttons.css
+badd +1 src/renderer/src/assets/lists.css
+badd +1 src/renderer/src/components/ReferenceInfo.tsx
+badd +1 ~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/graphviewer.css
+badd +30 ~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/splitview.css
 argglobal
 %argdel
-edit src/main/runMerman.ts
+edit src/renderer/src/App.tsx
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -56,19 +68,19 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 33 + 33) / 66)
-exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
-exe '2resize ' . ((&lines * 30 + 33) / 66)
-exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe 'vert 3resize ' . ((&columns * 83 + 120) / 240)
+exe '1resize ' . ((&lines * 32 + 33) / 66)
+exe 'vert 1resize ' . ((&columns * 79 + 120) / 240)
+exe '2resize ' . ((&lines * 31 + 33) / 66)
+exe 'vert 2resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 80 + 120) / 240)
 exe '4resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 4resize ' . ((&columns * 75 + 120) / 240)
-exe '5resize ' . ((&lines * 22 + 33) / 66)
-exe 'vert 5resize ' . ((&columns * 75 + 120) / 240)
-exe '6resize ' . ((&lines * 19 + 33) / 66)
-exe 'vert 6resize ' . ((&columns * 75 + 120) / 240)
+exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
+exe '5resize ' . ((&lines * 21 + 33) / 66)
+exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
+exe '6resize ' . ((&lines * 20 + 33) / 66)
+exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
 argglobal
-balt src/main/fileManagement.ts
+balt src/main/python-merman/merman2.py
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -77,54 +89,526 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 196 - ((13 * winheight(0) + 16) / 33)
+43
+sil! normal! zo
+44
+sil! normal! zo
+46
+sil! normal! zo
+47
+sil! normal! zo
+47
+sil! normal! zo
+54
+sil! normal! zo
+55
+sil! normal! zo
+55
+sil! normal! zo
+62
+sil! normal! zo
+63
+sil! normal! zo
+63
+sil! normal! zo
+71
+sil! normal! zo
+72
+sil! normal! zo
+72
+sil! normal! zo
+78
+sil! normal! zo
+79
+sil! normal! zo
+90
+sil! normal! zo
+100
+sil! normal! zo
+113
+sil! normal! zo
+118
+sil! normal! zo
+122
+sil! normal! zo
+123
+sil! normal! zo
+124
+sil! normal! zo
+129
+sil! normal! zo
+130
+sil! normal! zo
+130
+sil! normal! zo
+139
+sil! normal! zo
+140
+sil! normal! zo
+141
+sil! normal! zo
+141
+sil! normal! zo
+148
+sil! normal! zo
+148
+sil! normal! zo
+148
+sil! normal! zo
+151
+sil! normal! zo
+152
+sil! normal! zo
+152
+sil! normal! zo
+162
+sil! normal! zo
+162
+sil! normal! zo
+163
+sil! normal! zo
+163
+sil! normal! zo
+163
+sil! normal! zo
+166
+sil! normal! zo
+179
+sil! normal! zo
+180
+sil! normal! zo
+180
+sil! normal! zo
+180
+sil! normal! zo
+188
+sil! normal! zo
+189
+sil! normal! zo
+193
+sil! normal! zo
+200
+sil! normal! zo
+212
+sil! normal! zo
+217
+sil! normal! zo
+218
+sil! normal! zo
+222
+sil! normal! zo
+223
+sil! normal! zo
+223
+sil! normal! zo
+227
+sil! normal! zo
+227
+sil! normal! zo
+227
+sil! normal! zo
+230
+sil! normal! zo
+231
+sil! normal! zo
+234
+sil! normal! zo
+238
+sil! normal! zo
+239
+sil! normal! zo
+240
+sil! normal! zo
+240
+sil! normal! zo
+240
+sil! normal! zo
+241
+sil! normal! zo
+253
+sil! normal! zo
+254
+sil! normal! zo
+254
+sil! normal! zo
+254
+sil! normal! zo
+254
+sil! normal! zo
+266
+sil! normal! zo
+266
+sil! normal! zo
+269
+sil! normal! zo
+273
+sil! normal! zo
+274
+sil! normal! zo
+277
+sil! normal! zo
+278
+sil! normal! zo
+285
+sil! normal! zo
+286
+sil! normal! zo
+287
+sil! normal! zo
+287
+sil! normal! zo
+287
+sil! normal! zo
+288
+sil! normal! zo
+298
+sil! normal! zo
+298
+sil! normal! zo
+299
+sil! normal! zo
+299
+sil! normal! zo
+299
+sil! normal! zo
+300
+sil! normal! zo
+309
+sil! normal! zo
+310
+sil! normal! zo
+323
+sil! normal! zo
+324
+sil! normal! zo
+324
+sil! normal! zo
+324
+sil! normal! zo
+325
+sil! normal! zo
+335
+sil! normal! zo
+336
+sil! normal! zo
+336
+sil! normal! zo
+336
+sil! normal! zo
+341
+sil! normal! zo
+344
+sil! normal! zo
+348
+sil! normal! zo
+351
+sil! normal! zo
+352
+sil! normal! zo
+352
+sil! normal! zo
+363
+sil! normal! zo
+366
+sil! normal! zo
+368
+sil! normal! zo
+378
+sil! normal! zo
+379
+sil! normal! zo
+379
+sil! normal! zo
+399
+sil! normal! zo
+400
+sil! normal! zo
+400
+sil! normal! zo
+401
+sil! normal! zo
+405
+sil! normal! zo
+406
+sil! normal! zo
+407
+sil! normal! zo
+416
+sil! normal! zo
+417
+sil! normal! zo
+418
+sil! normal! zo
+418
+sil! normal! zo
+424
+sil! normal! zo
+432
+sil! normal! zo
+433
+sil! normal! zo
+433
+sil! normal! zo
+434
+sil! normal! zo
+434
+sil! normal! zo
+435
+sil! normal! zo
+435
+sil! normal! zo
+436
+sil! normal! zo
+437
+sil! normal! zo
+437
+sil! normal! zo
+443
+sil! normal! zo
+443
+sil! normal! zo
+444
+sil! normal! zo
+444
+sil! normal! zo
+445
+sil! normal! zo
+454
+sil! normal! zo
+455
+sil! normal! zo
+455
+sil! normal! zo
+456
+sil! normal! zo
+456
+sil! normal! zo
+457
+sil! normal! zo
+458
+sil! normal! zo
+459
+sil! normal! zo
+464
+sil! normal! zo
+465
+sil! normal! zo
+466
+sil! normal! zo
+472
+sil! normal! zo
+473
+sil! normal! zo
+474
+sil! normal! zo
+480
+sil! normal! zo
+481
+sil! normal! zo
+482
+sil! normal! zo
+488
+sil! normal! zo
+489
+sil! normal! zo
+490
+sil! normal! zo
+496
+sil! normal! zo
+497
+sil! normal! zo
+498
+sil! normal! zo
+504
+sil! normal! zo
+505
+sil! normal! zo
+506
+sil! normal! zo
+512
+sil! normal! zo
+515
+sil! normal! zo
+516
+sil! normal! zo
+517
+sil! normal! zo
+522
+sil! normal! zo
+523
+sil! normal! zo
+524
+sil! normal! zo
+525
+sil! normal! zo
+525
+sil! normal! zo
+525
+sil! normal! zo
+525
+sil! normal! zo
+528
+sil! normal! zo
+529
+sil! normal! zo
+529
+sil! normal! zo
+541
+sil! normal! zo
+542
+sil! normal! zo
+543
+sil! normal! zo
+543
+sil! normal! zo
+545
+sil! normal! zo
+549
+sil! normal! zo
+550
+sil! normal! zo
+551
+sil! normal! zo
+556
+sil! normal! zo
+557
+sil! normal! zo
+558
+sil! normal! zo
+563
+sil! normal! zo
+564
+sil! normal! zo
+565
+sil! normal! zo
+570
+sil! normal! zo
+571
+sil! normal! zo
+572
+sil! normal! zo
+577
+sil! normal! zo
+578
+sil! normal! zo
+579
+sil! normal! zo
+584
+sil! normal! zo
+585
+sil! normal! zo
+590
+sil! normal! zo
+591
+sil! normal! zo
+let s:l = 599 - ((24 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 196
+keepjumps 599
+normal! 015|
+wincmd w
+argglobal
+if bufexists(fnamemodify("src/renderer/src/components/PreprocessorManager.tsx", ":p")) | buffer src/renderer/src/components/PreprocessorManager.tsx | else | edit src/renderer/src/components/PreprocessorManager.tsx | endif
+if &buftype ==# 'terminal'
+  silent file src/renderer/src/components/PreprocessorManager.tsx
+endif
+balt src/renderer/src/components/MermanEditor.tsx
+setlocal foldmethod=expr
+setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=99
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+8
+sil! normal! zo
+58
+sil! normal! zo
+59
+sil! normal! zo
+72
+sil! normal! zo
+75
+sil! normal! zo
+77
+sil! normal! zo
+78
+sil! normal! zo
+117
+sil! normal! zo
+131
+sil! normal! zo
+131
+sil! normal! zo
+136
+sil! normal! zo
+151
+sil! normal! zo
+151
+sil! normal! zo
+163
+sil! normal! zo
+163
+sil! normal! zo
+166
+sil! normal! zo
+167
+sil! normal! zo
+168
+sil! normal! zo
+176
+sil! normal! zo
+180
+sil! normal! zo
+184
+sil! normal! zo
+196
+sil! normal! zo
+197
+sil! normal! zo
+198
+sil! normal! zo
+198
+sil! normal! zo
+199
+sil! normal! zo
+211
+sil! normal! zo
+212
+sil! normal! zo
+212
+sil! normal! zo
+213
+sil! normal! zo
+let s:l = 23 - ((22 * winheight(0) + 15) / 31)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 23
 normal! 09|
 wincmd w
 argglobal
-if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
+if bufexists(fnamemodify("~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/splitview.css", ":p")) | buffer ~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/splitview.css | else | edit ~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/splitview.css | endif
 if &buftype ==# 'terminal'
-  silent file src/main/runMerman.ts
+  silent file ~/Development/Merman\ Script\ Viewer/src/renderer/src/assets/splitview.css
 endif
-balt src/main/fileManagement.ts
+balt src/renderer/src/assets/lists.css
 setlocal foldmethod=expr
-setlocal foldexpr=v:lua.vim.lsp.foldexpr()
+setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
 setlocal foldignore=#
 setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 367 - ((13 * winheight(0) + 15) / 30)
+let s:l = 30 - ((29 * winheight(0) + 32) / 64)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 367
-normal! 060|
-wincmd w
-argglobal
-if bufexists(fnamemodify("src/main/python-merman/merman2.py", ":p")) | buffer src/main/python-merman/merman2.py | else | edit src/main/python-merman/merman2.py | endif
-if &buftype ==# 'terminal'
-  silent file src/main/python-merman/merman2.py
-endif
-balt src/main/runMerman.ts
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.vim.lsp.foldexpr()
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=99
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-let s:l = 26 - ((25 * winheight(0) + 32) / 64)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 26
-normal! 0
+keepjumps 30
+normal! 025|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/main/env.d.ts", ":p")) | buffer src/main/env.d.ts | else | edit src/main/env.d.ts | endif
@@ -140,12 +624,12 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 41 - ((17 * winheight(0) + 10) / 21)
+let s:l = 43 - ((13 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 41
-normal! 058|
+keepjumps 43
+normal! 034|
 wincmd w
 argglobal
 if bufexists(fnamemodify("src/renderer/src/env.d.ts", ":p")) | buffer src/renderer/src/env.d.ts | else | edit src/renderer/src/env.d.ts | endif
@@ -161,19 +645,19 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 20 - ((16 * winheight(0) + 11) / 22)
+let s:l = 86 - ((5 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 20
-normal! 015|
+keepjumps 86
+normal! 0
 wincmd w
 argglobal
-if bufexists(fnamemodify("src/main/runMerman.ts", ":p")) | buffer src/main/runMerman.ts | else | edit src/main/runMerman.ts | endif
+if bufexists(fnamemodify("~/Development/processor\ 5\ test.js", ":p")) | buffer ~/Development/processor\ 5\ test.js | else | edit ~/Development/processor\ 5\ test.js | endif
 if &buftype ==# 'terminal'
-  silent file src/main/runMerman.ts
+  silent file ~/Development/processor\ 5\ test.js
 endif
-balt src/renderer/src/App.tsx
+balt src/renderer/src/components/PreprocessorManager.tsx
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.vim.lsp.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -182,25 +666,25 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 18 - ((12 * winheight(0) + 9) / 19)
+let s:l = 18 - ((10 * winheight(0) + 10) / 20)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 18
-normal! 023|
+normal! 0
 wincmd w
 3wincmd w
-exe '1resize ' . ((&lines * 33 + 33) / 66)
-exe 'vert 1resize ' . ((&columns * 80 + 120) / 240)
-exe '2resize ' . ((&lines * 30 + 33) / 66)
-exe 'vert 2resize ' . ((&columns * 80 + 120) / 240)
-exe 'vert 3resize ' . ((&columns * 83 + 120) / 240)
+exe '1resize ' . ((&lines * 32 + 33) / 66)
+exe 'vert 1resize ' . ((&columns * 79 + 120) / 240)
+exe '2resize ' . ((&lines * 31 + 33) / 66)
+exe 'vert 2resize ' . ((&columns * 79 + 120) / 240)
+exe 'vert 3resize ' . ((&columns * 80 + 120) / 240)
 exe '4resize ' . ((&lines * 21 + 33) / 66)
-exe 'vert 4resize ' . ((&columns * 75 + 120) / 240)
-exe '5resize ' . ((&lines * 22 + 33) / 66)
-exe 'vert 5resize ' . ((&columns * 75 + 120) / 240)
-exe '6resize ' . ((&lines * 19 + 33) / 66)
-exe 'vert 6resize ' . ((&columns * 75 + 120) / 240)
+exe 'vert 4resize ' . ((&columns * 79 + 120) / 240)
+exe '5resize ' . ((&lines * 21 + 33) / 66)
+exe 'vert 5resize ' . ((&columns * 79 + 120) / 240)
+exe '6resize ' . ((&lines * 20 + 33) / 66)
+exe 'vert 6resize ' . ((&columns * 79 + 120) / 240)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

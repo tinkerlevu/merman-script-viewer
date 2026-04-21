@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import ContentHeight from "./dynamicSize"
 
+
 // ------------- working setup :
 // <div style={{ position: "relative", height: '100vh'}}>
 // const container_style = { position: 'absolute', top: 0, bottom:0, overflow: "scroll", }
@@ -179,9 +180,9 @@ export default function GraphViewer(
         event.preventDefault();
 
         if (event.deltaY < -1)
-          setZoomRatio(0.1)
+          setZoomRatio(event.shiftKey ? 0.5 : 0.1)
         else
-          setZoomRatio(-0.1)
+          setZoomRatio(event.shiftKey ? -0.5 : -0.1)
 
       }
     }, { passive: false }); // 'passive: false' is required to call preventDefault()

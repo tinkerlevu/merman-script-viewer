@@ -46,6 +46,12 @@ ul {
 }
 */
 
+body { /* global animation speed */
+  transition: 0.3s;
+}
+
+
+
 body {
   min-height: 100vh;
   color: var(--color-text);
@@ -74,6 +80,3 @@ hr {
   background-color: dark-blue;
   border-color: var(--color-background);
 }
-
-
-

@@ -38,15 +38,17 @@ export function ReferenceTopics(
         onMouseEnter={() => setInfoAbout(i.title)}
         onMouseLeave={() => setInfoAbout(selected)}
         onMouseDown={() => setSelected(i.title)}
-      // TODO: hover in css Style
-      // TODO add class SelectedRefInfo as selected=i.title
+        // TODO: hover in css Style
+        // TODO add class SelectedRefInfo as selected=i.title
+        className={selected == i.title ? 'selected' : ''}
       >
-        <span className="refinfo_title">{i.title}</span>
+        <span className="left" />
+        <span className='title'>{i.title}</span>
         <button
           onClick={() => apply_example(i.example)}
-        >
-          {">"}
-        </button>
+          className="right"
+        />
+
       </li>)
     }
   </ul>
