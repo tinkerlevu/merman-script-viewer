@@ -213,7 +213,7 @@ export default function GraphViewer(
   }, [])
 
   return (<>
-    <div style={{ display: 'grid' }}>
+    <div style={{ display: 'grid' }} className="mermaid">
       <div
         style={container_style}
         ref={divRef}
@@ -233,7 +233,6 @@ export default function GraphViewer(
           onClick={() => setZoomRatio(0.1)}
         >
           <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
-          {outdated ? "yes" : "no"}
         </button>
         <button
           onClick={() => setZoomRatio(-0.1)}

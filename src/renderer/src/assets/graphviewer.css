@@ -1,5 +1,17 @@
 /*outdated*/
 
+
+/* Style all flowchart arrow lines */
+.mermaid .flowchart-link {
+    stroke: green !important;
+    stroke-width: 2px;
+}
+/* Style all arrowheads */
+.mermaid .marker {
+    fill: green !important;
+    stroke: green !important;
+}
+
 .graph-outdated {
   filter: blur(2px) saturate(50%);
   opacity: 0.5s;
