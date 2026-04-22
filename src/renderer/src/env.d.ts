@@ -60,6 +60,7 @@ type OpenFile = {
     todo: DocPos,
     remember: DocPos,
     merman: DocPos,
+    processed: DocPos,
   },
   bookmarks: Map<GraphPos>, // !! not able to be converted to JSON
   console_buffer: Set<string> // console display in bottom left

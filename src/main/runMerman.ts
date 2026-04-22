@@ -87,7 +87,7 @@ export default async function full_render(
 
   console_log(filepath, "> Finished")
 
-  // convert the generated merman script to array of strings
+  // convert the generated  merman script to array of strings
   var merman_script: Array<string> = []
 
   for (const processed_line of generated)
@@ -110,7 +110,9 @@ export default async function full_render(
 
   console_log(filepath, "- Translation successful")
 
-  const hash = createHash('md5').update(mermaid.script.join('')).digest('base64url')
+  const hash = createHash('md5')
+    .update(mermaid.script.join('') + merman_text)
+    .digest('base64url')
   send_hash(filepath, hash)
 
   handleFinishedRender(null, { // send generated lines with actual hash

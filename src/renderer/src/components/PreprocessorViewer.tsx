@@ -1,5 +1,5 @@
 import { GeneratedLine, OpenFile, ProcessedLine, ProcessorPrintout } from "@renderer/env";
-import { useEffect, useState } from "react";
+import { act, useEffect, useRef, useState } from "react";
 import parse from 'html-react-parser';
 import ContentHeight from "./dynamicSize";
 import { highlightText } from "prism-react-editor/prism";
@@ -10,6 +10,15 @@ import { highlightText } from "prism-react-editor/prism";
 
 import '../assets/processed_viewer.css'
 import { MermanLanguage } from "./CodeEditor";
+
+const cache = new Map()
+
+const manage_cache = () => {
+  if (cache.size > 30)
+    Array.from(cache.keys())
+      .slice(0, 10)
+      .forEach(hash => cache.delete(hash))
+}
 
 export default function PreprocessorViewer(
   { activeFile, refresher }: {
@@ -23,11 +32,28 @@ export default function PreprocessorViewer(
     width: "100%"
   }
 
+
+
   const [processedRows, setProcessedRows] =
     useState<HTMLTableRowElement>([])
 
+
   useEffect(() => {
     var tablerows: Array<any> = []
+
+    if (activeFile.preprocessed.hash != 'pending') {
+      tablerows = cache.get(activeFile.preprocessed.hash)
+
+      if (tablerows) {
+        setProcessedRows(tablerows)
+        console.log("CACHE", activeFile.preprocessed.hash, tablerows)
+        return
+      }
+      tablerows = []
+    }
+    console.log("RUNNNNNNNING")
+
+
     for (const line of activeFile.preprocessed.lines) {
 
       var error: any = null
@@ -72,14 +98,40 @@ export default function PreprocessorViewer(
       </>
       )
     }
+    cache.set(activeFile.preprocessed.hash, tablerows)
+    manage_cache()
     setProcessedRows(tablerows)
-  }, [activeFile, activeFile.preprocessed.lines])
+    console.log("CURRENT CACHE", cache)
+  }, [activeFile, activeFile.preprocessed.lines, cache])
+
+
+  // Scrolling
+  const divRef = useRef(null)
+
+  useEffect(() => {
+    if (!divRef.current) return
+    console.log('restoring', activeFile.scroll_pos.processed.scroll)
+    divRef.current.scrollTop =
+      activeFile.scroll_pos.processed.scroll
+
+  }, [divRef.current, activeFile, processedRows])
+
+
+  const handleScroll = (_) => {
+    if (!divRef.current) return
+    activeFile.scroll_pos.processed.scroll = divRef.current?.scrollTop
+  }
+
+
+  //  END of Scrolling
 
 
 
   return <>
     <div
       style={container_style}
+      ref={divRef}
+      onScroll={handleScroll}
     >
       <table className="processed-table">
         <colgroup>
@@ -89,18 +141,20 @@ export default function PreprocessorViewer(
           <col className="big-column" />
           <col className="big-column" />
         </colgroup>
-        <tr>
-          <th colSpan={2}>
-            Source
-          </th>
-          <th>
-            Generated
-          </th>
-          <th>
-            Console Output
-          </th>
-        </tr>
-        {processedRows}
+        <tbody>
+          <tr>
+            <th colSpan={2}>
+              Source
+            </th>
+            <th>
+              Generated
+            </th>
+            <th>
+              Console Output
+            </th>
+          </tr>
+          {processedRows}
+        </tbody>
       </table>
     </div>
   </>
@@ -145,7 +199,8 @@ function GeneratedLinesTable(
       <col className="sub-table-text" />
 
     </ colgroup>
-    {rows}
+    <tbody>    {rows}</tbody>
+
   </table>
 }
 
@@ -179,7 +234,9 @@ function PrintoutTable(
     <colgroup>
       <col className="sub-table-text" />
     </colgroup>
-    {rows}
+    <tbody>
+      {rows}
+    </tbody>
   </table>
 }
 

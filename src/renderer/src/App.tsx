@@ -100,6 +100,7 @@ function App(): React.JSX.Element {
       todo: blank_docpos(),
       remember: blank_docpos(),
       merman: blank_docpos(),
+      processed: blank_docpos(),
     },
     bookmarks: new Map(),
     console_buffer: new Set(),
@@ -298,6 +299,8 @@ function App(): React.JSX.Element {
       update_file.text_hash = data.hash
       setRefresher(prev => prev + 1)
     })
+
+    return () => window.electron.ipcRenderer.removeAllListeners("new_render_hash")
   }, [openFiles])
 
 
@@ -333,13 +336,14 @@ function App(): React.JSX.Element {
           tab.favicon : setFavicon()
       })))
     })
+
+    return () => window.electron.ipcRenderer.removeAllListeners("new_render_status")
   }, [openFiles, activeFile])
 
 
+  useEffect(() => {
 
-
-  useEffect(
-    window.electron.ipcRenderer.on("new_render", (_, data) => {
+    const listener = (_, data) => {
 
       const update_file = getOpenFile(data.filepath)
 
@@ -382,6 +386,7 @@ function App(): React.JSX.Element {
           update_file.remember = new_markdown
       }
       else { // Preprocessor Generated output
+        console.log("SETTING NEW HASH", data.hash)
         update_file.preprocessed = {
           lines: data.lines,
           hash: data.hash,
@@ -393,9 +398,13 @@ function App(): React.JSX.Element {
 
       setRefresher(prev => prev + 1) // refresh all image displays
 
-    }),
-    [openFiles]
-  )
+    }
+
+    window.electron.ipcRenderer.on("new_render", listener)
+    return () =>
+      window.electron.ipcRenderer.removeAllListeners("new_render")
+
+  }, [openFiles])
 
 
   // NOTE: ---------- console display
