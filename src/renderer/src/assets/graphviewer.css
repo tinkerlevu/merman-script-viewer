@@ -2,13 +2,13 @@
 
 .graph-outdated {
   filter: blur(2px) saturate(50%);
-  opacity: 0.5;
-  transition: 0s
+  opacity: 0.5s;
+  transition: filter 1.5s, opacity 1.5s;
 }
 
 .graph-up-to-date {
  /* to prevent weird scrolling bugs*/
-transition: 0s
+transition: filter 1.5s, opacity 1.5s ease-in-out;
 }
 
 .graph-controls {
