@@ -2,6 +2,7 @@ import MarkdownPreview from '@uiw/react-markdown-preview';
 import { useEffect, useRef, useState } from 'react';
 import ContentHeight from './dynamicSize';
 
+import '../assets/markdown_preview.css'
 
 export default function MarkdownViewer(
   { activeFile, type, refresh, theme }: {
@@ -60,6 +61,7 @@ export default function MarkdownViewer(
       onScroll={handleScroll}
     >
       <MarkdownPreview
+        className="md-previewer"
         source={text}
         style={{ padding: 16 }}
         wrapperElement={{

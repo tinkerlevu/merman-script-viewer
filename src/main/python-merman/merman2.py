@@ -1259,14 +1259,15 @@ class ReportItem:
 
     # get markdown formatted text to put into Todo/Remember report
   def get_entry(self):
-    tab = '&nbsp;' * 4  # to separate content from line indicators
+    tab = '&nbsp;' * 0#disabled 4  # to separate content from line indicators
 
     # generate line indicator:
     result = '#### line: ' + str(self.linenumber)
     if isinstance(self.source, GraphNode):
       result += ' [ ' + self.source.get_class() + ' ]'
 
-    return result + '\n' + tab + self.text.replace('<br>', '<br>' + tab)
+    return result + '\n' + tab + self.text.replace('<br>', '\n')
+    #.replace('<br>', '<br>' + tab)
 
     # true if Keyword exists in self.text
   def find(self, query):
@@ -1278,10 +1279,15 @@ class ReportItem:
   def highlight(self, target, color):
     self.text = self.text.replace(
       target,
-      '<span style="background-color: ' + color + '">' +
-      target + '</span>'
+      '''<span class="md-keyword md-keyword-type-{}" style="--suggested-color: {}"> {} </span>'''.format(target, color, target)
     )
-
+  # def highlight(self, target, color):
+  #   self.text = self.text.replace(
+  #     target,
+  #     '<span style="background-color: ' + color + '">' +
+  #     target + '</span>'
+  #   )
+  #
 
 
 
@@ -1805,7 +1811,7 @@ def run(merman_filetext, only_analyze=False):
       # for each category of items
       for item in categories.get(category, []):
         # write item entry to report
-        OUTPUTS['todo'].append(item.get_entry() + '\n\n')
+        OUTPUTS['todo'].append(item.get_entry() + '\n')
 
     # ---------- Generate Remember Report --------
 
@@ -1882,7 +1888,7 @@ def run(merman_filetext, only_analyze=False):
       # for each category of items
       for item in categories.get(category, []):
         # write item entry to report
-        OUTPUTS['remember'].append(item.get_entry() + '\n\n')
+        OUTPUTS['remember'].append(item.get_entry() + '\n')
 
 # ------------ Count Words -----------
 

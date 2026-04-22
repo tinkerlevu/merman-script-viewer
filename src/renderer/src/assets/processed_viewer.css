@@ -4,8 +4,8 @@ table, th, td {
   height: 100%;
   margin: 0px;
   border-spacing: 0px;
-  padding-top: 3px;
-  padding-bottom: 1px;
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 .processed-table {
@@ -25,18 +25,18 @@ table, th, td {
   min-width: 3vw;
 }
 
+
 .sub-table  {
   width: 100%;
   min-width: 40vw
 }
 
 .sub-table tr td{
-  height: 0%
+  height: 0%;
 }
 
 .sub-table-number {
-  max-width: 1vw;
-  min-width: 2vw;
+  min-width: min(3vw, 50px);
   border-spacing: 5px;
 }
 
