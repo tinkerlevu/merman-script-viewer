@@ -4,10 +4,9 @@ import { Editor, PrismEditor } from "prism-react-editor"
 import { BasicSetup } from "prism-react-editor/setups"
 
 // Adding the JSX grammar
-import "prism-react-editor/prism/languages/javascript"
 
 // Adds comment toggling and auto-indenting for JSX
-import "prism-react-editor/languages/jsx"
+// import "prism-react-editor/languages/jsx"
 
 import "prism-react-editor/layout.css"
 // import "prism-react-editor/themes/prism.css"
@@ -18,6 +17,9 @@ import "prism-react-editor/invisibles.css"
 import { languages } from "prism-react-editor/prism"
 import { RefObject } from "react"
 
+
+// import "prism-react-editor/prism/languages/javascript"
+import javascript from "../assets/javascript.js"
 
 
 // CUSTOM HIGHLIGHTING
@@ -53,6 +55,9 @@ export default function CodeEditor(
   if (!value) value = "var foo = bar"
 
 
+  console.log("LANGUAGES", languages)
+  // import "prism-react-editor/prism/languages/javascript"
+  import('prism-react-editor/prism/languages/javascript')
 
   return <>
 
