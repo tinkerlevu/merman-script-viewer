@@ -10,7 +10,7 @@ import "prism-react-editor/prism/languages/javascript"
 import "prism-react-editor/languages/jsx"
 
 import "prism-react-editor/layout.css"
-import "prism-react-editor/themes/github-dark.css"
+// import "prism-react-editor/themes/prism.css"
 
 // Required by the basic setup
 import "prism-react-editor/search.css"
@@ -23,7 +23,7 @@ import { RefObject } from "react"
 // CUSTOM HIGHLIGHTING
 //
 
-const MermanLanguage = {
+export const MermanLanguage = {
   'comment': /\/\/.*/,
   'string': /"(?:\\.|[^\\"])*"/,
   'keyword': /\b(if|else|while|return|custom_key|foo)\b/,
@@ -54,13 +54,16 @@ export default function CodeEditor(
 
 
 
-  return <Editor
-    language={highlighting}
-    value={value}
-    ref={ref}
-    onUpdate={onUpdate}
-    readOnly={type == "javascript"}
-  >
-    <BasicSetup />
-  </Editor>
+  return <>
+
+    <Editor
+      language={highlighting}
+      value={value}
+      ref={ref}
+      onUpdate={onUpdate}
+      readOnly={type == "javascript"}
+    >
+      <BasicSetup />
+    </Editor>
+  </>
 }

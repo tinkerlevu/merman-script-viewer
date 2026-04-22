@@ -16,13 +16,17 @@ import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFile, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faFile, faPlus, } from '@fortawesome/free-solid-svg-icons'
 
 // for file tabs
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import '@sinm/react-chrome-tabs/css/chrome-tabs-dark-theme.css';
 // for regular tabs
 //import 'react-tabs/style/react-tabs.css';
+//
+
+// For highlighting
+import { useEditorTheme } from "prism-react-editor/themes"
 
 
 // my components and stuff
@@ -415,6 +419,8 @@ function App(): React.JSX.Element {
   // NOTE: ---------- UI color theme
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const prismTheme = useEditorTheme(theme == 'light' ?
+    'prism' : 'dracula')
 
   useEffect(() => {
     const darkmode = `
@@ -433,6 +439,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
+      <style>{prismTheme}</style>
       <div style={{ height: '100vh' }}>
         <div className='FixedContainer'>
           <FileTabBar

@@ -37,6 +37,7 @@ export default function TabIcon(
     monitoredHash,
     refresh])
 
-  return <img src={icon} style={{ maxHeight: "14px", paddingRight: "5px" }} />  // TODO:remove style
+  return <span className='loading-tabicon'><img src={icon} style={{ maxHeight: "14px", paddingRight: "5px" }} /></span> // TODO:remove style
+
 
 }

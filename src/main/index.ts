@@ -10,7 +10,7 @@ import { initalizePreProcessor, openPreProcessScript } from './preProcessorManag
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1300,
     height: 710,
     show: false,
     frame: true,

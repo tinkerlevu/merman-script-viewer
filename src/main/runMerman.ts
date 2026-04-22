@@ -221,7 +221,7 @@ function createRenderWindow(): BrowserWindow {
     }
   })
   // enable this to show the window
-  renderWindow.on('ready-to-show', () => renderWindow.show())
+  // renderWindow.on('ready-to-show', () => renderWindow.show())
 
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {

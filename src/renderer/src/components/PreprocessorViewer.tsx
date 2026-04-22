@@ -2,8 +2,14 @@ import { GeneratedLine, OpenFile, ProcessedLine, ProcessorPrintout } from "@rend
 import { useEffect, useState } from "react";
 import parse from 'html-react-parser';
 import ContentHeight from "./dynamicSize";
+import { highlightText } from "prism-react-editor/prism";
+
+
+//TODO: highlightText()
+
 
 import '../assets/processed_viewer.css'
+import { MermanLanguage } from "./CodeEditor";
 
 export default function PreprocessorViewer(
   { activeFile, refresher }: {
@@ -37,6 +43,7 @@ export default function PreprocessorViewer(
       }
       var type = line.line_num % 2 == 0 ? 'main-A' : 'main-B'
 
+
       tablerows.push(<>
         < tr
           className={type}
@@ -46,7 +53,9 @@ export default function PreprocessorViewer(
             {line.line_num}
           </td>
           <td>
-            {line.source}
+            {parse(
+              highlightText(line.source, MermanLanguage)
+            )}
           </td>
           <td>
             <GeneratedLinesTable
@@ -104,14 +113,14 @@ function GeneratedLinesTable(
   }): React.JSX.Element {
 
   const [rows, setRows] = useState<HTMLTableRowElement>()
-  var alternate = 1
+  var alternate_gen = 1
 
   useEffect(() => {
     var tablerows: Array<any> = []
     for (const line of generated_lines) {
       tablerows.push(
         <tr
-          className={alternate++ % 2 == 0 ? 'even' : 'odd'}
+          className={alternate_gen++ % 2 == 0 ? 'odd' : 'even'}
           key={line.line_num}
         // TODO: mark row as line.default in css
         >
@@ -119,7 +128,9 @@ function GeneratedLinesTable(
             &nbsp;{line.line_num}&nbsp;
           </td>
           <td>
-            {line.content}
+            {parse(
+              highlightText(line.content, MermanLanguage)
+            )}
           </td>
         </tr>
       )
@@ -152,7 +163,7 @@ function PrintoutTable(
     var alternate = 1
     for (const line of printout_lines) {
       tablerows.push(
-        <tr className={alternate++ % 2 == 0 ? 'even' : 'odd'}>
+        <tr className={alternate++ % 2 == 1 ? 'odd' : 'even'}>
           <td>
             {line.type == "html" ? parse(line.content) : line.content}
           </td>

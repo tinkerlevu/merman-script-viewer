@@ -1,3 +1,8 @@
+.loading-tabicon {
+  padding: min(8px, 2%)
+}
+
+
 .react-tabs {
   -webkit-tap-highlight-color: transparent;
 }
@@ -16,9 +21,13 @@
   bottom: -1px;
   position: relative;
   list-style: none;
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
+  min-height: 30px;
+  width: 10%;
+  min-width: 130px;
 }
+
 
 .react-tabs__tab--selected {
   background: var(--selected-tab-background);

@@ -1,7 +1,11 @@
 
 table, th, td {
   /* border: 1px solid black; */
-  height: 100%
+  height: 100%;
+  margin: 0px;
+  border-spacing: 0px;
+  padding-top: 3px;
+  padding-bottom: 1px;
 }
 
 .processed-table {
@@ -13,8 +17,7 @@ table, th, td {
 
 
 .big-column {
-  min-width: 30vw;
-  font-size: 3px;
+  min-width: 20vw;
 }
 
 
@@ -24,6 +27,7 @@ table, th, td {
 
 .sub-table  {
   width: 100%;
+  min-width: 40vw
 }
 
 .sub-table tr td{
