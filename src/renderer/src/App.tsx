@@ -583,6 +583,7 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               type="todo"
               refresh={refresher}
+              theme={theme}
             />
           </TabPanel>
           <TabPanel> {/* Remember.md */}
@@ -590,6 +591,7 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               type="remember"
               refresh={refresher}
+              theme={theme}
             />
           </TabPanel>
           <TabPanel>

@@ -4,10 +4,11 @@ import ContentHeight from './dynamicSize';
 
 
 export default function MarkdownViewer(
-  { activeFile, type, refresh }: {
+  { activeFile, type, refresh, theme }: {
     activeFile: OpenFile,
     type: RenderMDType,
-    refresh: number
+    refresh: number,
+    theme: string,
   }
 ): React.JSX.Element {
 
@@ -61,6 +62,9 @@ export default function MarkdownViewer(
       <MarkdownPreview
         source={text}
         style={{ padding: 16 }}
+        wrapperElement={{
+          "data-color-mode": theme
+        }}
       />
     </div>
   </>)
