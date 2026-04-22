@@ -1,5 +1,6 @@
-// DEFAULTS
 
+import Prism from 'prismjs'; // Hacky fix
+// DEFAULTS
 import { Editor, PrismEditor } from "prism-react-editor"
 import { BasicSetup } from "prism-react-editor/setups"
 
@@ -7,7 +8,6 @@ import { BasicSetup } from "prism-react-editor/setups"
 
 // Adds comment toggling and auto-indenting for JSX
 // import "prism-react-editor/languages/jsx"
-
 import "prism-react-editor/layout.css"
 // import "prism-react-editor/themes/prism.css"
 
@@ -18,8 +18,8 @@ import { languages } from "prism-react-editor/prism"
 import { RefObject } from "react"
 
 
+// for some fucking reason this doesn't work in appimage, etc. build probs sth vite related
 // import "prism-react-editor/prism/languages/javascript"
-import javascript from "../assets/javascript.js"
 
 
 // CUSTOM HIGHLIGHTING
@@ -35,9 +35,10 @@ export const MermanLanguage = {
 
 
 languages['merman'] = MermanLanguage
+languages['javascript'] = Prism.languages.javascript // hacky fix
 
 
-
+// import 'prismjs/components/prism-javascript';
 
 
 
@@ -55,9 +56,7 @@ export default function CodeEditor(
   if (!value) value = "var foo = bar"
 
 
-  console.log("LANGUAGES", languages)
-  // import "prism-react-editor/prism/languages/javascript"
-  import('prism-react-editor/prism/languages/javascript')
+  console.log("LANGUAGES", languages, Prism)
 
   return <>
 

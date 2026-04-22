@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import prismjs from 'vite-plugin-prismjs';
 
 export default defineConfig({
   main: {},
@@ -11,7 +12,12 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react()],
+    plugins: [
+      react(),
+      prismjs({
+        languages: ['javascript'],
+      }),
+    ],
 
     build: {
       rollupOptions: {

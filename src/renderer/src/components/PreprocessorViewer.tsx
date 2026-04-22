@@ -20,6 +20,12 @@ const manage_cache = () => {
       .forEach(hash => cache.delete(hash))
 }
 
+const is_block_comment_marker = (text: string): boolean => {
+  return /^\s*###\s*$/.test(text)
+}
+var in_gblock_comment = false // marks block comment mode in generated table, doesn't reset till a full rerendering
+
+
 export default function PreprocessorViewer(
   { activeFile, refresher }: {
     activeFile: OpenFile,
@@ -31,8 +37,6 @@ export default function PreprocessorViewer(
     height: ContentHeight(),
     width: "100%"
   }
-
-
 
   const [processedRows, setProcessedRows] =
     useState<HTMLTableRowElement>([])
@@ -53,6 +57,9 @@ export default function PreprocessorViewer(
     }
     console.log("RUNNNNNNNING")
 
+    var in_block_comment = false
+    var in_gblock_comment = false
+
 
     for (const line of activeFile.preprocessed.lines) {
 
@@ -69,6 +76,26 @@ export default function PreprocessorViewer(
       }
       var type = line.line_num % 2 == 0 ? 'main-A' : 'main-B'
 
+      var source_text = parse(highlightText(
+        line.source, MermanLanguage))
+
+      if (in_block_comment) {
+        source_text =
+          <span className="merman-block-comment">
+            {line.source}
+          </span>
+
+      }
+      if (is_block_comment_marker(line.source)) {
+        in_block_comment = !in_block_comment // could add special style for block comment markers:
+        source_text =
+          < span className="merman-block-comment" >
+            {line.source}
+          </span >
+      }
+
+
+
 
       tablerows.push(<>
         < tr
@@ -79,9 +106,7 @@ export default function PreprocessorViewer(
             {line.line_num}
           </td>
           <td>
-            {parse(
-              highlightText(line.source, MermanLanguage)
-            )}
+            {source_text}
           </td>
           <td>
             <GeneratedLinesTable
@@ -161,6 +186,7 @@ export default function PreprocessorViewer(
 }
 
 
+
 function GeneratedLinesTable(
   { generated_lines }: {
     generated_lines: Array<GeneratedLine>
@@ -170,7 +196,39 @@ function GeneratedLinesTable(
 
   useEffect(() => {
     var tablerows: Array<any> = []
+
+
+
     for (const [i, line] of generated_lines.entries()) {
+
+      var content_text: any = ""
+
+      if (in_gblock_comment) {
+        console.log("??????????????????")
+        content_text =
+          <span className="merman-block-comment">
+            {line.content + 'potato'}
+          </span>
+
+      }
+      else {
+        console.log("!!!!!!!!!!")
+        content_text = parse(highlightText(
+          line.content, MermanLanguage))
+
+      }
+      if (is_block_comment_marker(line.content)) {
+
+        console.log("----------")
+        console.log(i, line.content)
+        in_gblock_comment = !in_gblock_comment // could add special style for block comment markers:
+        content_text =
+          < span className="merman-block-comment" >
+            {line.content}
+          </span >
+      }
+
+
       tablerows.push(
         <tr
           className={i % 2 == 0 ? 'odd' : 'even'}
@@ -181,9 +239,7 @@ function GeneratedLinesTable(
             &nbsp;{line.line_num}&nbsp;
           </td>
           <td>
-            {parse(
-              highlightText(line.content, MermanLanguage)
-            )}
+            {content_text}
           </td>
         </tr>
       )

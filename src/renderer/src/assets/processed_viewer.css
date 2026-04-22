@@ -65,3 +65,7 @@ table, th, td {
 .main-B .even {
   background: #ffe6f2
 }
+
+.merman-block-comment {
+  color: blue
+}
