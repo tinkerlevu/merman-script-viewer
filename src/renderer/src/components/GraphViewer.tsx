@@ -13,10 +13,11 @@ import '../assets/graphviewer.css'
 // const container_style = { position: 'absolute', top: 0, bottom:0, overflow: "scroll", }
 
 export default function GraphViewer(
-  { activeFile, type, refresh }: {
+  { activeFile, type, refresh, outdated }: {
     activeFile: OpenFile,
     type: RenderImageType,
     refresh: number
+    outdated: boolean
 
   }
 ): React.JSX.Element {
@@ -217,6 +218,7 @@ export default function GraphViewer(
         style={container_style}
         ref={divRef}
         onScroll={handleScroll}
+        className={outdated ? 'graph-outdated' : 'graph-up-to-date'}
       >
         {/*image displayed here */}
       </div>
@@ -231,6 +233,7 @@ export default function GraphViewer(
           onClick={() => setZoomRatio(0.1)}
         >
           <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+          {outdated ? "yes" : "no"}
         </button>
         <button
           onClick={() => setZoomRatio(-0.1)}

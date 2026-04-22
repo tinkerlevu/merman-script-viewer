@@ -167,14 +167,13 @@ function GeneratedLinesTable(
   }): React.JSX.Element {
 
   const [rows, setRows] = useState<HTMLTableRowElement>()
-  var alternate_gen = 1
 
   useEffect(() => {
     var tablerows: Array<any> = []
-    for (const line of generated_lines) {
+    for (const [i, line] of generated_lines.entries()) {
       tablerows.push(
         <tr
-          className={alternate_gen++ % 2 == 0 ? 'odd' : 'even'}
+          className={i % 2 == 0 ? 'odd' : 'even'}
           key={line.line_num}
         // TODO: mark row as line.default in css
         >
@@ -215,10 +214,9 @@ function PrintoutTable(
 
   useEffect(() => {
     var tablerows: Array<any> = []
-    var alternate = 1
-    for (const line of printout_lines) {
+    for (const [i, line] of printout_lines.entries()) {
       tablerows.push(
-        <tr className={alternate++ % 2 == 1 ? 'odd' : 'even'}>
+        <tr className={i % 2 == 0 ? 'odd' : 'even'}>
           <td>
             {line.type == "html" ? parse(line.content) : line.content}
           </td>

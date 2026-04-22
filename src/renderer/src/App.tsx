@@ -11,7 +11,7 @@ import process_fav from "./assets/favicons/test.ico" // FIX: change this
 import none_fav from "./assets/favicons/filetab_none.ico"
 
 
-import { useEffect, useRef, useState } from 'react';
+import { act, useEffect, useRef, useState } from 'react';
 import { TabProperties as FileTabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import { Tabs as FileTabBar } from '@sinm/react-chrome-tabs';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -168,8 +168,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     window.electron.ipcRenderer.on('file_change', (_, data) => {
-
-
+      console.log("triggering")
       if (data.newfile) {
 
         console.log("newFile")
@@ -195,6 +194,8 @@ function App(): React.JSX.Element {
       } else { // NOTE:: File Already opened
         const changed_file = getOpenFile(data.filepath) // automatically updates active file anyways if it's open
 
+        console.log("updating", data.text)
+
         if (!changed_file) return
 
         if (changed_file.text != data.text) {
@@ -207,6 +208,8 @@ function App(): React.JSX.Element {
           render_merman(changed_file.filepath, data.text)
 
       }
+
+      return () => window.electron.ipcRenderer.removeAllListeners('file_change')
 
     })
   }, [openFiles, activeFile, fileTabs])
@@ -571,6 +574,7 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               type="script"
               refresh={refresher}
+              outdated={activeFile.text_hash != activeFile.script.hash}
             />
           </TabPanel>
           <TabPanel> {/* Summary */}
@@ -578,6 +582,7 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               type="summary"
               refresh={refresher}
+              outdated={activeFile.text_hash != activeFile.summary.hash}
             />
           </TabPanel>
           <TabPanel> {/* Assorted */}
@@ -585,6 +590,7 @@ function App(): React.JSX.Element {
               activeFile={activeFile}
               type="sorted"
               refresh={refresher}
+              outdated={activeFile.text_hash != activeFile.sorted.hash}
             />
           </TabPanel>
           <TabPanel> {/* Todo.md */}

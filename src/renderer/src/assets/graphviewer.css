@@ -1,3 +1,16 @@
+/*outdated*/
+
+.graph-outdated {
+  filter: blur(2px) saturate(50%);
+  opacity: 0.5;
+  transition: 0s
+}
+
+.graph-up-to-date {
+ /* to prevent weird scrolling bugs*/
+transition: 0s
+}
+
 .graph-controls {
   justify-self: right;
   margin-right: 60px;

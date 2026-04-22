@@ -1,7 +1,6 @@
 import { BrowserWindow, dialog } from "electron"
 import { extname, parse } from "path"
-import { existsSync, writeFileSync, openSync, fstatSync, PathOrFileDescriptor, readSync, writeSync, ftruncateSync, closeSync } from "fs"
-import { MonitoredFile } from "./env"
+import { existsSync, writeFileSync, readFileSync } from "fs"
 import chokidar from "chokidar"
 
 const supported_extensions = [
@@ -90,18 +89,10 @@ export async function SaveAsFile(old_filepath, text) {
 
 }
 
-
 // WARNING: make sure there is always corresponding filepath in monitoredFiles
-var monitoredFiles: Array<MonitoredFile> = [] // all files with fs.Watch applied to them
 const watcher = chokidar.watch([],
   { awaitWriteFinish: { stabilityThreshold: 500 }, atomic: true })
-watcher.on('change', path => loadFileContents(path)) // send file changes to renderer here
-
-
-// filepath is used as an id to coordinate multiple parts of the app
-const getFileHandle = (filepath: string) =>
-  // @ts-ignore
-  monitoredFiles.find((i) => i.filepath === filepath).handle
+watcher.on('change', path => { loadFileContents(path) }) // send file changes to renderer here
 
 
 
@@ -118,36 +109,19 @@ function startMonitorFile(filepath: string) {
   //   // else rename event
   // })
 
-  const file_handle: PathOrFileDescriptor = openSync(filepath, 'r+')
-
-  monitoredFiles.push({
-    filepath: filepath,
-    handle: file_handle,
-  })
 
 }
 
 
 
 function loadFileContents(filepath: string, newfile: boolean | void) {
-  const handle = getFileHandle(filepath)
-  let stats = fstatSync(handle)
-  const buffer = Buffer.alloc(stats.size)
-  console.log(stats)
-
-  readSync(
-    handle,
-    buffer, 0, // write from start of buffer
-    stats.size, 0 // read from start of file
-  )
-
-  const data = buffer.toString('utf8')
+  const data = readFileSync(filepath, 'utf8')
 
   mainWindow.webContents.send('file_change', {
     filepath: filepath,
     text: data,
     title: parse(filepath).name,
-    newfile: newfile ? newfile : false
+    newfile: newfile || false
   })
 
 
@@ -156,10 +130,7 @@ function loadFileContents(filepath: string, newfile: boolean | void) {
 
 // Save files to disk
 export function writeFileContents(filepath: string, data) {
-  console.log(filepath, data)
-  const file_handle = getFileHandle(filepath)
-  const num_bytes_written = writeSync(file_handle, data, 0, 'utf8') // overwrite data from start of file
-  ftruncateSync(file_handle, num_bytes_written) // trim length of file
+  writeFileSync(filepath, data, 'utf8')
 }
 
 
@@ -171,14 +142,7 @@ export function writeFileContents(filepath: string, data) {
 
 
 export function closeFile(filepath: string) {
-  var to_close = monitoredFiles.find(i => i.filepath == filepath)
-  monitoredFiles = monitoredFiles.filter(i => i.filepath != filepath) // remove file to close from monitored
-
-  if (!to_close) return
 
   watcher.unwatch(filepath) // stop monitoring changes on this file
 
-  closeSync(to_close.handle)
-
-  console.log(monitoredFiles, to_close)
 }
