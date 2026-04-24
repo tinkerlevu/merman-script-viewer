@@ -31,7 +31,7 @@ Have only tested build on linux so far.
 - preprocessor docs and example implementations
 - arbitary mermaid graphs in todo and remember reports
 - finish other noted TODOs in code
-An Electron application with React and TypeScript
+- figure out which license would apply with all the various packages used in this project
 
 ## Project Setup
 
