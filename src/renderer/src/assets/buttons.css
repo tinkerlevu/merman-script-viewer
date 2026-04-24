@@ -34,7 +34,7 @@ button:active {
 
 }
 
-.preprocessor-button:disabled {
+.preprocessor-button:disabled, button:disabled {
   opacity: 0.3;
   background: grey;
 }
@@ -48,7 +48,7 @@ button:active {
 
 
 
-/* checkbox stuff: */
+/* checkbox stuff for preprocessor: */
 
 
 .control {

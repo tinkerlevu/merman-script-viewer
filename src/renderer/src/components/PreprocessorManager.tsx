@@ -64,7 +64,7 @@ export default function PreprocessorManager(
         onClick={openProcessorScript}>
         Open
       </button>
-      <button >Dry Run</button>
+      <button disabled={true} >Dry Run</button> {/*TODO: implement generating table without rendering?*/}
       <button
         className="right"
         onClick={() => setCurrentFile('')}

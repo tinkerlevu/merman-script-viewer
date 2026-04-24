@@ -23,6 +23,8 @@ export default function MermanEditor(
       filepath: ActiveFile.filepath,
       text: editorRef.current?.value // recommended way to get editor state
     })
+
+    setUnsavedChanges(false)
     // ActiveFile.text = editorRef.current?.value // recommended way to get editor state
     // setUnsavedChanges(false)
   }
@@ -105,11 +107,13 @@ export default function MermanEditor(
       <FixedBar>
         <button
           onClick={saveFile}
-          disabled={!unsavedChanges}>
+          disabled={!unsavedChanges || ActiveFile.filepath == ""}>
           Save
         </button>
         <button
-          onClick={saveAsFile}>
+          onClick={saveAsFile}
+          disabled={!ActiveFile.filepath}
+        >
           Save As
         </button>
         <div className="right spaced" >

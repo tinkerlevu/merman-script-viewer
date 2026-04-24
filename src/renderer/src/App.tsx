@@ -438,13 +438,21 @@ function App(): React.JSX.Element {
     const darkmode = `
       --color-text: #ddd;
       --color-background: #222436;
-      --selected-tab-background: #000;
+      --color-background-accent: #2a2b35;
+      --color-background-alt: #282a36;
+      --color-background-alt-accent: #2d3034;
+        --selected-tab-background: #000;
+      --mermaid-arrow-color: #AA44AA;
       scrollbar-color: #993399 #2d3034;
 `
     const lightmode = `
       --color-text: #000;
       --color-background: #eee;
+      --color-background-accent: #fff;
+      --color-background-alt: #e5ffff;
+      --color-background-alt-accent: #daf2f2;
       --selected-tab-background: #fff;
+      --mermaid-arrow-color: #333333;
 `
     document.body.style = theme == 'light' ? lightmode : darkmode
   }, [theme])
@@ -537,7 +545,9 @@ function App(): React.JSX.Element {
               <Tab
                 disabled={true}>
                 <button
-                  onClick={() => render_merman(null, null)}>
+                  onClick={() => render_merman(null, null)}
+                  disabled={activeFile.filepath == ""}
+                >
                   Render
                 </button>
               </Tab>

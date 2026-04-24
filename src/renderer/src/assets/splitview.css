@@ -35,8 +35,7 @@
 
 
 .splitview ul li:hover, ul .selected {
-  background-color: white;
-  color: black;
+  background-color: var(--color-background-alt);
   transition: 0.3s;
 }
 

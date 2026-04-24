@@ -6,6 +6,7 @@ table, th, td {
   border-spacing: 0px;
   padding-top: 0px;
   padding-bottom: 0px;
+  color: var(--color-text);
 }
 
 .processed-table {
@@ -51,19 +52,19 @@ table, th, td {
 
 /* alternating table colors: */
 .main-A {
-  background: #ccffff
+  background: var(--color-background)
 }
 
 .main-A .even {
-  background: #e6ffff
+  background: var(--color-background-accent)
 }
 
 .main-B {
-  background: #ff99cc
+  background: var(--color-background-alt)
 }
 
 .main-B .even {
-  background: #ffe6f2
+  background: var(--color-background-alt-accent)
 }
 
 .merman-block-comment {

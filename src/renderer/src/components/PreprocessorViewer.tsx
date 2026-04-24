@@ -204,7 +204,6 @@ function GeneratedLinesTable(
       var content_text: any = ""
 
       if (in_gblock_comment) {
-        console.log("??????????????????")
         content_text =
           <span className="merman-block-comment">
             {line.content + 'potato'}
@@ -212,15 +211,12 @@ function GeneratedLinesTable(
 
       }
       else {
-        console.log("!!!!!!!!!!")
         content_text = parse(highlightText(
           line.content, MermanLanguage))
 
       }
       if (is_block_comment_marker(line.content)) {
 
-        console.log("----------")
-        console.log(i, line.content)
         in_gblock_comment = !in_gblock_comment // could add special style for block comment markers:
         content_text =
           < span className="merman-block-comment" >

@@ -53,7 +53,7 @@ export default function CodeEditor(
   // setup editor stuff here
   //
   var highlighting = type === "javascript" ? 'javascript' : 'merman';
-  if (!value) value = "var foo = bar"
+  if (!value) value = type == "merman" ? "Open a file using the *new tab* button on the tab bar ( top left )" : "Open a file to preview it"
 
 
   console.log("LANGUAGES", languages, Prism)
