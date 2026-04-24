@@ -1,6 +1,3 @@
-// ------------------------------ TODO: REPLACE THESE -------------------------------
-import Versions from './components/Versions' // TODO: replace with WORD COUNT, and put word count on processed tab
-
 import light_mode_icon from "./assets/favicons/lightmode.png"
 import dark_mode_icon from "./assets/favicons/darkmode.png"
 
@@ -21,16 +18,12 @@ import { faFile, faPlus, } from '@fortawesome/free-solid-svg-icons'
 // for file tabs
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import '@sinm/react-chrome-tabs/css/chrome-tabs-dark-theme.css';
-// for regular tabs
-//import 'react-tabs/style/react-tabs.css';
-//
 
 // For highlighting
 import { useEditorTheme } from "prism-react-editor/themes"
 
 
 // my components and stuff
-// import layout from './assets/spacing.module.css';
 import MarkdownViewer from './components/MarkdownViewer'
 import MermanEditor from './components/MermanEditor'
 import TabIcon from './components/TabIcon'
