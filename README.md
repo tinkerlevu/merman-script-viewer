@@ -32,6 +32,7 @@ Have only tested build on linux so far.
 - arbitary mermaid graphs in todo and remember reports
 - finish other noted TODOs in code
 - figure out which license would apply with all the various packages used in this project
+- change pyodide initialization to just only run one when the first render is requested then keep the initialized instance in memory
 
 ## Project Setup
 
