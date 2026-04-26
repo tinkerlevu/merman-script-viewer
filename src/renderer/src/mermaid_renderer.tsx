@@ -11,11 +11,14 @@ import { createRoot } from 'react-dom/client'
 // Initialize mermaid
 mermaid.initialize({
   startOnLoad: true,
-  theme: 'default',
+  theme: 'null',
   securityLevel: 'loose',
   // TODO: add more configurations here!
   maxTextSize: Number.MAX_SAFE_INTEGER,
   maxEdges: Number.MAX_SAFE_INTEGER,
+  htmlLabels: true,
+  wrap: false,
+  markdownAutoWrap: false,
 });
 
 

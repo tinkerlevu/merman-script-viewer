@@ -6,15 +6,22 @@
     "image": {
       "uri": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzUwbW0iIGhlaWdodD0iMzUwbW0iIHZpZXdCb3g9IjAgMCAzNTAgMzUwIiB2ZXJzaW9uPSIxLjEiIGlkPSJzdmcxIj4KICA8ZGVmcyBpZD0iZGVmczEiPjwvZGVmcz4KICA8ZyBpZD0ibGF5ZXIxIj4KICAgIDxyZWN0IHN0eWxlPSJvcGFjaXR5OjAuNzAzMjUxO2ZpbGw6bm9uZTtzdHJva2U6I2ZmMDAwMDtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgaWQ9InJlY3QxIiB3aWR0aD0iMjczLjUwODI0IiBoZWlnaHQ9IjI2Mi41MjE2NCIgeD0iMzQuNjk0NDg5IiB5PSI0MS4wNTUxNDkiPjwvcmVjdD4KICAgIDxyZWN0IHN0eWxlPSJvcGFjaXR5OjAuNzAzMjUxO2ZpbGw6bm9uZTtzdHJva2U6I2ZmMDAwMDtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgaWQ9InJlY3QyIiB3aWR0aD0iMTQ4LjYwODA4IiBoZWlnaHQ9IjE1MC45MjEwNCIgeD0iOTIuNTE4NjM5IiB5PSIxMDIuOTI2OTkiPjwvcmVjdD4KICAgIDxwYXRoIHN0eWxlPSJvcGFjaXR5OjAuNzAzMjUxO2ZpbGw6bm9uZTtzdHJva2U6I2ZmMDAwMDtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgaWQ9InBhdGgyIiBkPSJtIDE1OC40MzgxOCwxNzIuMzE1OTcgLTE2LjI3ODMsLTcuMDUwMTIgLTE2LjM1NjkxLDYuODY1ODEgMS42NzQ4LC0xNy42NjAyIC0xMS41ODQzNCwtMTMuNDM0NjkgMTcuMzEzMzksLTMuODY0NDggOS4xOTczOSwtMTUuMTY4OSA5LjAyNTQ3LDE1LjI3MTgyIDE3LjI2ODYzLDQuMDU5NzkgLTExLjczNTM0LDEzLjMwMjk4IHoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0LjUyNjgxLDMxLjIyNzY4OCkiPjwvcGF0aD4KICA8L2c+Cjwvc3ZnPgo="}
   },
-  {
-    "title": "--- topic ---",
-    "info": "overview oddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddf topic\nokay",
-    "example": "# topic comment \n \"example 1\" \n \"example 2\""
-  },
-  {
+    {
     "title": "specific subtopic",
     "info": "subtopic info",
     "example": "\"this is \\bbold\\b text\""
+  },
+  {
+    "title": "--- Dialog ---",
+    "info": "overview oddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddf topic\nokay",
+    "example": "# topic comment \n \"example 1\" \n \"example 2\""
+  },
+
+  {
+    "title": "Setting Node Size",
+    "info": "use -<number> tag\n it acts as a multiplier that increases the default word wrapping width (25 characters).\n\ne.g.\" hello world\" -2 ",
+    "example": "\"this node has been word wrapped at the usual default point\"\n -3 \"this node has triple the node wrap limit Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\""
+
   }
 ]
 

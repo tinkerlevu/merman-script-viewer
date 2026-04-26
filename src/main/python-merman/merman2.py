@@ -824,6 +824,15 @@ class GraphNode(Linkable):
         # set class
       self.classdef = matches[0].replace(':', '')
 
+       # word wrap limit
+    matches = re.findall(r'[=]+[0-9]+[=]*|[0-9]+[=]+', self.remainder)
+
+    if matches:
+      if len(matches) > 1:
+        self.throw_error('Word Wrap size defined more than once')
+      self.node_word_wrap = int(matches[0].replace('=', ''))
+      # --> Default already specified above
+
        # QUICKCONNECT ---
     if re.search(r'!!![!]*', self.remainder):
       self.quickconnect = True
@@ -1075,6 +1084,9 @@ class GraphNode(Linkable):
     # Add DOUBLE QUOTES ---------
 
     wordwrapped = '"' + wordwrapped + '"'
+
+    # NOTE: WARNING: hacky fix since mermaid word wrap disabling is broken atm (mermaid version 11.14.0)
+    wordwrapped = wordwrapped.replace(' ', ' ') # NOTE: replace space with unicode non breaking space U+00A0
 
     # APPLY BRACKETS ---------
 
