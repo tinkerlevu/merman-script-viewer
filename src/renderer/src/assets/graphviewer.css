@@ -8,6 +8,11 @@
     stroke: var(--mermaid-arrow-color) !important;
 }
 
+.mermaid b {
+/* whoops accidentally broke \b \b tags inside mermaid node labels */
+  font-weight: 800
+}
+
 .graph-outdated {
   filter: blur(2px) saturate(50%);
   opacity: 0.5s;
