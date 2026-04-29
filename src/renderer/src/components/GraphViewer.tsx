@@ -6,11 +6,10 @@ import { faMagnifyingGlassMinus, faMagnifyingGlassPlus, faExpand, faTrashArrowUp
 
 
 import '../assets/graphviewer.css'
+import { GraphPos, OpenFile, RenderedImage, RenderImageType } from "@renderer/env";
 
+const ScrollPos_Cache = new Map<string | GraphPos>()
 
-// ------------- working setup :
-// <div style={{ position: "relative", height: '100vh'}}>
-// const container_style = { position: 'absolute', top: 0, bottom:0, overflow: "scroll", }
 
 export default function GraphViewer(
   { activeFile, type, refresh, outdated }: {
@@ -31,6 +30,7 @@ export default function GraphViewer(
   }
 
   const divRef = useRef(null);
+  const renderRef = useRef<HTMLDivElement>(null);
 
   const activeImage: RenderedImage | void = // void should never trigger
     type == "script" ? activeFile.script :
@@ -44,46 +44,24 @@ export default function GraphViewer(
     scroll_y: 0,
   }
 
+  const GET_KEY = () => activeFile.filepath + "_" + type
+
+  const [zoom, setZoom] = useState<number>(1)
+
   // have to recall this to actually use the stored scroll position to override the current scroll position
   const apply_scroll = (pos: GraphPos) => {
     if (!divRef.current) return
-    if (pos.scroll_x == 0 && pos.scroll_y == 0) return // Hacky bugfix
 
     const container = divRef.current
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(() => { // wait for rendering to finish
       container.scrollTop = pos.scroll_y * container.scrollHeight
       container.scrollLeft = pos.scroll_x * (container.scrollWidth - container.clientWidth)
-      console.log("goto")
+      ScrollPos_Cache.set(GET_KEY(), pos) // re-assert position after waiting for rendering to finish
     })
-    console.log("restoring Current", type, pos)
+    console.log("restoring Current", activeFile.filepath, type, pos)
 
   }
-
-
-
-  const [zoom, setZoom] = useState<number>(1)
-  const [restore, setRestore] = useState<GraphPos | null>(null)
-  // const [restoreZoom, setRestoreZoom] = useState<number | null>(null)
-
-  useEffect(() => {
-    var data: GraphPos
-
-    if (type == "script")
-      data = activeFile.scroll_pos.script
-    else if (type == "summary")
-      data = activeFile.scroll_pos.summary
-    else if (type == "sorted")
-      data = activeFile.scroll_pos.sorted
-    else {
-      console.error("invalid GraphViewer type")
-      data = blank_graphpos
-    }
-
-    setZoom(data.zoom)
-    setRestore(data)
-  },
-    [activeFile, type])
 
   const getScrollPos = () => {
     const container = divRef.current
@@ -101,58 +79,42 @@ export default function GraphViewer(
     return data
   }
 
-  const handleScroll = (e) => {
-    if (!divRef.current) return
-
-    // TODO: exit if activeScroll isn't loaded
-
-    var pos = getScrollPos()
-
-    // Save position TODO: make it more efficent, stop running these checks every cycle
-    if (type == "script")
-      activeFile.scroll_pos.script = pos
-    else if (type == "summary")
-      activeFile.scroll_pos.summary = pos
-    else if (type == "sorted")
-      activeFile.scroll_pos.sorted = pos
-    else
-      console.error("invalid GraphViewer type")
-  }
-
-
   useEffect(() => { // load image and zoom when changed
     if (!divRef.current) return
 
-    const container = divRef.current
+    var restore = ScrollPos_Cache.get(GET_KEY())
 
-    var size: number
-    var pos: GraphPos
-
-    if (restore) {
-      size = restore.zoom * 100
-      pos = restore
-      setRestore(null)
-    }
-    else {
-      size = zoom * 100
-      pos = getScrollPos()
+    if (!restore) {
+      restore = structuredClone(blank_graphpos)
+      ScrollPos_Cache.set(GET_KEY(), restore)
     }
 
-    container.innerHTML = activeImage.svg
-      .replace('width="100%"',
-        'height="' + size + '%"') // zoom in out
+    renderRef.current.innerHTML = activeImage.svg
+      .replace('width="100%"', "height=100%")
+      // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
-        'style="margin-left: 50%; margin-right: 50%; display: block"') // center image
+        'style="margin-left: 500px; margin-right: 500px;"') // center image
 
-    apply_scroll(pos) // ignores (0,0) positions like when initalizing
+
+    setZoom(restore.zoom)
+    apply_scroll(restore)
+
   }, [
     activeFile,
     activeImage,
-    zoom,
-    restore
+    refresh,
   ])
 
   useEffect(() => { }, [refresh]) // force refresh
+
+  useEffect(() => {
+    if (!renderRef.current) return
+
+    renderRef.current.style.height = zoom * 100 + "%"
+
+    apply_scroll(ScrollPos_Cache.get(GET_KEY()))
+
+  }, [zoom])
 
   const setZoomRatio = (ratio: number | null) => {
     var new_zoom: number
@@ -161,24 +123,21 @@ export default function GraphViewer(
       new_zoom = zoom + zoom * ratio
     else
       new_zoom = 1
-    // TODO: Math.max(
+    // TODO: apply bounds to zoom
 
-    if (type == "script")
-      activeFile.scroll_pos.script.zoom = new_zoom
-    else if (type == "summary")
-      activeFile.scroll_pos.summary.zoom = new_zoom
-    else if (type == "sorted")
-      activeFile.scroll_pos.sorted.zoom = new_zoom
-    else
-      console.error("invalid GraphViewer type")
+    var current_pos = getScrollPos()
+    current_pos.zoom = new_zoom
 
-    setZoom(new_zoom)
+    ScrollPos_Cache.set(GET_KEY(), current_pos)
+    console.log("setting cache")
+    setZoom(new_zoom) // trigger refresh
+
 
   }
 
 
   useEffect(() => {
-    window.addEventListener('wheel', (event) => {
+    const listner = (event) => {
       if (event.ctrlKey) {
         // Prevent default browser zoom behavior if desired
         event.preventDefault();
@@ -187,10 +146,12 @@ export default function GraphViewer(
           setZoomRatio(event.shiftKey ? 0.5 : 0.1)
         else
           setZoomRatio(event.shiftKey ? -0.5 : -0.1)
-
       }
-    }, { passive: false }); // 'passive: false' is required to call preventDefault()
-  }, [zoom])
+    }
+
+    window.addEventListener('wheel', listner, { passive: false }); // 'passive: false' is required to call preventDefault()
+    return () => window.removeEventListener('wheel', listner)
+  }, [zoom, activeImage])
 
 
   const [eraseable, setEraseable] = useState<boolean>(false)
@@ -217,10 +178,16 @@ export default function GraphViewer(
       <div
         style={container_style}
         ref={divRef}
-        onScroll={handleScroll}
+        //onScroll={handleScroll}
         className={outdated ? 'graph-outdated' : 'graph-up-to-date'}
       >
-        {/*image displayed here */}
+        <div
+          ref={renderRef}
+          style={{ marginLeft: "30%", marginRight: "30%" }}
+        >
+
+          {/*image displayed here */}
+        </div>
       </div>
       <div className="graph-controls"
         style={{

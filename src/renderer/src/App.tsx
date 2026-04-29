@@ -58,14 +58,6 @@ function App(): React.JSX.Element {
     }
   }
 
-  const blank_graphpos = (): GraphPos => {
-    return {
-      zoom: 1.0,
-      scroll_x: 0.5, // middle of page
-      scroll_y: 0,
-    }
-  }
-
 
   const blank_docpos = (): DocPos => {
     return {
@@ -87,9 +79,7 @@ function App(): React.JSX.Element {
     remember: blank_markdown(),
     auto_render: false,
     scroll_pos: {
-      script: blank_graphpos(),
-      summary: blank_graphpos(),
-      sorted: blank_graphpos(),
+      save_graph_pos: () => { },
       todo: blank_docpos(),
       remember: blank_docpos(),
       merman: blank_docpos(),
@@ -474,7 +464,8 @@ function App(): React.JSX.Element {
           />
         </div>
 
-        <Tabs>
+        <Tabs
+        >
           <div className='FixedContainer'>
             <TabList>
               {/* replace with favicon component for the image and markdowntabs*/}

@@ -56,8 +56,6 @@ export default function CodeEditor(
   if (!value) value = type == "merman" ? "Open a file using the *new tab* button on the tab bar ( top left )" : "Open a file to preview it"
 
 
-  console.log("LANGUAGES", languages, Prism)
-
   return <>
 
     <Editor

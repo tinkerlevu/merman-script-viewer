@@ -54,9 +54,7 @@ type OpenFile = {
   remember: RenderedMD,
   auto_render: boolean,
   scroll_pos: {
-    script: GraphPos,
-    summary: GraphPos,
-    sorted: GraphPos,
+    save_graph_pos: () => void // this is called before switching tabs or file tabs, overwritten by the current active graph
     todo: DocPos,
     remember: DocPos,
     merman: DocPos,
