@@ -22,7 +22,6 @@ export default function GraphViewer(
 ): React.JSX.Element {
 
 
-
   const container_style = {
     overflow: "scroll",
     height: ContentHeight(),
@@ -47,6 +46,18 @@ export default function GraphViewer(
   const GET_KEY = () => activeFile.filepath + "_" + type
 
   const [zoom, setZoom] = useState<number>(1)
+
+  // SAVING scroll and zoom state before switching tabs:
+  useEffect(() => {
+    // subscribe on load or file change
+    activeFile.scroll_pos.save_graph_pos = () => {
+      ScrollPos_Cache.set(GET_KEY(), getScrollPos())
+    }
+
+    // unsub on unload or before different file is loaded
+    return () => { activeFile.scroll_pos.save_graph_pos = () => { } }
+
+  }, [activeFile, zoom])
 
   // have to recall this to actually use the stored scroll position to override the current scroll position
   const apply_scroll = (pos: GraphPos) => {

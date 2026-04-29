@@ -79,7 +79,7 @@ function App(): React.JSX.Element {
     remember: blank_markdown(),
     auto_render: false,
     scroll_pos: {
-      save_graph_pos: () => { },
+      save_graph_pos: null, // functions not supported on structured clone () => { },
       todo: blank_docpos(),
       remember: blank_docpos(),
       merman: blank_docpos(),
@@ -160,6 +160,7 @@ function App(): React.JSX.Element {
         newFile.filepath = data.filepath
         newFile.text = data.text
         newFile.unsaved_text = data.text // for bug in formal build?
+        newFile.scroll_pos.save_graph_pos = () => { } // functions not supported in structuredClone
 
         setOpenFiles(prev => [...prev, newFile]);
         setActiveFile(newFile)
@@ -465,6 +466,7 @@ function App(): React.JSX.Element {
         </div>
 
         <Tabs
+          onSelect={() => { activeFile.scroll_pos.save_graph_pos(); return true }}
         >
           <div className='FixedContainer'>
             <TabList>
