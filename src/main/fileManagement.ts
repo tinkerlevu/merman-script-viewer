@@ -90,8 +90,12 @@ export async function SaveAsFile(old_filepath, text) {
 }
 
 // WARNING: make sure there is always corresponding filepath in monitoredFiles
-const watcher = chokidar.watch([],
-  { awaitWriteFinish: { stabilityThreshold: 500 }, atomic: true })
+const watcher = chokidar.watch([], {
+  awaitWriteFinish: { stabilityThreshold: 500 },
+  atomic: true,
+  usePolling: true, interval: 1500,
+  persistent: true
+})
 watcher.on('change', path => { loadFileContents(path) }) // send file changes to renderer here
 
 
