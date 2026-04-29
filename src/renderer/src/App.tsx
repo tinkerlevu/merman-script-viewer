@@ -245,6 +245,7 @@ function App(): React.JSX.Element {
 
 
   const set_active_tab = (id: string) => {
+    activeFile.scroll_pos.save_graph_pos() // save zoom and scroll of currently? open graphview
     setFileTabs(fileTabs.map((tab) => (
       { ...tab, active: id === tab.id })));
     setActiveFile(getOpenFile(id))
@@ -466,7 +467,7 @@ function App(): React.JSX.Element {
         </div>
 
         <Tabs
-          onSelect={() => { activeFile.scroll_pos.save_graph_pos(); return true }}
+          onSelect={() => { activeFile.scroll_pos.save_graph_pos(); return true }} // save zoom and scroll position of currently? open graphview before switching
         >
           <div className='FixedContainer'>
             <TabList>

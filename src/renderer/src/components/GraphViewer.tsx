@@ -90,7 +90,7 @@ export default function GraphViewer(
     return data
   }
 
-  useEffect(() => { // load image and zoom when changed
+  useEffect(() => { // load image and restore scrolling and zoom on load or when image changed
     if (!divRef.current) return
 
     var restore = ScrollPos_Cache.get(GET_KEY())
@@ -104,7 +104,7 @@ export default function GraphViewer(
       .replace('width="100%"', "height=100%")
       // zoom in out
       .replace(/style=\"max-width:[ 0-9.]+px;\"/i, // remove max width
-        'style="margin-left: 500px; margin-right: 500px;"') // center image
+        'style="margin-left: 500px; margin-right: 500px;"') // TODO: fix centering this is a temp solution
 
 
     setZoom(restore.zoom)
@@ -194,7 +194,7 @@ export default function GraphViewer(
       >
         <div
           ref={renderRef}
-          style={{ marginLeft: "30%", marginRight: "30%" }}
+          style={{ marginLeft: "30%", marginRight: "30%" }} // TODO: fix centering, this is a temp solution
         >
 
           {/*image displayed here */}
