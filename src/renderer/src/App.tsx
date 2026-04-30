@@ -284,6 +284,8 @@ function App(): React.JSX.Element {
 
       if (!update_file) return
 
+      activeFile.scroll_pos.save_graph_pos()
+
       update_file.text_hash = data.hash
       setRefresher(prev => prev + 1)
     })
@@ -300,6 +302,8 @@ function App(): React.JSX.Element {
 
       if (!update_file) return
 
+      activeFile.scroll_pos.save_graph_pos()
+
       update_file.render_status = data.status
       setRefresher(refresher + 1)
 
@@ -315,8 +319,6 @@ function App(): React.JSX.Element {
         else
           return none_fav
       }
-
-      console.log("ACTIVE FILE RENDER STATUS", activeFile)
 
       setFileTabs(fileTabs.map(tab => ({
         ...tab,
@@ -388,7 +390,10 @@ function App(): React.JSX.Element {
 
     }
 
-    window.electron.ipcRenderer.on("new_render", listener)
+    window.electron.ipcRenderer.on("new_render", (_, data) => {
+      activeFile.scroll_pos.save_graph_pos() // save position if in graphview before refreshing image
+      listener(_, data)
+    })
     return () =>
       window.electron.ipcRenderer.removeAllListeners("new_render")
 
